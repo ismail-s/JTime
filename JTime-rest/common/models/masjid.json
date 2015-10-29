@@ -22,7 +22,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "salaahtimes": {
+      "type": "hasMany",
+      "model": "SalaahTime",
+      "foreignKey": ""
+    }
+  },
   "acls": [],
   "methods": {}
 }

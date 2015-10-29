@@ -1,0 +1,43 @@
+{
+    "name": "SalaahTime",
+    "base": "PersistedModel",
+    "idInjection": true,
+    "options": {
+        "validateUpsert": true
+    },
+    "properties": {
+        "type": {
+            "type": "string",
+            "required": "true"
+        },
+        "masjidId": {
+            "type": "Number",
+            "required": "true"
+        },
+        "datetime": {
+            "type": "date",
+            "required": "true"
+        },
+        "createdAt": {
+            "type": "date",
+            "required": "true",
+            "defaultFn": "now"
+        },
+        "lastModifiedAt": {
+            "type": "date",
+            "required": "true",
+            "defaultFn": "now"
+        }
+    },
+    "validations": [],
+    "relations": {
+        "masjid": {
+            "model": "Masjid",
+            "type": "belongsTo",
+            "foreignKey": "masjidId",
+            "required": "true"
+        }
+    },
+    "acls": [],
+    "methods": {}
+}

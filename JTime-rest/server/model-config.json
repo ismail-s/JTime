@@ -35,5 +35,9 @@
   "Masjid": {
     "dataSource": "postgres",
     "public": true
+  },
+  "SalaahTime": {
+    "dataSource": "postgres",
+    "public": true
   }
 }
