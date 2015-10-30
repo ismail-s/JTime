@@ -1,3 +1,5 @@
-module.exports = function(Masjid) {
+var updateTimestamp = require("../updateTimestamp");
 
+module.exports = function(Masjid) {
+    Masjid.observe('before save', updateTimestamp);
 };
