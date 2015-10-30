@@ -8,7 +8,11 @@
     "properties": {
         "type": {
             "type": "string",
-            "required": "true"
+            "required": "true",
+            "length": 1,
+            "postgres": {
+                "dataLength": 1
+            }
         },
         "masjidId": {
             "type": "Number",

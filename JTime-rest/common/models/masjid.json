@@ -8,7 +8,11 @@
   "properties": {
     "name": {
       "type": "string",
-      "required": "true"
+      "required": "true",
+      "length": 50,
+      "postgres": {
+        "dataLength": 50
+      }
     },
     "createdAt": {
       "type": "date",
