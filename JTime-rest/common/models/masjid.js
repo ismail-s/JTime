@@ -7,32 +7,14 @@ module.exports = function(Masjid) {
     });
 
     Masjid.getTodayTimes = function(id, cb) {
-        var SalaahTime = Masjid.app.models.SalaahTime;
-        // Create date objs for start and end of day
-        var end_of_today = new Date();
-        end_of_today.setHours(23, 59, 59, 999);
-        var start_of_today = new Date();
-        start_of_today.setHours(0, 0, 0, 0);
-        // Find salaah times for today for specified masjid
-        SalaahTime.find({
-                where: {
-                    masjidId: id,
-                    datetime: {
-                        between: [start_of_today, end_of_today]
-                    }
-                },
-                fields: {
-                    type: true,
-                    datetime: true
-                }
-            },
-            function(err, instances) {
-                if (err != null) {
-                    console.error(err, instances, id);
-                    cb(500);
-                }
-                cb(null, instances);
-            });
+        var today = new Date();
+        Masjid.getTimes(id, today, function(err, instances) {
+            if (err != null) {
+                console.error(err, instances, id);
+                cb(500);
+            }
+            cb(null, instances);
+        });
     };
     Masjid.remoteMethod(
         'getTodayTimes', {
