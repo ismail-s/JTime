@@ -42,6 +42,17 @@
             "required": "true"
         }
     },
-    "acls": [],
+    "acls": [{
+        "accessType": "*",
+        "principalType": "ROLE",
+        "principalId": "$everyone",
+        "permission": "DENY"
+    }, {
+        "accessType": "WRITE",
+        "principalType": "ROLE",
+        "principalId": "$authenticated",
+        "permission": "ALLOW",
+        "property": "create"
+    }],
     "methods": {}
 }
