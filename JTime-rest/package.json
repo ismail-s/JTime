@@ -8,11 +8,14 @@
   "dependencies": {
     "compression": "^1.0.3",
     "cors": "^2.5.2",
+    "express-session": "^1.12.1",
     "loopback": "^2.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^2.1.0",
+    "loopback-component-passport": "^1.5.0",
     "loopback-connector-postgresql": "^2.3.0",
     "loopback-datasource-juggler": "^2.39.0",
+    "passport-google-oauth": "^0.2.0",
     "serve-favicon": "^2.0.1"
   },
   "devDependencies": {
