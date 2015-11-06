@@ -1,4 +1,4 @@
-# JTime
+# JTime [![Build Status](https://travis-ci.org/ismail-s/JTime.svg?branch=master)](https://travis-ci.org/ismail-s/JTime)
 
 See local masjid jamaat times on the move, with jamaat times submitted in-app by anyone.
 
