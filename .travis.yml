@@ -26,5 +26,5 @@ sudo: false
 
 cache:
   directories:
-    - $HOME/.gradle
+    - $HOME/JTime-android/.gradle
 
