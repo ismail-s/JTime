@@ -5,7 +5,7 @@
           package="com.ismail_s.jtime.android">
 
     <application android:name=".JTimeApplication">
-        <activity android:name=".activity.MainActivity" android:screenOrientation="portrait">
+        <activity android:name=".activity.AllMasjidsActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

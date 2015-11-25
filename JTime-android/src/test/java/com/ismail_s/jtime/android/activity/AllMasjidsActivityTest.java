@@ -12,10 +12,10 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
-public class MainActivityTest {
+public class AllMasjidsActivityTest {
 
     @Test
     public void testSomething() throws Exception {
-        assertTrue(Robolectric.setupActivity(MainActivity.class) != null);
+        assertTrue(Robolectric.setupActivity(AllMasjidsActivity.class) != null);
     }
 }

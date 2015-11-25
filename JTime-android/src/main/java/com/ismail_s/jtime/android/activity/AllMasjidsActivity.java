@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import com.ismail_s.jtime.android.R;
 
-public class MainActivity extends Activity {
+public class AllMasjidsActivity extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
