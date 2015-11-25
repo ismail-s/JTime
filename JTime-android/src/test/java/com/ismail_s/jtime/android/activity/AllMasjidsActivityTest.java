@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 public class AllMasjidsActivityTest {
 
     @Test
-    public void testSomething() throws Exception {
+    public void testListActivityDisplaysToastsOnClickingListItems() throws Exception {
         String[] masjids = new String[]{"one", "two", "three", "four", "five", "six"};
         ListActivity activity = Robolectric.setupActivity(AllMasjidsActivity.class);
         assertTrue(activity != null);
