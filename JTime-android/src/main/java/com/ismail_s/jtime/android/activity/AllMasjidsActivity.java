@@ -10,6 +10,6 @@ public class AllMasjidsActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.deckard);
+    setContentView(R.layout.all_masjids_activity);
   }
 }
