@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import com.ismail_s.jtime.android.R;
 
-public class DeckardActivity extends Activity {
+public class MainActivity extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
