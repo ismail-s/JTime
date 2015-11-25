@@ -15,15 +15,15 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 @LargeTest
-public class MainActivityEspressoTest {
+public class MasjidActivityEspressoTest {
 
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityRule =
-            new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MasjidActivity> mActivityRule =
+            new ActivityTestRule<>(MasjidActivity.class);
 
     @Test
     public void testActivityShouldHaveText() throws InterruptedException {
-        onView(withId(R.id.text)).check(matches(withText("Hello Espresso!")));
+        onView(withId(R.id.title)).check(matches(withText("Masjid Activity")));
     }
 }
