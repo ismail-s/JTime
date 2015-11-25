@@ -1,8 +1,9 @@
-package com.example.activity;
+package com.ismail_s.jtime.android.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import com.example.R;
+
+import com.ismail_s.jtime.android.R;
 
 public class DeckardActivity extends Activity {
 

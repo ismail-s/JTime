@@ -1,6 +1,6 @@
-package com.example.activity;
+package com.ismail_s.jtime.android.activity;
 
-import com.example.BuildConfig;
+import com.ismail_s.jtime.android.BuildConfig;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

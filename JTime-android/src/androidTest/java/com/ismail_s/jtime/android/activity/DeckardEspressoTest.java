@@ -1,9 +1,9 @@
-package com.example.activity;
+package com.android.activity;
 
-import com.example.R;
+import com.android.R;
+import com.ismail_s.activity.DeckardActivity;
 
 import android.support.test.rule.ActivityTestRule;
-import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import org.junit.Rule;

@@ -2,10 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           android:versionCode="2"
           android:versionName="1.0.0-SNAPSHOT"
-          package="com.example">
+          package="com.ismail_s.jtime.android">
 
-    <application android:name=".DeckardApplication">
-        <activity android:name=".activity.DeckardActivity" android:screenOrientation="portrait">
+    <application android:name="com.ismail_s.jtime.android.DeckardApplication">
+        <activity android:name="com.ismail_s.jtime.android.activity.DeckardActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
