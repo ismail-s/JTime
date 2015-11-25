@@ -1,6 +1,7 @@
 package com.ismail_s.jtime.android.activity;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,6 +27,9 @@ public class AllMasjidsActivity extends ListActivity {
               CharSequence text = ((TextView)view).getText();
               Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
               toast.show();
+              Intent intent = new Intent(getBaseContext(), MasjidActivity.class);
+              intent.putExtra(Constants.MASJID_NAME, text);
+              startActivity(intent);
           }
       });
   }

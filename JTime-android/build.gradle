@@ -34,7 +34,6 @@ dependencies {
     }
 
     // Support v4
-    compile 'com.android.support:support-v4:22.2.0'
 
     // Espresso
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2'
