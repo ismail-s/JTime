@@ -12,6 +12,7 @@ import com.ismail_s.jtime.android.RestClient;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 public class MasjidActivity extends Activity {
     private ArrayList<TextView> dateTextViews = new ArrayList<>();
@@ -36,7 +37,7 @@ public class MasjidActivity extends Activity {
     }
 
     private String formatCalendar(GregorianCalendar calendar) {
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
         return formatter.format(calendar.getTime());
     }
 }
