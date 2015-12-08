@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 public class MasjidActivity extends Activity {
-    private ArrayList<TextView> dateTextViews;
+    private ArrayList<TextView> dateTextViews = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
