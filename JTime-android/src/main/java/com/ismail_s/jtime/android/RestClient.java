@@ -1,8 +1,5 @@
 package com.ismail_s.jtime.android;
 
-import com.strongloop.android.loopback.RestAdapter;
-
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class RestClient {

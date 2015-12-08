@@ -2,7 +2,6 @@ package com.ismail_s.jtime.android.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.ArrayMap;
 import android.widget.TextView;
 
 import com.ismail_s.jtime.android.MasjidPojo;
