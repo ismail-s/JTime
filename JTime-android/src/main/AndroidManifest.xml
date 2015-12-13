@@ -2,20 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ismail_s.jtime.android"
     android:versionCode="2"
-    android:versionName="1.0.0-SNAPSHOT" >
+    android:versionName="1.0.0-SNAPSHOT">
 
-    <application android:name=".JTimeApplication" >
+    <application
+        android:name=".JTimeApplication"
+        android:theme="@android:style/Theme.Holo.Light">
         <activity
             android:name=".activity.AllMasjidsActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MasjidActivity" >
-        </activity>
+        <activity android:name=".activity.MasjidActivity"></activity>
     </application>
 
 </manifest>
