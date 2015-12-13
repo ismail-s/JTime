@@ -16,7 +16,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MasjidActivity"></activity>
+        <activity android:name=".activity.MasjidActivity" />
+        <activity
+            android:name=".activity.NewMasjidActivity"
+            android:label="@string/title_activity_new_masjid"
+            android:parentActivityName=".activity.AllMasjidsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ismail_s.jtime.android.activity.AllMasjidsActivity" />
+        </activity>
     </application>
 
 </manifest>

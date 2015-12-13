@@ -48,5 +48,7 @@ dependencies {
 
     // Loopback SDK
     compile 'com.strongloop:loopback-sdk-android:1.5.2'
+    compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:support-v13:22.2.0'
 }
 
