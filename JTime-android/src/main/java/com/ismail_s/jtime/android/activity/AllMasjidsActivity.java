@@ -27,7 +27,7 @@ public class AllMasjidsActivity extends ListActivity {
               CharSequence text = ((TextView)view).getText();
               Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
               toast.show();
-              Intent intent = new Intent(getBaseContext(), MasjidActivity.class);
+              Intent intent = new Intent(getBaseContext(), NewMasjidActivity.class);
               intent.putExtra(Constants.MASJID_NAME, text);
               startActivity(intent);
           }
