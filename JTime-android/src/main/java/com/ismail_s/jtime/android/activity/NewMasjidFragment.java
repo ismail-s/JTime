@@ -20,7 +20,6 @@ import java.util.Locale;
  * A placeholder fragment containing a simple view.
  */
 public class NewMasjidFragment extends Fragment {
-    private ArrayList<TextView> dateTextViews = new ArrayList<>();
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -52,14 +51,18 @@ public class NewMasjidFragment extends Fragment {
         TextView masjidNameView = (TextView) findViewById(R.id.masjid_name);
         masjidNameView.setText(masjidName);
         MasjidPojo masjidTimes = (new RestClient()).getMasjidTimes(masjidName);
-        dateTextViews.add((TextView) findViewById(R.id.fajr_date));
-        dateTextViews.add((TextView) findViewById(R.id.zohar_date));
-        dateTextViews.add((TextView) findViewById(R.id.asr_date));
-        dateTextViews.add((TextView) findViewById(R.id.magrib_date));
-        dateTextViews.add((TextView) findViewById(R.id.esha_date));
+        ArrayList<TextView> dateTextViews = new ArrayList<>();
+        dateTextViews.add((TextView) rootView.findViewById(R.id.fajr_date));
+        dateTextViews.add((TextView) rootView.findViewById(R.id.zohar_date));
+        dateTextViews.add((TextView) rootView.findViewById(R.id.asr_date));
+        dateTextViews.add((TextView) rootView.findViewById(R.id.magrib_date));
+        dateTextViews.add((TextView) rootView.findViewById(R.id.esha_date));
         GregorianCalendar[] times = masjidTimes.getTimes();
         for (int i = 0; i < dateTextViews.size(); i++) {
-            dateTextViews.get(i).setText(formatCalendar(times[i]));
+            String res = formatCalendar(times[i]);
+            TextView x = dateTextViews.get(i);
+            assert x != null;
+            x.setText(res);
         }
         return rootView;
     }
