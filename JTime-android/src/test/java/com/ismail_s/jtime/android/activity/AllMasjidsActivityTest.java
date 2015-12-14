@@ -52,7 +52,7 @@ public class AllMasjidsActivityTest {
     public void testListActivityStartsMasjidActivityWithCorrectIntent() {
         for (int i = 0; i <= 5; i++) {
             clickOnItem(i);
-            Intent expectedIntent = new Intent(activity, MasjidActivity.class);
+            Intent expectedIntent = new Intent(activity, NewMasjidActivity.class);
             expectedIntent.putExtra(Constants.MASJID_NAME, masjids[i]);
             Intent actualIntent = Shadows.shadowOf(activity).getNextStartedActivity();
             assertEquals(expectedIntent, actualIntent);
