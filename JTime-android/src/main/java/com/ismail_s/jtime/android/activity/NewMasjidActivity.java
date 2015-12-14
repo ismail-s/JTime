@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.ismail_s.jtime.android.R;
 
@@ -42,6 +43,9 @@ public class NewMasjidActivity extends Activity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        String masjidName = getIntent().getStringExtra(Constants.MASJID_NAME);
+        TextView masjidNameView = (TextView) findViewById(R.id.masjid_name);
+        masjidNameView.setText(masjidName);
 
 
     }
