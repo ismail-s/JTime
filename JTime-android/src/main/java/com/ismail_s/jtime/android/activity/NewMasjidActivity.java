@@ -49,6 +49,7 @@ public class NewMasjidActivity extends Activity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setCurrentItem(NUM_OF_PAGES / 2);
         String masjidName = getIntent().getStringExtra(Constants.MASJID_NAME);
         TextView masjidNameView = (TextView) findViewById(R.id.masjid_name);
         masjidNameView.setText(masjidName);
