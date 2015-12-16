@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Fajr"
+                android:text="@string/fajr"
                 android:id="@+id/textView" />
 
             <TextView
@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Zohar"
+                android:text="@string/zohar"
                 android:id="@+id/textView3" />
 
             <TextView
@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Asr"
+                android:text="@string/asr"
                 android:id="@+id/textView6" />
 
             <TextView
@@ -81,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Magrib"
+                android:text="@string/magrib"
                 android:id="@+id/textView8" />
 
             <TextView
@@ -99,7 +99,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Esha"
+                android:text="@string/esha"
                 android:id="@+id/textView9" />
 
             <TextView

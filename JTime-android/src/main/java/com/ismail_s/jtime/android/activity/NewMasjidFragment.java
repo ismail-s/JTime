@@ -49,8 +49,6 @@ public class NewMasjidFragment extends Fragment {
         GregorianCalendar date = (GregorianCalendar) getArguments().getSerializable(ARG_DATE);
         textView.setText(getString(R.string.section_format, formatCalendarAsDate(date)));
         String masjidName = getActivity().getIntent().getStringExtra(Constants.MASJID_NAME);
-        TextView masjidNameView = (TextView) findViewById(R.id.masjid_name);
-        masjidNameView.setText(masjidName);
         MasjidPojo masjidTimes = (new RestClient()).getMasjidTimes(masjidName);
         ArrayList<TextView> dateTextViews = new ArrayList<>();
         dateTextViews.add((TextView) rootView.findViewById(R.id.fajr_date));
@@ -81,7 +79,4 @@ public class NewMasjidFragment extends Fragment {
         return formatter.format(calendar.getTime());
     }
 
-    public View findViewById(int id) {
-        return getActivity().findViewById(id);
-    }
 }
