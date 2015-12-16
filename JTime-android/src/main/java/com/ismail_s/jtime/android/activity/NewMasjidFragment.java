@@ -44,7 +44,7 @@ public class NewMasjidFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_new_masjid, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_masjid, container, false);
         TextView textView = (TextView) rootView.findViewById(R.id.section_label);
         GregorianCalendar date = (GregorianCalendar) getArguments().getSerializable(ARG_DATE);
         textView.setText(getString(R.string.section_format, formatCalendarAsDate(date)));
