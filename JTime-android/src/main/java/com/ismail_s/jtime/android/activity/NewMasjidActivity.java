@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.ismail_s.jtime.android.R;
 
+import java.util.GregorianCalendar;
+
 public class NewMasjidActivity extends Activity {
 
     /**
@@ -87,7 +89,10 @@ public class NewMasjidActivity extends Activity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a NewMasjidFragment (defined as a static inner class below).
-            return NewMasjidFragment.newInstance(position + 1);
+            position = position - 499;
+            GregorianCalendar date = new GregorianCalendar();
+            date.add(GregorianCalendar.DAY_OF_YEAR, position);
+            return NewMasjidFragment.newInstance(date);
         }
 
         @Override

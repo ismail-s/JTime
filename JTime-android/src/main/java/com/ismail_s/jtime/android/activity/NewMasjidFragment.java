@@ -24,7 +24,7 @@ public class NewMasjidFragment extends Fragment {
      * The fragment argument representing the section number for this
      * fragment.
      */
-    private static final String ARG_SECTION_NUMBER = "section_number";
+    private static final String ARG_DATE = "date";
 
     public NewMasjidFragment() {
     }
@@ -33,10 +33,10 @@ public class NewMasjidFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static NewMasjidFragment newInstance(int sectionNumber) {
+    public static NewMasjidFragment newInstance(GregorianCalendar date) {
         NewMasjidFragment fragment = new NewMasjidFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putSerializable(ARG_DATE, date);
         fragment.setArguments(args);
         return fragment;
     }
@@ -46,7 +46,8 @@ public class NewMasjidFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_new_masjid, container, false);
         TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-        textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+        GregorianCalendar date = (GregorianCalendar) getArguments().getSerializable(ARG_DATE);
+        textView.setText(getString(R.string.section_format, formatCalendarAsDate(date)));
         String masjidName = getActivity().getIntent().getStringExtra(Constants.MASJID_NAME);
         TextView masjidNameView = (TextView) findViewById(R.id.masjid_name);
         masjidNameView.setText(masjidName);
@@ -59,7 +60,7 @@ public class NewMasjidFragment extends Fragment {
         dateTextViews.add((TextView) rootView.findViewById(R.id.esha_date));
         GregorianCalendar[] times = masjidTimes.getTimes();
         for (int i = 0; i < dateTextViews.size(); i++) {
-            String res = formatCalendar(times[i]);
+            String res = formatCalendarAsTime(times[i]);
             TextView x = dateTextViews.get(i);
             assert x != null;
             x.setText(res);
@@ -67,8 +68,16 @@ public class NewMasjidFragment extends Fragment {
         return rootView;
     }
 
-    private String formatCalendar(GregorianCalendar calendar) {
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    private String formatCalendarAsTime(GregorianCalendar calendar) {
+        return formatCalendar(calendar, "HH:mm");
+    }
+
+    private String formatCalendarAsDate(GregorianCalendar calendar) {
+        return formatCalendar(calendar, "yyyy MMM dd");
+    }
+
+    private String formatCalendar(GregorianCalendar calendar, String formatString) {
+        SimpleDateFormat formatter = new SimpleDateFormat(formatString, Locale.getDefault());
         return formatter.format(calendar.getTime());
     }
 
