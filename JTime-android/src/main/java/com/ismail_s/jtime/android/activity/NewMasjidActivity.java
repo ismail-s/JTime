@@ -17,6 +17,10 @@ import com.ismail_s.jtime.android.R;
 import java.util.GregorianCalendar;
 
 public class NewMasjidActivity extends Activity {
+    /**
+     * This should be a big number, so that it is as if there are an infinite number of pages.
+     */
+    private static final int NUM_OF_PAGES = 1000;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -89,7 +93,7 @@ public class NewMasjidActivity extends Activity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a NewMasjidFragment (defined as a static inner class below).
-            position = position - 499;
+            position = position - (NUM_OF_PAGES / 2);
             GregorianCalendar date = new GregorianCalendar();
             date.add(GregorianCalendar.DAY_OF_YEAR, position);
             return NewMasjidFragment.newInstance(date);
@@ -97,8 +101,7 @@ public class NewMasjidActivity extends Activity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 1000;
+            return NUM_OF_PAGES;
         }
 
         @Override
