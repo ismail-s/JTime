@@ -16,6 +16,7 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -49,28 +50,15 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
      * @param cal is the date to check whether it is being displayed
      */
     private void checkCorrectDateIsDisplayedInFragment(Calendar cal) {
+        sleepForSplitSecond();
         String[] months = {"Jan", "Feb", "Mar", "Apr", "may", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         String[] date = new String[3];
         date[0] = String.valueOf(cal.get(Calendar.YEAR));
         date[1] = months[cal.get(Calendar.MONTH)];
         date[2] = String.valueOf(cal.get(Calendar.DAY_OF_MONTH));
-        // TODO-refactor out the duplicated code
-        /* Due to issues directly figuring out which is the currently displayed fragment (3 in
-        total exist at the same time), we swipe backwards and forwards each way, in such a way that
-        only the fragment we should be checking stays in memory. Bit weird, but it works.
-         */
         for (String elem : date) {
-            onView(allOf(withId(R.id.section_label), withText(containsString(date[2])))).check(matches(withText(containsString(elem))));
+            onView(allOf(withId(R.id.section_label), isCompletelyDisplayed())).check(matches(withText(containsString(elem))));
         }
-        onView(withId(R.id.container)).perform(swipeLeft());
-        for (String elem : date) {
-            onView(allOf(withId(R.id.section_label), withText(containsString(date[2])))).check(matches(withText(containsString(elem))));
-        }
-        onView(withId(R.id.container)).perform(swipeRight(), swipeRight());
-        for (String elem : date) {
-            onView(allOf(withId(R.id.section_label), withText(containsString(date[2])))).check(matches(withText(containsString(elem))));
-        }
-        onView(withId(R.id.container)).perform(swipeLeft());
     }
 
     public void testCorrectDateIsDisplayedinFragments() {
@@ -84,5 +72,30 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
         checkCorrectDateIsDisplayedInFragment(tomorrow);
         onView(withId(R.id.container)).perform(swipeRight(), swipeRight());
         checkCorrectDateIsDisplayedInFragment(yesterday);
+    }
+
+    private void checkMasjidTimesAreCorrectForCurrentFragment() {
+        sleepForSplitSecond();
+        onView(allOf(withId(R.id.fajr_date), isCompletelyDisplayed())).check(matches(withText("05:30")));
+        onView(allOf(withId(R.id.zohar_date), isCompletelyDisplayed())).check(matches(withText("12:00")));
+        onView(allOf(withId(R.id.asr_date), isCompletelyDisplayed())).check(matches(withText("15:00")));
+        onView(allOf(withId(R.id.magrib_date), isCompletelyDisplayed())).check(matches(withText("15:12")));
+        onView(allOf(withId(R.id.esha_date), isCompletelyDisplayed())).check(matches(withText("19:45")));
+    }
+
+    private void sleepForSplitSecond() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Thread running tests was interrupted.");
+        }
+    }
+
+    public void testThatMasjidTimesAreDisplayedInEachFragment() {
+        checkMasjidTimesAreCorrectForCurrentFragment();
+        onView(withId(R.id.container)).perform(swipeLeft());
+        checkMasjidTimesAreCorrectForCurrentFragment();
+        onView(withId(R.id.container)).perform(swipeRight(), swipeRight());
+        checkMasjidTimesAreCorrectForCurrentFragment();
     }
 }
