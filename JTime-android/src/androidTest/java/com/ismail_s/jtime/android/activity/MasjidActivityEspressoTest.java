@@ -10,10 +10,16 @@ import com.ismail_s.jtime.android.R;
 
 import org.junit.Before;
 
+import java.util.Calendar;
+
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.swipeLeft;
+import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
 
 @LargeTest
 public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2<MasjidActivity> {
@@ -34,5 +40,49 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
 
     public void testActivityShouldHaveMasjidName() throws InterruptedException {
         onView(withId(R.id.masjid_name)).check(matches(withText("one")));
+    }
+
+    /**
+     * Before calling this method, swipe to the correct fragment. Then call it to make sure that
+     * the correct date is being displayed in the currently displayed fragment.
+     *
+     * @param cal is the date to check whether it is being displayed
+     */
+    private void checkCorrectDateIsDisplayedInFragment(Calendar cal) {
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "may", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        String[] date = new String[3];
+        date[0] = String.valueOf(cal.get(Calendar.YEAR));
+        date[1] = months[cal.get(Calendar.MONTH)];
+        date[2] = String.valueOf(cal.get(Calendar.DAY_OF_MONTH));
+        // TODO-refactor out the duplicated code
+        /* Due to issues directly figuring out which is the currently displayed fragment (3 in
+        total exist at the same time), we swipe backwards and forwards each way, in such a way that
+        only the fragment we should be checking stays in memory. Bit weird, but it works.
+         */
+        for (String elem : date) {
+            onView(allOf(withId(R.id.section_label), withText(containsString(date[2])))).check(matches(withText(containsString(elem))));
+        }
+        onView(withId(R.id.container)).perform(swipeLeft());
+        for (String elem : date) {
+            onView(allOf(withId(R.id.section_label), withText(containsString(date[2])))).check(matches(withText(containsString(elem))));
+        }
+        onView(withId(R.id.container)).perform(swipeRight(), swipeRight());
+        for (String elem : date) {
+            onView(allOf(withId(R.id.section_label), withText(containsString(date[2])))).check(matches(withText(containsString(elem))));
+        }
+        onView(withId(R.id.container)).perform(swipeLeft());
+    }
+
+    public void testCorrectDateIsDisplayedinFragments() {
+        Calendar today = Calendar.getInstance();
+        Calendar yesterday = Calendar.getInstance();
+        yesterday.add(Calendar.DAY_OF_YEAR, -1);
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        checkCorrectDateIsDisplayedInFragment(today);
+        onView(withId(R.id.container)).perform(swipeLeft());
+        checkCorrectDateIsDisplayedInFragment(tomorrow);
+        onView(withId(R.id.container)).perform(swipeRight(), swipeRight());
+        checkCorrectDateIsDisplayedInFragment(yesterday);
     }
 }
