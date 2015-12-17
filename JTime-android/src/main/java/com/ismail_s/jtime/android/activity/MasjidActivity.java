@@ -82,11 +82,11 @@ public class MasjidActivity extends Activity {
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-            // Return a NewMasjidFragment (defined as a static inner class below).
+            // Return a MasjidFragment (defined as a static inner class below).
             position = position - (NUM_OF_PAGES / 2);
             GregorianCalendar date = new GregorianCalendar();
             date.add(GregorianCalendar.DAY_OF_YEAR, position);
-            return NewMasjidFragment.newInstance(date);
+            return MasjidFragment.newInstance(date);
         }
 
         @Override

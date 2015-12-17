@@ -19,22 +19,22 @@ import java.util.Locale;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class NewMasjidFragment extends Fragment {
+public class MasjidFragment extends Fragment {
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
     private static final String ARG_DATE = "date";
 
-    public NewMasjidFragment() {
+    public MasjidFragment() {
     }
 
     /**
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static NewMasjidFragment newInstance(GregorianCalendar date) {
-        NewMasjidFragment fragment = new NewMasjidFragment();
+    public static MasjidFragment newInstance(GregorianCalendar date) {
+        MasjidFragment fragment = new MasjidFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_DATE, date);
         fragment.setArguments(args);
