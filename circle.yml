@@ -19,7 +19,7 @@ test:
     - adb shell input keyevent 92
     - (cd JTime-android && ./gradlew connectedAndroidTest)
   post:
-    - cp -r Jtime-android/build/outputs $CIRCLE_ARTIFACTS
+    - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
-    - find Jtime-android/build/test-results -name "*.xml" -exec cp {} $CIRCLE_TEST_REPORTS/ \;
-    - cp -r Jtime-android/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+    - find JTime-android/build/test-results -name "*.xml" -exec cp {} $CIRCLE_TEST_REPORTS/ \;
+    - cp -r JTime-android/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
