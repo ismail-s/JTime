@@ -1,0 +1,25 @@
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter tools,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23
+    - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
+test:
+  pre:
+    # start the emulator
+    - emulator -avd circleci-android22 -no-audio -no-window:
+        background: true
+        parallel: true
+    # wait for it to have booted
+    - circle-android wait-for-boot
+  override:
+    - adb start-server:
+        background: true
+    - (cd JTime-android && ./gradlew test assembleDebug)
+    # Unlock the lockscreen on the emulator
+    - adb shell input keyevent 82
+    - adb shell input keyevent 92
+    - (cd JTime-android && ./gradlew connectedAndroidTest)
+  post:
+    - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
+    # copy the test results to the test results directory.
+    - find JTime-android/build/test-results -name "*.xml" -exec cp {} $CIRCLE_TEST_REPORTS/ \;
+    - cp -r JTime-android/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
