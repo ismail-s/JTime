@@ -86,7 +86,7 @@ public class MasjidActivity extends Activity {
             position = position - (NUM_OF_PAGES / 2);
             GregorianCalendar date = new GregorianCalendar();
             date.add(GregorianCalendar.DAY_OF_YEAR, position);
-            return MasjidFragment.newInstance(date);
+            return MasjidFragment.Companion.newInstance(date);
         }
 
         @Override
