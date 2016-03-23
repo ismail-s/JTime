@@ -1,4 +1,4 @@
-# JTime [![Circle CI](https://circleci.com/gh/ismail-s/JTime.svg?style=svg)](https://circleci.com/gh/ismail-s/JTime)
+# JTime [![Circle CI](https://circleci.com/gh/ismail-s/JTime.svg?style=svg)](https://circleci.com/gh/ismail-s/JTime) [![Stories in Ready](https://badge.waffle.io/ismail-s/JTime.svg?label=ready&title=Ready)](https://waffle.io/ismail-s/JTime)
 
 See local masjid jamaat times on the move, with jamaat times submitted in-app by anyone.
 
