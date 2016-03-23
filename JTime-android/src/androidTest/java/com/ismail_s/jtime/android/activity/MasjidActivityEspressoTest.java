@@ -51,7 +51,7 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
      */
     private void checkCorrectDateIsDisplayedInFragment(Calendar cal) {
         sleepForSplitSecond();
-        String[] months = {"Jan", "Feb", "Mar", "Apr", "may", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         String[] date = new String[3];
         date[0] = String.valueOf(cal.get(Calendar.YEAR));
         date[1] = months[cal.get(Calendar.MONTH)];
@@ -85,7 +85,7 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
 
     private void sleepForSplitSecond() {
         try {
-            Thread.sleep(100);
+            Thread.sleep(150);
         } catch (InterruptedException e) {
             throw new RuntimeException("Thread running tests was interrupted.");
         }
