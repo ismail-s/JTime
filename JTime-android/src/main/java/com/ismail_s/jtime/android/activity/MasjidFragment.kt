@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 import java.text.SimpleDateFormat
