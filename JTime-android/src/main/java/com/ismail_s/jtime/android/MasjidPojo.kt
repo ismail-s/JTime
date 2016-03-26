@@ -4,6 +4,7 @@ import java.util.GregorianCalendar
 
 class MasjidPojo {
     var name: String? = null
+    var id: Int? = null
     var fajrTime: GregorianCalendar? = null
     var zoharTime: GregorianCalendar? = null
     var asrTime: GregorianCalendar? = null
@@ -22,6 +23,13 @@ class MasjidPojo {
     constructor(name: String) {
         this.name = name
     }
+
+    constructor(name: String, id: Int) {
+        this.name = name
+        this.id = id
+    }
+
+    constructor()
 
     val times: Array<GregorianCalendar>
         get() = arrayOf(fajrTime!!, zoharTime!!, asrTime!!, magribTime!!, eshaTime!!)
