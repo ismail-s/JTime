@@ -29,6 +29,7 @@ class AllMasjidsActivity : ListActivity() {
                     val toast = Toast.makeText(applicationContext, text, Toast.LENGTH_SHORT)
                     toast.show()
                     val intent = Intent(baseContext, MasjidActivity::class.java)
+                    intent.putExtra(Constants.MASJID_ID, masjidMap.get(text))
                     intent.putExtra(Constants.MASJID_NAME, text)
                     startActivity(intent)
                 }

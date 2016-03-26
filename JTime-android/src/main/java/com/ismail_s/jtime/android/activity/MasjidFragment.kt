@@ -53,8 +53,9 @@ class MasjidFragment : Fragment() {
                 Toast.makeText(activity.applicationContext, s, Toast.LENGTH_LONG).show()
             }
         }
-        //TODO-don't hardcode this
-        RestClient(activity.applicationContext).getMasjidTimes(1, cb, date)
+        // TODO-instead of 1, what should the default value be here?
+        val masjidId = activity.intent.getIntExtra(Constants.MASJID_ID, 1)
+        RestClient(activity.applicationContext).getMasjidTimes(masjidId, cb, date)
         return rootView
     }
 
