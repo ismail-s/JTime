@@ -34,7 +34,7 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         Intent intent = new Intent();
-        intent.putExtra(Constants.MASJID_ID, "one");
+        intent.putExtra(Constants.MASJID_NAME, "one");
         setActivityIntent(intent);
         getActivity();
     }
