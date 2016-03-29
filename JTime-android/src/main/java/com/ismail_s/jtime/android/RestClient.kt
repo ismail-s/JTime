@@ -17,7 +17,7 @@ class RestClient {
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
     constructor(context: Context) {
-        this.restAdapter = RestAdapter(context, "http://ismail-laptop:3000/api")
+        this.restAdapter = RestAdapter(context, Companion.url)
         this.masjidRepo = this.restAdapter.createRepository("Masjid")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times-for-today", "GET"), "Masjid.getTodayTimes")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
@@ -75,5 +75,10 @@ class RestClient {
 
     interface MasjidsCallback: Callback {
         fun onSuccess(masjids: List<MasjidPojo>)
+    }
+
+    companion object {
+        // By having url in the companion object, we can change the url from tests
+        var url = "http://ismail-laptop:3000/api"
     }
 }
