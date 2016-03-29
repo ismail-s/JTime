@@ -14,7 +14,7 @@ import java.util.*
 class RestClient {
     private var restAdapter: RestAdapter
     private var masjidRepo: ModelRepository<Model>
-    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'.000Z'")
+    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
     constructor(context: Context) {
         this.restAdapter = RestAdapter(context, "http://ismail-laptop:3000/api")
