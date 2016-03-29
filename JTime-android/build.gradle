@@ -58,7 +58,12 @@ dependencies {
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.android.support:support-v13:23.1.1'
     androidTestCompile 'com.android.support:support-annotations:23.1.1'
+
+    //Kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    //Okhttp mockwebserver
+    androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.2.0'
 }
 repositories {
     mavenCentral()

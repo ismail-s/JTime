@@ -2,11 +2,12 @@ package com.ismail_s.jtime.android.activity
 
 import android.app.Fragment
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
+import com.ismail_s.jtime.android.MasjidPojo
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 import java.text.SimpleDateFormat
@@ -23,22 +24,38 @@ class MasjidFragment : Fragment() {
         val textView = rootView.findViewById(R.id.section_label) as TextView
         val date = arguments.getSerializable(ARG_DATE) as GregorianCalendar
         textView.text = getString(R.string.section_format, formatCalendarAsDate(date))
-        val masjidName = activity.intent.getStringExtra(Constants.MASJID_NAME)
-        val masjidTimes = RestClient().getMasjidTimes(masjidName)
-        val dateTextViews = arrayOfNulls<TextView>(5)
-        Log.d("", "am here")
-        dateTextViews[0] = rootView.findViewById(R.id.fajr_date) as TextView
-        dateTextViews[1] = rootView.findViewById(R.id.zohar_date) as TextView
-        dateTextViews[2] = rootView.findViewById(R.id.asr_date) as TextView
-        dateTextViews[3] = rootView.findViewById(R.id.magrib_date) as TextView
-        dateTextViews[4] = rootView.findViewById(R.id.esha_date) as TextView
-        //Toast.makeText()
-        val times = masjidTimes.times
-        for ((view, time) in dateTextViews.zip(times)) {
-            val res = formatCalendarAsTime(time)
-            Log.d("", "am in loop with" + res + "and" + view)
-            view?.text = res
+        val cb = object : RestClient.MasjidTimesCallback {
+            override fun onSuccess(times: MasjidPojo) {
+                if (times.fajrTime != null) {
+                    val fTime = formatCalendarAsTime(times.fajrTime as GregorianCalendar)
+                    (rootView.findViewById(R.id.fajr_date) as TextView).text = fTime
+                }
+                if (times.zoharTime != null) {
+                    val zTime = formatCalendarAsTime(times.zoharTime as GregorianCalendar)
+                    (rootView.findViewById(R.id.zohar_date) as TextView).text = zTime
+                }
+                if (times.asrTime != null) {
+                    val aTime = formatCalendarAsTime(times.asrTime as GregorianCalendar)
+                    (rootView.findViewById(R.id.asr_date) as TextView).text = aTime
+                }
+                if (times.magribTime != null) {
+                    val mTime = formatCalendarAsTime(times.magribTime as GregorianCalendar)
+                    (rootView.findViewById(R.id.magrib_date) as TextView).text = mTime
+                }
+                if (times.eshaTime != null) {
+                    val eTime = formatCalendarAsTime(times.eshaTime as GregorianCalendar)
+                    (rootView.findViewById(R.id.esha_date) as TextView).text = eTime
+                }
+            }
+
+            override fun onError(t: Throwable) {
+                val s = "Failed to get times: " + t.message
+                Toast.makeText(activity.applicationContext, s, Toast.LENGTH_LONG).show()
+            }
         }
+        // TODO-instead of 1, what should the default value be here?
+        val masjidId = activity.intent.getIntExtra(Constants.MASJID_ID, 1)
+        RestClient(activity.applicationContext).getMasjidTimes(masjidId, cb, date)
         return rootView
     }
 

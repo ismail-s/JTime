@@ -7,10 +7,16 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import com.ismail_s.jtime.android.R;
+import com.ismail_s.jtime.android.RestClient;
 
 import org.junit.Before;
 
 import java.util.Calendar;
+
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
@@ -32,9 +38,29 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        MockWebServer server = new MockWebServer();
+        RestClient.Companion.setUrl(String.valueOf(server.url("/")));
+        server.setDispatcher(new Dispatcher() {
+            @Override
+            public MockResponse dispatch(RecordedRequest recordedRequest) throws InterruptedException {
+                if (recordedRequest.getPath().startsWith("/Masjids/1/times")) {
+                    String mockJsonResponse = ""
+                            + "{\"times\": ["
+                            + "{\"id\": 1,\"type\": \"f\",\"datetime\": \"2016-03-28T05:30:00.000Z\"},"
+                            + "{\"id\": 2,\"type\": \"z\",\"datetime\": \"2016-03-28T12:00:00.000Z\"},"
+                            + "{\"id\": 3,\"type\": \"a\",\"datetime\": \"2016-03-28T15:00:00.000Z\"},"
+                            + "{\"id\": 4,\"type\": \"m\",\"datetime\": \"2016-03-28T15:12:00.000Z\"},"
+                            + "{\"id\": 5,\"type\": \"e\",\"datetime\": \"2016-03-28T19:45:00.000Z\"}"
+                            + "]}";
+                    return new MockResponse().setBody(mockJsonResponse);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        });
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         Intent intent = new Intent();
         intent.putExtra(Constants.MASJID_NAME, "one");
+        intent.putExtra(Constants.MASJID_ID, 1);
         setActivityIntent(intent);
         getActivity();
     }
