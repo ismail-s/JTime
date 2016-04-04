@@ -19,6 +19,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -29,10 +30,10 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 
 @LargeTest
-public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2<MasjidActivity> {
+public class MainActivityEspressoTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    public MasjidActivityEspressoTest() {
-        super(MasjidActivity.class);
+    public MainActivityEspressoTest() {
+        super(MainActivity.class);
     }
 
     @Before
@@ -54,18 +55,23 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
                             + "]}";
                     return new MockResponse().setBody(mockJsonResponse);
                 }
+                if (recordedRequest.getPath().startsWith("/Masjids")) {
+                    String mockJsonResponse = "[{\"id\": 1, \"name\": \"one\"}]";
+                    return new MockResponse().setBody(mockJsonResponse);
+                }
                 return new MockResponse().setResponseCode(404);
             }
         });
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-        Intent intent = new Intent();
-        intent.putExtra(Constants.MASJID_NAME, "one");
-        intent.putExtra(Constants.MASJID_ID, 1);
-        setActivityIntent(intent);
         getActivity();
     }
 
+    private void clickOnMasjidNameToOpenMasjidFragment() {
+        onView(allOf(withId(R.id.content), withText("one"))).perform(click());
+    }
+
     public void testActivityShouldHaveMasjidName() throws InterruptedException {
+        clickOnMasjidNameToOpenMasjidFragment();
         onView(withId(R.id.masjid_name)).check(matches(withText("one")));
     }
 
@@ -88,6 +94,7 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
     }
 
     public void testCorrectDateIsDisplayedinFragments() {
+        clickOnMasjidNameToOpenMasjidFragment();
         Calendar today = Calendar.getInstance();
         Calendar yesterday = Calendar.getInstance();
         yesterday.add(Calendar.DAY_OF_YEAR, -1);
@@ -118,6 +125,7 @@ public class MasjidActivityEspressoTest extends ActivityInstrumentationTestCase2
     }
 
     public void testThatMasjidTimesAreDisplayedInEachFragment() {
+        clickOnMasjidNameToOpenMasjidFragment();
         checkMasjidTimesAreCorrectForCurrentFragment();
         onView(withId(R.id.container)).perform(swipeLeft());
         checkMasjidTimesAreCorrectForCurrentFragment();

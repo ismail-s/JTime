@@ -54,8 +54,8 @@ class MasjidFragment : Fragment() {
             }
         }
         // TODO-instead of 1, what should the default value be here?
-        val masjidId = activity.intent.getIntExtra(Constants.MASJID_ID, 1)
-        RestClient(activity.applicationContext).getMasjidTimes(masjidId, cb, date)
+        val masjidId = arguments.getInt(Constants.MASJID_ID)
+        RestClient(activity).getMasjidTimes(masjidId, cb, date)
         return rootView
     }
 
@@ -83,10 +83,11 @@ class MasjidFragment : Fragment() {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        fun newInstance(date: GregorianCalendar): MasjidFragment {
+        fun newInstance(masjidId: Int, date: GregorianCalendar): MasjidFragment {
             val fragment = MasjidFragment()
             val args = Bundle()
             args.putSerializable(ARG_DATE, date)
+            args.putInt(Constants.MASJID_ID, masjidId)
             fragment.arguments = args
             return fragment
         }

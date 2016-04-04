@@ -3,6 +3,7 @@
     package="com.ismail_s.jtime.android"
     android:versionCode="2"
     android:versionName="1.0.0-SNAPSHOT">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -11,21 +12,21 @@
         android:name=".JTimeApplication"
         android:theme="@android:style/Theme.Holo.Light">
         <activity
-            android:name=".activity.AllMasjidsActivity"
-            android:screenOrientation="portrait">
+            android:name=".activity.MasjidActivity"
+            android:label="@string/title_activity_masjid"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.ismail_s.jtime.android.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.MainActivity"
+            android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".activity.MasjidActivity"
-            android:label="@string/title_activity_masjid"
-            android:parentActivityName=".activity.AllMasjidsActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.ismail_s.jtime.android.activity.AllMasjidsActivity" />
         </activity>
     </application>
 

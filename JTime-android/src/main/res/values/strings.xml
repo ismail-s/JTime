@@ -7,4 +7,5 @@
     <string name="asr">Asr</string>
     <string name="magrib">Magrib</string>
     <string name="esha">Esha</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>
