@@ -1,6 +1,5 @@
 package com.ismail_s.jtime.android.activity
 
-import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -28,11 +27,7 @@ class MyItemRecyclerViewAdapter(private val mValues: List<MasjidPojo>, private v
             val text = masjidPojo.name
             val toast = Toast.makeText(mainActivity.applicationContext, text, Toast.LENGTH_SHORT)
             toast.show()
-            //TODO: switch to switching fragments
-            val intent = Intent(mainActivity.applicationContext, MasjidActivity::class.java)
-            intent.putExtra(Constants.MASJID_ID, masjidPojo.id)
-            intent.putExtra(Constants.MASJID_NAME, text)
-            mainActivity.startActivity(intent)
+            mainActivity.switchToMasjidsFragment(masjidPojo.id!!, masjidPojo.name!!)
         }
     }
 

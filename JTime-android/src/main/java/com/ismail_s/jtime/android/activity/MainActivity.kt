@@ -1,10 +1,11 @@
 package com.ismail_s.jtime.android.activity
 
+import android.app.Activity
+import android.app.Fragment
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
 import com.ismail_s.jtime.android.R
 
-class MainActivity : FragmentActivity() {
+class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,8 +30,17 @@ class MainActivity : FragmentActivity() {
             firstFragment.arguments = intent.extras;
 
             // Add the fragment to the 'fragment_container' FrameLayout
-            supportFragmentManager.beginTransaction()
-                    .add(R.id.fragment_container, firstFragment).commit();
+            switchToFragment(firstFragment)
         }
+    }
+
+    fun switchToMasjidsFragment(masjidId: Int, masjidName: String) {
+        val fragment = MasjidsFragment.newInstance(masjidId, masjidName)
+        switchToFragment(fragment)
+    }
+
+    fun switchToFragment(fragment: Fragment) {
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment).commit()
     }
 }
