@@ -3,25 +3,29 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter tools,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
 test:
-  pre:
-    # start the emulator
-    - emulator -avd circleci-android22 -no-audio -no-window:
-        background: true
-        parallel: true
-    # wait for it to have booted
-    - circle-android wait-for-boot
   override:
-    - adb start-server:
-        background: true
-    # Try running tests twice if they fail first time
+  # Try running tests twice if they fail first time
     #Robolectric tests are failing atm, looks like a problem with
     # robolectric
     #- (cd JTime-android && (./gradlew test assembleDebug || ./gradlew test assembleDebug))
     - (cd JTime-android &&./gradlew assembleDebug)
+  # start the emulator
+    - emulator -avd circleci-android22 -no-audio -no-window:
+        background: true
+        parallel: true
+    - adb start-server:
+        background: true
+    # wait for it to have booted
+    - circle-android wait-for-boot
+    # Sleeping isn't a brilliant fix...
+    - sleep 30
+    - adb devices
     # Unlock the lockscreen on the emulator
     - adb shell input keyevent 82
     - adb shell input keyevent 92
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen.png
     - (cd JTime-android && ./gradlew connectedAndroidTest)
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen1.png
   post:
     - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.

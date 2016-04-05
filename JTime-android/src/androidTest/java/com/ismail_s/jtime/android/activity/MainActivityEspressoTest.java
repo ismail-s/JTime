@@ -1,8 +1,12 @@
 package com.ismail_s.jtime.android.activity;
 
 
-import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.action.GeneralLocation;
+import android.support.test.espresso.action.GeneralSwipeAction;
+import android.support.test.espresso.action.Press;
+import android.support.test.espresso.action.Swipe;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 
@@ -19,6 +23,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
@@ -131,5 +136,18 @@ public class MainActivityEspressoTest extends ActivityInstrumentationTestCase2<M
         checkMasjidTimesAreCorrectForCurrentFragment();
         onView(withId(R.id.container)).perform(swipeRight(), swipeRight());
         checkMasjidTimesAreCorrectForCurrentFragment();
+    }
+
+    public void testNavigationDrawerHasButtonToReturnToMasjidsList() {
+        clickOnMasjidNameToOpenMasjidFragment();
+        onView(withId(R.id.fragment_container)).perform(swipeInNavigationDrawer());
+        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).perform(click());
+        onView(allOf(withId(R.id.content), withText("one"))).check(matches(isCompletelyDisplayed()));
+    }
+
+    private ViewAction swipeInNavigationDrawer() {
+        return actionWithAssertions(new GeneralSwipeAction(Swipe.FAST,
+                GeneralLocation.CENTER_LEFT,
+                GeneralLocation.CENTER_RIGHT, Press.FINGER));
     }
 }
