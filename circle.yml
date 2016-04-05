@@ -20,7 +20,9 @@ test:
     # Unlock the lockscreen on the emulator
     - adb shell input keyevent 82
     - adb shell input keyevent 92
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen.png
     - (cd JTime-android && ./gradlew connectedAndroidTest)
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen1.png
   post:
     - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
