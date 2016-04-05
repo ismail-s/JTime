@@ -13,10 +13,10 @@ test:
     - emulator -avd circleci-android22 -no-audio -no-window:
         background: true
         parallel: true
-    # wait for it to have booted
-    - circle-android wait-for-boot
     - adb start-server:
         background: true
+    # wait for it to have booted
+    - circle-android wait-for-boot
     - sleep 10
     - adb devices
     # Unlock the lockscreen on the emulator
