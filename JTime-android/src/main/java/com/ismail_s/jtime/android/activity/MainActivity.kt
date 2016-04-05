@@ -4,12 +4,26 @@ import android.app.Activity
 import android.app.Fragment
 import android.os.Bundle
 import com.ismail_s.jtime.android.R
+import com.mikepenz.materialdrawer.Drawer
+import com.mikepenz.materialdrawer.DrawerBuilder
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 
 class MainActivity : Activity() {
-
+    var drawer: Drawer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        drawer = DrawerBuilder()
+                .withActivity(this)
+                .addDrawerItems(PrimaryDrawerItem()
+                        .withName("All Masjids")
+                        .withOnDrawerItemClickListener { view, position, drawerItem ->
+                            switchToAllMasjidsFragment()
+                            drawer?.closeDrawer()
+                            true
+                        })
+                .build()
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -21,16 +35,7 @@ class MainActivity : Activity() {
             if (savedInstanceState != null) {
                 return;
             }
-
-            // Create a new Fragment to be placed in the activity layout
-            val firstFragment = AllMasjidsFragment();
-
-            // In case this activity was started with special instructions from an
-            // Intent, pass the Intent's extras to the fragment as arguments
-            firstFragment.arguments = intent.extras;
-
-            // Add the fragment to the 'fragment_container' FrameLayout
-            switchToFragment(firstFragment)
+            switchToAllMasjidsFragment()
         }
     }
 
@@ -38,6 +43,8 @@ class MainActivity : Activity() {
         val fragment = MasjidsFragment.newInstance(masjidId, masjidName)
         switchToFragment(fragment)
     }
+
+    fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment())
 
     fun switchToFragment(fragment: Fragment) {
         fragmentManager.beginTransaction()
