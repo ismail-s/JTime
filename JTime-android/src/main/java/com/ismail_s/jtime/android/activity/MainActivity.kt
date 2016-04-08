@@ -17,6 +17,11 @@ class MainActivity : Activity() {
         drawer = DrawerBuilder()
                 .withActivity(this)
                 .addDrawerItems(PrimaryDrawerItem()
+                        .withName("Login")
+                        .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                            // Do login
+                            true
+                        }, PrimaryDrawerItem()
                         .withName("All Masjids")
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
                             switchToAllMasjidsFragment()
