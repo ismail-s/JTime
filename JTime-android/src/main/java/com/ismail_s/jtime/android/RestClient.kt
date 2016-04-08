@@ -1,6 +1,10 @@
 package com.ismail_s.jtime.android
 
 import android.content.Context
+import cz.msebera.android.httpclient.Header
+import com.loopj.android.http.AsyncHttpClient
+import com.loopj.android.http.JsonHttpResponseHandler
+import com.loopj.android.http.RequestParams
 import com.strongloop.android.loopback.Model
 import com.strongloop.android.loopback.ModelRepository
 import com.strongloop.android.loopback.RestAdapter
@@ -65,6 +69,24 @@ class RestClient {
         })
     }
 
+    fun login(code: String, cb: LoginCallback) {
+        val requestParams = RequestParams()
+        requestParams.put("code", code)
+        val url = Companion.url.substringBeforeLast('/') + "/auth/google/callback"
+        AsyncHttpClient().get(url, requestParams, object:JsonHttpResponseHandler(){
+            override fun onSuccess(statusCode: Int, headers: Array<Header>, response: JSONObject) {
+                val accessToken = response.getString("access_token")
+                val id = response.getInt("id")
+                restAdapter.setAccessToken(accessToken)
+                cb.onSuccess(id, accessToken)
+            }
+
+            override fun onFailure(statusCode: Int, headers: Array<Header>, throwable: Throwable, errorResponse: JSONObject) {
+                cb.onError(throwable)
+            }
+        })
+    }
+
     interface Callback {
         fun onError(t: Throwable)
     }
@@ -75,6 +97,10 @@ class RestClient {
 
     interface MasjidsCallback: Callback {
         fun onSuccess(masjids: List<MasjidPojo>)
+    }
+
+    interface LoginCallback: Callback {
+        fun onSuccess(id: Int, accessToken: String)
     }
 
     companion object {
