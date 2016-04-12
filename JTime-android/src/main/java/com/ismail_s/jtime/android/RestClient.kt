@@ -1,9 +1,11 @@
 package com.ismail_s.jtime.android
 
 import android.content.Context
-import cz.msebera.android.httpclient.Header
-import com.loopj.android.http.AsyncHttpClient
-import com.loopj.android.http.JsonHttpResponseHandler
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.android.extension.responseJson
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.getAs
 import com.loopj.android.http.RequestParams
 import com.strongloop.android.loopback.Model
 import com.strongloop.android.loopback.ModelRepository
@@ -73,18 +75,21 @@ class RestClient {
         val requestParams = RequestParams()
         requestParams.put("code", code)
         val url = Companion.url.substringBeforeLast('/') + "/auth/google/callback"
-        AsyncHttpClient().get(url, requestParams, object:JsonHttpResponseHandler(){
-            override fun onSuccess(statusCode: Int, headers: Array<Header>, response: JSONObject) {
-                val accessToken = response.getString("access_token")
-                val id = response.getInt("id")
-                restAdapter.setAccessToken(accessToken)
-                cb.onSuccess(id, accessToken)
-            }
 
-            override fun onFailure(statusCode: Int, headers: Array<Header>, throwable: Throwable, errorResponse: JSONObject) {
-                cb.onError(throwable)
+        Fuel.get(url, listOf("code" to code)).responseJson { request, response, result ->
+            when (result) {
+                is Result.Failure -> {
+                    cb.onError(result.getAs<FuelError>()!!)
+                }
+                is Result.Success -> {
+                    val data = result.get()
+                    val accessToken = data.getString("access_token")
+                    val id = data.getInt("id")
+                    restAdapter.setAccessToken(accessToken)
+                    cb.onSuccess(id, accessToken)
+                }
             }
-        })
+        }
     }
 
     interface Callback {
