@@ -2,7 +2,12 @@ package com.ismail_s.jtime.android.activity
 
 import android.app.Activity
 import android.app.Fragment
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
+import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.GoogleApiClient
 import com.ismail_s.jtime.android.R
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
@@ -10,9 +15,16 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 
 class MainActivity : Activity() {
     var drawer: Drawer? = null
+    var googleApiClient: GoogleApiClient? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build()
+        //TODO-use enableAutoManage
+        googleApiClient = GoogleApiClient.Builder(this).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build()
 
         drawer = DrawerBuilder()
                 .withActivity(this)
@@ -20,6 +32,8 @@ class MainActivity : Activity() {
                         .withName("Login")
                         .withOnDrawerItemClickListener { view, i, iDrawerItem ->
                             // Do login
+                            val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
+                            startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
                             true
                         }, PrimaryDrawerItem()
                         .withName("All Masjids")
@@ -41,6 +55,17 @@ class MainActivity : Activity() {
                 return;
             }
             switchToAllMasjidsFragment()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        if (requestCode == Constants.RC_SIGN_IN) {
+            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+            if (result.isSuccess) {
+                val acct = result.signInAccount
+                Toast.makeText(this, "email: ${acct?.email}", Toast.LENGTH_SHORT).show()
+                //TODO-login on server
+            }
         }
     }
 
