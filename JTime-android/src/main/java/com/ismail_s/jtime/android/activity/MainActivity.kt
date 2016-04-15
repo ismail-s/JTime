@@ -1,21 +1,32 @@
 package com.ismail_s.jtime.android.activity
 
-import android.app.Activity
 import android.app.Fragment
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.ismail_s.jtime.android.R
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 
-class MainActivity : Activity() {
+class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListener {
     var drawer: Drawer? = null
     var googleApiClient: GoogleApiClient? = null
+
+    /**
+     * Called when Sign in with Google fails
+     */
+    override fun onConnectionFailed(connectionResult: ConnectionResult) {
+        val string = "Failed to login, with error: ${connectionResult.toString()}"
+        Toast.makeText(this, string, Toast.LENGTH_SHORT)
+        .show()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -23,8 +34,10 @@ class MainActivity : Activity() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build()
-        //TODO-use enableAutoManage
-        googleApiClient = GoogleApiClient.Builder(this).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build()
+        googleApiClient = GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build()
 
         drawer = DrawerBuilder()
                 .withActivity(this)
