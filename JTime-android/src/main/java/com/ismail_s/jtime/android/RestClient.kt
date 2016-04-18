@@ -4,6 +4,7 @@ import android.content.Context
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.Manager
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
 import com.loopj.android.http.RequestParams
@@ -86,6 +87,7 @@ class RestClient {
                     val accessToken = data.getString("access_token")
                     val id = data.getInt("id")
                     restAdapter.setAccessToken(accessToken)
+                    Manager.instance.baseHeaders = mapOf("Authorization" to accessToken)
                     cb.onSuccess(id, accessToken)
                 }
             }
