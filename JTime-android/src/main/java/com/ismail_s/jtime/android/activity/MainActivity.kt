@@ -22,9 +22,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
      * Called when Sign in with Google fails
      */
     override fun onConnectionFailed(connectionResult: ConnectionResult) {
-        val string = "Failed to login, with error: ${connectionResult.toString()}"
-        Toast.makeText(this, string, Toast.LENGTH_SHORT)
-        .show()
+        showShortToast("Failed to login, with error: ${connectionResult.toString()}")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,4 +91,6 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
     }
+
+    fun showShortToast(s: String) = Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
 }
