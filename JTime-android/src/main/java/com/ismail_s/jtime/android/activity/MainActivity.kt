@@ -6,16 +6,22 @@ import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.ismail_s.jtime.android.R
+import com.ismail_s.jtime.android.RestClient
+import com.mikepenz.materialdrawer.AccountHeader
+import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 
 class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListener {
     var drawer: Drawer? = null
+    var header: AccountHeader? = null
     var googleApiClient: GoogleApiClient? = null
 
     /**
@@ -31,14 +37,19 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                .requestIdToken("654477471044-i8156m316nreihgdqoicsh0gktgqjaua.apps.googleusercontent.com")
                 .build()
         googleApiClient = GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build()
 
+        header = AccountHeaderBuilder().withActivity(this)
+                .withProfileImagesVisible(false).withCompactStyle(true)
+                .build()
         drawer = DrawerBuilder()
                 .withActivity(this)
+                .withAccountHeader(header as AccountHeader)
                 .addDrawerItems(PrimaryDrawerItem()
                         .withName("Login")
                         .withOnDrawerItemClickListener { view, i, iDrawerItem ->
@@ -73,9 +84,18 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
         if (requestCode == Constants.RC_SIGN_IN) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
             if (result.isSuccess) {
-                val acct = result.signInAccount
-                Toast.makeText(this, "email: ${acct?.email}", Toast.LENGTH_SHORT).show()
-                //TODO-login on server
+                val acct = result.signInAccount as GoogleSignInAccount
+                showShortToast("email: ${acct.email}")
+                val cb = object: RestClient.LoginCallback {
+                    override fun onSuccess(id: Int, accessToken: String) {
+                        header?.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
+                    }
+
+                    override fun onError(t: Throwable) {
+                        showShortToast("Error when trying to login on server: ${t.message}")
+                    }
+                }
+                RestClient(this).login(acct.idToken!!, cb)
             }
         }
     }
