@@ -94,6 +94,28 @@ class RestClient {
         }
     }
 
+    fun logout(cb: LogoutCallback) {
+        val url = Companion.url + "/users/logout"
+        url.httpPost().responseString { request, response, result ->
+            when (result) {
+                is Result.Failure -> {
+                    cb.onError(result.getAs<FuelError>()!!)
+                }
+                is Result.Success -> {
+                    if (response.httpStatusCode == 204) {
+                        // Clear persisted login tokens
+                        restAdapter.clearAccessToken()
+                        Manager.instance.baseHeaders = emptyMap()
+                        cb.onSuccess()
+                    }
+                    else {
+                        cb.onError(result.getAs<FuelError>()!!)
+                    }
+                }
+            }
+        }
+    }
+
     interface Callback {
         fun onError(t: Throwable)
     }
@@ -108,6 +130,10 @@ class RestClient {
 
     interface LoginCallback: Callback {
         fun onSuccess(id: Int, accessToken: String)
+    }
+
+    interface LogoutCallback: Callback {
+        fun onSuccess()
     }
 
     companion object {
