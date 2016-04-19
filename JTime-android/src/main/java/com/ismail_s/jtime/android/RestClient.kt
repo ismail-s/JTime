@@ -1,7 +1,7 @@
 package com.ismail_s.jtime.android
 
 import android.content.Context
-import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.*
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Manager
