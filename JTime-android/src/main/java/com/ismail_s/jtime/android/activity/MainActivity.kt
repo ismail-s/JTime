@@ -20,9 +20,9 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 
 class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListener {
-    var drawer: Drawer? = null
-    var header: AccountHeader? = null
-    var googleApiClient: GoogleApiClient? = null
+    lateinit var drawer: Drawer
+    lateinit var header: AccountHeader
+    lateinit var googleApiClient: GoogleApiClient
 
     /**
      * Called when Sign in with Google fails
@@ -49,7 +49,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                 .build()
         drawer = DrawerBuilder()
                 .withActivity(this)
-                .withAccountHeader(header as AccountHeader)
+                .withAccountHeader(header)
                 .addDrawerItems(PrimaryDrawerItem()
                         .withName("Login")
                         .withOnDrawerItemClickListener { view, i, iDrawerItem ->
@@ -61,7 +61,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         .withName("All Masjids")
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
                             switchToAllMasjidsFragment()
-                            drawer?.closeDrawer()
+                            drawer.closeDrawer()
                             true
                         })
                 .build()
@@ -88,7 +88,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                 showShortToast("email: ${acct.email}")
                 val cb = object: RestClient.LoginCallback {
                     override fun onSuccess(id: Int, accessToken: String) {
-                        header?.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
+                        header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
                     }
 
                     override fun onError(t: Throwable) {

@@ -1,13 +1,13 @@
 package com.ismail_s.jtime.android
 
 import android.content.Context
-import com.github.kittinunf.fuel.*
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
-import com.ismail_s.jtime.android.SharedPreferences
 import com.loopj.android.http.RequestParams
 import com.strongloop.android.loopback.Model
 import com.strongloop.android.loopback.ModelRepository
@@ -20,14 +20,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class RestClient {
-    private var sharedPrefs: SharedPreferences
+    private var sharedPrefs: SharedPreferencesWrapper
     private var restAdapter: RestAdapter
     private var masjidRepo: ModelRepository<Model>
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
     constructor(context: Context) {
         this.restAdapter = RestAdapter(context, Companion.url)
-        this.sharedPrefs = SharedPreferences(context)
+        this.sharedPrefs = SharedPreferencesWrapper(context)
         this.masjidRepo = this.restAdapter.createRepository("Masjid")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times-for-today", "GET"), "Masjid.getTodayTimes")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
@@ -91,7 +91,7 @@ class RestClient {
                     val id = data.getInt("id")
                     restAdapter.setAccessToken(accessToken)
                     Manager.instance.baseHeaders = mapOf("Authorization" to accessToken)
-                    sharedPrefs.setAccessToken(accessToken)
+                    sharedPrefs.accessToken = accessToken
 
                     cb.onSuccess(id, accessToken)
                 }
