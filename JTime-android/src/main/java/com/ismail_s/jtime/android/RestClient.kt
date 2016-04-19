@@ -7,6 +7,7 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Manager
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
+import com.ismail_s.jtime.android.SharedPreferences
 import com.loopj.android.http.RequestParams
 import com.strongloop.android.loopback.Model
 import com.strongloop.android.loopback.ModelRepository
@@ -19,12 +20,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class RestClient {
+    private var sharedPrefs: SharedPreferences
     private var restAdapter: RestAdapter
     private var masjidRepo: ModelRepository<Model>
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
 
     constructor(context: Context) {
         this.restAdapter = RestAdapter(context, Companion.url)
+        this.sharedPrefs = SharedPreferences(context)
         this.masjidRepo = this.restAdapter.createRepository("Masjid")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times-for-today", "GET"), "Masjid.getTodayTimes")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
@@ -88,6 +91,8 @@ class RestClient {
                     val id = data.getInt("id")
                     restAdapter.setAccessToken(accessToken)
                     Manager.instance.baseHeaders = mapOf("Authorization" to accessToken)
+                    sharedPrefs.setAccessToken(accessToken)
+
                     cb.onSuccess(id, accessToken)
                 }
             }
@@ -106,6 +111,7 @@ class RestClient {
                         // Clear persisted login tokens
                         restAdapter.clearAccessToken()
                         Manager.instance.baseHeaders = emptyMap()
+                        sharedPrefs.clearAccessToken()
                         cb.onSuccess()
                     }
                     else {
