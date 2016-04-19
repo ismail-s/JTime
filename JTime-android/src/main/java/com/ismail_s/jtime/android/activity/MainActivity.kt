@@ -24,6 +24,28 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     lateinit var header: AccountHeader
     lateinit var googleApiClient: GoogleApiClient
 
+    private val logoutDrawerItem = PrimaryDrawerItem()
+            .withName("Logout")
+            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                //Do logout
+                val cb = object : RestClient.LogoutCallback {
+                    override fun onSuccess() = showShortToast("Have successfully logged out")
+
+                    override fun onError(t: Throwable) = showShortToast("Logout unsuccessful: ${t.message}")
+                }
+                RestClient(this).logout(cb)
+                true
+            }
+
+    private val loginDrawerItem = PrimaryDrawerItem()
+            .withName("Login")
+            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                // Do login
+                val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
+                startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
+                true
+            }
+
     /**
      * Called when Sign in with Google fails
      */
@@ -50,14 +72,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
         drawer = DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(header)
-                .addDrawerItems(PrimaryDrawerItem()
-                        .withName("Login")
-                        .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                            // Do login
-                            val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
-                            startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
-                            true
-                        }, PrimaryDrawerItem()
+                .addDrawerItems(loginDrawerItem, logoutDrawerItem, PrimaryDrawerItem()
                         .withName("All Masjids")
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
                             switchToAllMasjidsFragment()
