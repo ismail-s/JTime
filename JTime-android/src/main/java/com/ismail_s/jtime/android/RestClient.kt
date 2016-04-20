@@ -146,7 +146,7 @@ class RestClient {
                     cb.onError(result.getAs<FuelError>()!!)
                 }
                 is Result.Success -> {
-                    if (result.httpStatusCode == 200) {
+                    if (response.httpStatusCode == 200) {
                         cb.onSuccess()
                     }
                     else {
