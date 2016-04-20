@@ -18,6 +18,7 @@ import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 
 class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListener {
     lateinit var drawer: Drawer
@@ -58,25 +59,23 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
         setContentView(R.layout.activity_main)
         setUpGoogleApiClient()
 
-        header = AccountHeaderBuilder().withActivity(this)
-                .withProfileImagesVisible(false).withCompactStyle(true)
-                .build()
-        drawer = DrawerBuilder()
-                .withActivity(this)
-                .withAccountHeader(header)
-                .addDrawerItems(loginDrawerItem, logoutDrawerItem, PrimaryDrawerItem()
-                        .withName("All Masjids")
-                        .withOnDrawerItemClickListener { view, position, drawerItem ->
-                            switchToAllMasjidsFragment()
-                            drawer.closeDrawer()
-                            true
-                        })
-                .build()
+        val cb = object: RestClient.SignedinCallback {
+            override fun onError(t: Throwable) {
+                showShortToast("Not logged in atm")
+                //Set button to be logout, create drawer
+                setUpNavDrawer(logoutDrawerItem)
+            }
+
+            override fun onSuccess() {
+                //Set button to be login, create drawer
+                setUpNavDrawer(loginDrawerItem)
+            }
+        }
+        RestClient(this).checkIfStillSignedInOnServer(cb)
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
         if (findViewById(R.id.fragment_container) != null) {
-
             // However, if we're being restored from a previous state,
             // then we don't need to do anything and should return or else
             // we could end up with overlapping fragments.
@@ -95,6 +94,23 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
         googleApiClient = GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build()
+    }
+
+    private fun setUpNavDrawer(loginOutButton: IDrawerItem) {
+        header = AccountHeaderBuilder().withActivity(this)
+                .withProfileImagesVisible(false).withCompactStyle(true)
+                .build()
+        drawer = DrawerBuilder()
+                .withActivity(this)
+                .withAccountHeader(header)
+                .addDrawerItems(loginOutButton, PrimaryDrawerItem()
+                        .withName("All Masjids")
+                        .withOnDrawerItemClickListener { view, position, drawerItem ->
+                            switchToAllMasjidsFragment()
+                            drawer.closeDrawer()
+                            true
+                        })
                 .build()
     }
 
