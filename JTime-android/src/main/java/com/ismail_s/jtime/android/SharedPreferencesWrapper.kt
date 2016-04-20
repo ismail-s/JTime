@@ -14,7 +14,7 @@ class SharedPreferencesWrapper {
             sharedPrefs?.edit()?.putString(PROPERTY_ACCESS_TOKEN, value)?.apply()
         }
 
-    var userId: String
+    var userId: Int
         get() = sharedPrefs?.getInt(PROPERTY_CURRENT_USER_ID, -1) as String
         set(value) {
             sharedPrefs?.edit()?.putInt(PROPERTY_CURRENT_USER_ID, value)?.apply()
