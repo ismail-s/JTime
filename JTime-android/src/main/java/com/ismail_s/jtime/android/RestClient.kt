@@ -1,6 +1,8 @@
 package com.ismail_s.jtime.android
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
@@ -18,15 +20,19 @@ import com.strongloop.android.remoting.adapters.Adapter
 import com.strongloop.android.remoting.adapters.RestContractItem
 import org.json.JSONObject
 import java.text.SimpleDateFormat
+import java.net.NoRouteToHostException
 import java.util.*
 
 class RestClient {
     private var sharedPrefs: SharedPreferencesWrapper
+    private var context: Context
     private var restAdapter: RestAdapter
     private var masjidRepo: ModelRepository<Model>
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private val noNetworkException = NoRouteToHostException("Network is not available")
 
     constructor(context: Context) {
+        this.context = context
         this.restAdapter = RestAdapter(context, Companion.url)
         this.sharedPrefs = SharedPreferencesWrapper(context)
         this.masjidRepo = this.restAdapter.createRepository("Masjid")
@@ -37,7 +43,20 @@ class RestClient {
         }
     }
 
+    fun internetIsAvailable(): Bool {
+        val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo()
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true
+        } else {
+            return false
+        }
+    }
+
     fun getMasjids(cb: MasjidsCallback) {
+        if (!internetIsAvailable()) {
+            cb.onError(noNetworkException)
+        }
         this.masjidRepo.findAll(object: ListCallback<Model> {
             override fun onSuccess(masjids: List<Model>) {
                 var res = mutableListOf<MasjidPojo>()
@@ -54,6 +73,9 @@ class RestClient {
     }
 
     fun getMasjidTimes(masjidId: Int, cb: MasjidTimesCallback, date: GregorianCalendar) {
+        if (!internetIsAvailable()) {
+            cb.onError(noNetworkException)
+        }
         val map = hashMapOf(Pair("id", masjidId), Pair("date", dateFormatter.format(date.time)))
         this.masjidRepo.invokeStaticMethod("getTimes", map, object : Adapter.JsonObjectCallback() {
             override fun onSuccess(response: JSONObject) {
@@ -80,6 +102,9 @@ class RestClient {
     }
 
     fun login(code: String, cb: LoginCallback) {
+        if (!internetIsAvailable()) {
+            cb.onError(noNetworkException)
+        }
         val requestParams = RequestParams()
         requestParams.put("code", code)
         val url = Companion.url.substringBeforeLast('/') + "/auth/google/callback"
@@ -105,6 +130,9 @@ class RestClient {
     }
 
     fun logout(cb: LogoutCallback) {
+        if (!internetIsAvailable()) {
+            cb.onError(noNetworkException)
+        }
         val url = Companion.url + "/users/logout"
         url.httpPost().responseString { request, response, result ->
             when (result) {
