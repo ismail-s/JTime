@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
@@ -31,7 +32,7 @@ class RestClient {
         this.masjidRepo = this.restAdapter.createRepository("Masjid")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times-for-today", "GET"), "Masjid.getTodayTimes")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
-        if (Manager.instance.baseHeaders == emptyMap() && sharedPrefs.accessToken != "") {
+        if (Manager.instance.baseHeaders == emptyMap<String, String>() && sharedPrefs.accessToken != "") {
             Manager.instance.baseHeaders = mapOf("Authorization" to sharedPrefs.accessToken)
         }
     }
