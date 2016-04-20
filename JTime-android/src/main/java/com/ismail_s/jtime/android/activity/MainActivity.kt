@@ -56,15 +56,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken("654477471044-i8156m316nreihgdqoicsh0gktgqjaua.apps.googleusercontent.com")
-                .build()
-        googleApiClient = GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build()
+        setUpGoogleApiClient()
 
         header = AccountHeaderBuilder().withActivity(this)
                 .withProfileImagesVisible(false).withCompactStyle(true)
@@ -93,6 +85,17 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
             }
             switchToAllMasjidsFragment()
         }
+    }
+
+    private fun setUpGoogleApiClient() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken("654477471044-i8156m316nreihgdqoicsh0gktgqjaua.apps.googleusercontent.com")
+                .build()
+        googleApiClient = GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
