@@ -23,13 +23,20 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     lateinit var drawer: Drawer
     lateinit var header: AccountHeader
     lateinit var googleApiClient: GoogleApiClient
+    private val LOGIN_DRAWER_ITEM_IDENTIFIER = 546
+    private val LOGOUT_DRAWER_ITEM_IDENTIFIER = 232
 
     private val logoutDrawerItem = PrimaryDrawerItem()
             .withName("Logout")
+            .withIdentifier(LOGOUT_DRAWER_ITEM_IDENTIFIER)
             .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                //Do logout
                 val cb = object : RestClient.LogoutCallback {
-                    override fun onSuccess() = showShortToast("Have successfully logged out")
+                    override fun onSuccess() {
+                        showShortToast("Have successfully logged out")
+                        //Remove logout button, add login button to nav drawer
+                        drawer.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
+                        drawer.addItemAtPosition(loginDrawerItem, 0)
+                    }
 
                     override fun onError(t: Throwable) = showShortToast("Logout unsuccessful: ${t.message}")
                 }
@@ -39,8 +46,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
 
     private val loginDrawerItem = PrimaryDrawerItem()
             .withName("Login")
+            .withIdentifier(LOGIN_DRAWER_ITEM_IDENTIFIER)
             .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                // Do login
                 val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
                 startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
                 true
@@ -122,6 +129,9 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                 val cb = object: RestClient.LoginCallback {
                     override fun onSuccess(id: Int, accessToken: String) {
                         header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
+                        //Remove login button, add logout button to nav drawer
+                        drawer.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
+                        drawer.addItemAtPosition(logoutDrawerItem, 0)
                     }
 
                     override fun onError(t: Throwable) {
