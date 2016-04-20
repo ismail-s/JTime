@@ -23,8 +23,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     lateinit var drawer: Drawer
     lateinit var header: AccountHeader
     lateinit var googleApiClient: GoogleApiClient
-    private val LOGIN_DRAWER_ITEM_IDENTIFIER = 546
-    private val LOGOUT_DRAWER_ITEM_IDENTIFIER = 232
+    private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
+    private val LOGOUT_DRAWER_ITEM_IDENTIFIER: Long = 232
 
     private val logoutDrawerItem = PrimaryDrawerItem()
             .withName("Logout")
