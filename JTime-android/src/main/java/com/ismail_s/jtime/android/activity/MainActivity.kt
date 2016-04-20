@@ -66,15 +66,15 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
         setUpGoogleApiClient()
 
         val cb = object: RestClient.SignedinCallback {
-            override fun onError(t: Throwable) {
+            override fun onLoggedOut() {
                 showShortToast("Not logged in atm")
-                //Set button to be logout, create drawer
-                setUpNavDrawer(logoutDrawerItem)
-            }
-
-            override fun onSuccess() {
                 //Set button to be login, create drawer
                 setUpNavDrawer(loginDrawerItem)
+            }
+
+            override fun onLoggedIn() {
+                //Set button to be logout, create drawer
+                setUpNavDrawer(logoutDrawerItem)
             }
         }
         RestClient(this).checkIfStillSignedInOnServer(cb)

@@ -130,12 +130,13 @@ class RestClient {
      * to see if the login is still valid (ie the session hasn't expired).
      * If the session has expired, clear the persisted login.
      *
-     * cb.onSuccess is called if we are logged in atm, else cb.onError
-     * is called.
+     * cb.onLoggedIn is called if we are logged in atm, else cb.OnLoggedOut
+     * is called (including if there is no persisted login).
      */
     fun checkIfStillSignedInOnServer(cb: SignedinCallback) {
         if (sharedPrefs.accessToken == "" || sharedPrefs.userId == -1) {
             // We don't have a persisted login
+            cb.onLoggedOut()
             return
         }
         var url = Companion.url + "/users/${sharedPrefs.userId}"
@@ -143,15 +144,15 @@ class RestClient {
             when (result) {
                 is Result.Failure -> {
                     clearSavedUser()
-                    cb.onError(result.getAs<FuelError>()!!)
+                    cb.onLoggedOut()
                 }
                 is Result.Success -> {
                     if (response.httpStatusCode == 200) {
-                        cb.onSuccess()
+                        cb.onLoggedIn()
                     }
                     else {
                         clearSavedUser()
-                        cb.onError(result.getAs<FuelError>()!!)
+                        cb.onLoggedOut()
                     }
                 }
             }
@@ -184,7 +185,10 @@ class RestClient {
         fun onSuccess()
     }
 
-    interface SignedinCallback: LogoutCallback {}
+    interface SignedinCallback {
+        fun onLoggedIn()
+        fun onLoggedOut()
+    }
 
     companion object {
         // By having url in the companion object, we can change the url from tests
