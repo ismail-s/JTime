@@ -43,9 +43,9 @@ class RestClient {
         }
     }
 
-    fun internetIsAvailable(): Bool {
+    fun internetIsAvailable(): Boolean {
         val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo()
+        val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo
         if (networkInfo != null && networkInfo.isConnected()) {
             return true
         } else {
