@@ -88,10 +88,11 @@ class RestClient {
                 is Result.Success -> {
                     val data = result.get()
                     val accessToken = data.getString("access_token")
-                    val id = data.getInt("id")
+                    val id = data.getInt("userId")
                     restAdapter.setAccessToken(accessToken)
                     Manager.instance.baseHeaders = mapOf("Authorization" to accessToken)
                     sharedPrefs.accessToken = accessToken
+                    sharedPrefs.userId = id
 
                     cb.onSuccess(id, accessToken)
                 }
@@ -111,7 +112,7 @@ class RestClient {
                         // Clear persisted login tokens
                         restAdapter.clearAccessToken()
                         Manager.instance.baseHeaders = emptyMap()
-                        sharedPrefs.clearAccessToken()
+                        sharedPrefs.clearSavedUser()
                         cb.onSuccess()
                     }
                     else {
