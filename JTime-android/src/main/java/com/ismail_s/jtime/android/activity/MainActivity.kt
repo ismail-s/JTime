@@ -18,7 +18,6 @@ import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 
 class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListener {
     lateinit var drawer: Drawer
@@ -97,7 +96,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                 .build()
     }
 
-    private fun setUpNavDrawer(loginOutButton: IDrawerItem) {
+    private fun setUpNavDrawer(loginOutButton: PrimaryDrawerItem) {
         header = AccountHeaderBuilder().withActivity(this)
                 .withProfileImagesVisible(false).withCompactStyle(true)
                 .build()
