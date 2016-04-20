@@ -31,6 +31,9 @@ class RestClient {
         this.masjidRepo = this.restAdapter.createRepository("Masjid")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times-for-today", "GET"), "Masjid.getTodayTimes")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
+        if (Manager.instance.baseHeaders == emptyMap() && sharedPrefs.accessToken != "") {
+            Manager.instance.baseHeaders = mapOf("Authorization" to sharedPrefs.accessToken)
+        }
     }
 
     fun getMasjids(cb: MasjidsCallback) {
@@ -110,9 +113,7 @@ class RestClient {
                 is Result.Success -> {
                     if (response.httpStatusCode == 204) {
                         // Clear persisted login tokens
-                        restAdapter.clearAccessToken()
-                        Manager.instance.baseHeaders = emptyMap()
-                        sharedPrefs.clearSavedUser()
+                        clearSavedUser()
                         cb.onSuccess()
                     }
                     else {
@@ -121,6 +122,45 @@ class RestClient {
                 }
             }
         }
+    }
+
+    /**
+     * Check if we have a persisted login. If we do, then query the rest server
+     * to see if the login is still valid (ie the session hasn't expired).
+     * If the session has expired, clear the persisted login.
+     *
+     * cb.onSuccess is called if we are logged in atm, else cb.onError
+     * is called.
+     */
+    fun checkIfStillSignedInOnServer(cb: SignedinCallback) {
+        if (sharedPrefs.accessToken == "" || sharedPrefs.userId == -1) {
+            // We don't have a persisted login
+            return
+        }
+        var url = Companion.url + "/users/${sharedPrefs.userId}"
+        url.httpGet().responseJson {request, response, result ->
+            when (result) {
+                is Result.Failure -> {
+                    clearSavedUser()
+                    cb.onError(result.getAs<FuelError>()!!)
+                }
+                is Result.Success -> {
+                    if (result.httpStatusCode == 200) {
+                        cb.onSuccess()
+                    }
+                    else {
+                        clearSavedUser()
+                        cb.onError(result.getAs<FuelError>()!!)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun clearSavedUser() {
+        restAdapter.clearAccessToken()
+        Manager.instance.baseHeaders = emptyMap()
+        sharedPrefs.clearSavedUser()
     }
 
     interface Callback {
@@ -142,6 +182,8 @@ class RestClient {
     interface LogoutCallback: Callback {
         fun onSuccess()
     }
+
+    interface SignedinCallback: LogoutCallback {}
 
     companion object {
         // By having url in the companion object, we can change the url from tests
