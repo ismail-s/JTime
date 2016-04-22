@@ -35,6 +35,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                     override fun onSuccess() {
                         showShortToast("Have successfully logged out")
                         //Remove logout button, add login button to nav drawer
+                        header.removeProfile(0)
                         drawer.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
                         drawer.addItemAtPosition(loginDrawerItem, 0)
                     }
