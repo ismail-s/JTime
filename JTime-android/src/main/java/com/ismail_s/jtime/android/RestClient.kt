@@ -108,9 +108,9 @@ class RestClient {
         }
         val requestParams = RequestParams()
         requestParams.put("code", code)
-        val url = Companion.url.substringBeforeLast('/') + "/auth/google/callback"
+        val url = Companion.url.substringBeforeLast('/') + "/auth/googleid"
 
-        Fuel.get(url, listOf("code" to code)).responseJson { request, response, result ->
+        Fuel.get(url, listOf("id_token" to code)).responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
                     cb.onError(result.getAs<FuelError>()!!)
