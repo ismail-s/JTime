@@ -8,6 +8,7 @@ class SharedPreferencesWrapper {
     private var SHARED_PREFERENCES_NAME = SharedPreferencesWrapper::class.qualifiedName
     private var PROPERTY_ACCESS_TOKEN = "ACCESS_TOKEN"
     private var PROPERTY_CURRENT_USER_ID = "CURRENT_USER_ID"
+    private var PROPERTY_USER_EMAIL = "CURRENT_USER_EMAIL"
     var accessToken: String
         get() = sharedPrefs?.getString(PROPERTY_ACCESS_TOKEN, "") as String
         set(value) {
@@ -19,6 +20,13 @@ class SharedPreferencesWrapper {
         set(value) {
             sharedPrefs?.edit()?.putInt(PROPERTY_CURRENT_USER_ID, value)?.apply()
         }
+
+    var email: String
+        get() = sharedPrefs?.getString(PROPERTY_USER_EMAIL, "") as String
+        set(value) {
+            sharedPrefs?.edit()?.putString(PROPERTY_USER_EMAIL, value)?.apply()
+        }
+
 
     val sharedPrefs: SharedPreferences?
         get() = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)

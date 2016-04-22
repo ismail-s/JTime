@@ -12,6 +12,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
+import com.ismail_s.jtime.android.SharedPreferencesWrapper
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -75,6 +76,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
             override fun onLoggedIn() {
                 //Set button to be logout, create drawer
                 setUpNavDrawer(logoutDrawerItem)
+                val email: String = SharedPreferencesWrapper(this@MainActivity).email
+                header.addProfile(ProfileDrawerItem().withEmail(email), 0)
             }
         }
         RestClient(this).checkIfStillSignedInOnServer(cb)
@@ -138,7 +141,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         showShortToast("Error when trying to login on server: ${t.message}")
                     }
                 }
-                RestClient(this).login(acct.idToken!!, cb)
+                RestClient(this).login(acct.idToken!!, acct.email!!, cb)
             }
         }
     }

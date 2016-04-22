@@ -102,7 +102,7 @@ class RestClient {
         })
     }
 
-    fun login(code: String, cb: LoginCallback) {
+    fun login(code: String, email: String, cb: LoginCallback) {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
         }
@@ -123,6 +123,7 @@ class RestClient {
                     Manager.instance.baseHeaders = mapOf("Authorization" to accessToken)
                     sharedPrefs.accessToken = accessToken
                     sharedPrefs.userId = id
+                    sharedPrefs.email = email
 
                     cb.onSuccess(id, accessToken)
                 }
