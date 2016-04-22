@@ -10,7 +10,7 @@
     <application
         android:allowBackup="true"
         android:name=".JTimeApplication"
-        android:theme="@style/MaterialDrawerTheme.Light.DarkToolbar.ActionBar">
+        android:theme="@style/MaterialDrawerTheme">
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/title_activity_main">

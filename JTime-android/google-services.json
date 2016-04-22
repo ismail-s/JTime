@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_id": "jtime-1118",
+    "project_number": "654477471044",
+    "name": "JTime"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:654477471044:android:93fdd10dfec6a9ac",
+        "client_id": "android:com.ismail_s.jtime.android",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.ismail_s.jtime.android",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "654477471044-nm4pli2ovg2al0i2p1updibu5hac1emd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ismail_s.jtime.android",
+            "certificate_hash": "1AB5015273F04B648D2688A034F916E87D1E7E9A"
+          }
+        },
+        {
+          "client_id": "654477471044-i8156m316nreihgdqoicsh0gktgqjaua.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

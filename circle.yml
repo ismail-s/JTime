@@ -1,6 +1,12 @@
 dependencies:
   pre:
-    - echo y | android update sdk --no-ui --all --filter tools,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-23
+    - echo y | android update sdk --no-ui --all --filter tools
+    - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
+    - echo y | android update sdk --no-ui --all --filter extra-android-support
+    - echo y | android update sdk --no-ui --all --filter extra-google-google_play_services
+    - echo y | android update sdk --no-ui --all --filter extra-google-m2repository
+    - echo y | android update sdk --no-ui --all --filter android-23
+    - echo y | android update sdk --no-ui --all --filter android-21
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
 test:
   override:
@@ -9,8 +15,9 @@ test:
     # robolectric
     #- (cd JTime-android && (./gradlew test assembleDebug || ./gradlew test assembleDebug))
     - (cd JTime-android &&./gradlew assembleDebug)
+    - android create avd -n custom-android21-googleapis -t "Google Inc.:Google APIs:21" --abi google_apis/armeabi-v7a
   # start the emulator
-    - emulator -avd circleci-android22 -no-audio -no-window:
+    - emulator -avd custom-android21-googleapis -no-audio -no-window:
         background: true
         parallel: true
     - adb start-server:
