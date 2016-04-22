@@ -38,7 +38,8 @@ class RestClient {
         this.masjidRepo = this.restAdapter.createRepository("Masjid")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times-for-today", "GET"), "Masjid.getTodayTimes")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
-        if (Manager.instance.baseHeaders == emptyMap<String, String>() && sharedPrefs.accessToken != "") {
+
+        if ((Manager.instance.baseHeaders == emptyMap<String, String>() || Manager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
             Manager.instance.baseHeaders = mapOf("Authorization" to sharedPrefs.accessToken)
         }
     }
