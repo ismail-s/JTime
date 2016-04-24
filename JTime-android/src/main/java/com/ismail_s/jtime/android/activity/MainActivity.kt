@@ -21,7 +21,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 
 class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListener {
-    lateinit var drawer: Drawer
+     var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var googleApiClient: GoogleApiClient
     private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
@@ -37,10 +37,10 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         showShortToast("Have successfully logged out")
                         //Remove logout button, add login button to nav drawer
                         header.removeProfile(0)
-                        drawer.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
-                        drawer.addItemAtPosition(loginDrawerItem, 0)
+                        drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
+                        drawer?.addItemAtPosition(loginDrawerItem, 0)
                         //remove addMasjidDrawerItem
-                        drawer.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                        drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
                     }
 
                     override fun onError(t: Throwable) = showShortToast("Logout unsuccessful: ${t.message}")
@@ -129,7 +129,6 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         .withName("All Masjids")
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
                             switchToAllMasjidsFragment()
-                            drawer.closeDrawer()
                             true
                         })
                 .build()
@@ -145,10 +144,10 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                     override fun onSuccess(id: Int, accessToken: String) {
                         header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
                         //Remove login button, add logout button to nav drawer
-                        drawer.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
-                        drawer.addItemAtPosition(logoutDrawerItem, 0)
+                        drawer?.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
+                        drawer?.addItemAtPosition(logoutDrawerItem, 0)
                         //add addMasjidDrawerItem
-                        drawer.addItem(addMasjidDrawerItem)
+                        drawer?.addItem(addMasjidDrawerItem)
                     }
 
                     override fun onError(t: Throwable) {
@@ -172,6 +171,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     fun switchToFragment(fragment: Fragment) {
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
+        drawer?.closeDrawer()
+
     }
 
     fun showShortToast(s: String) = Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
