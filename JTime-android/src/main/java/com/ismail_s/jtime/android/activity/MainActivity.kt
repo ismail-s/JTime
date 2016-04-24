@@ -90,6 +90,9 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                 setUpNavDrawer(logoutDrawerItem)
                 val email: String = SharedPreferencesWrapper(this@MainActivity).email
                 header.addProfile(ProfileDrawerItem().withEmail(email), 0)
+                //add addMasjidDrawerItem
+                drawer?.addItem(addMasjidDrawerItem)
+
             }
         }
         RestClient(this).checkIfStillSignedInOnServer(cb)
