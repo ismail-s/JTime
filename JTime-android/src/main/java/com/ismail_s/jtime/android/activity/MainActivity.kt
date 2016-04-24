@@ -26,6 +26,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     lateinit var googleApiClient: GoogleApiClient
     private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
     private val LOGOUT_DRAWER_ITEM_IDENTIFIER: Long = 232
+    private val ADD_MASJID_DRAWER_ITEM_IDENTIFIER: Long = 785
 
     private val logoutDrawerItem = PrimaryDrawerItem()
             .withName("Logout")
@@ -38,6 +39,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         header.removeProfile(0)
                         drawer.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
                         drawer.addItemAtPosition(loginDrawerItem, 0)
+                        //remove addMasjidDrawerItem
+                        drawer.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
                     }
 
                     override fun onError(t: Throwable) = showShortToast("Logout unsuccessful: ${t.message}")
@@ -52,6 +55,14 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
             .withOnDrawerItemClickListener { view, i, iDrawerItem ->
                 val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
                 startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
+                true
+            }
+
+    private val addMasjidDrawerItem = PrimaryDrawerItem()
+            .withName("Add Masjid")
+            .withIdentifier(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                switchToAddMasjidFragment()
                 true
             }
 
@@ -136,6 +147,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         //Remove login button, add logout button to nav drawer
                         drawer.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
                         drawer.addItemAtPosition(logoutDrawerItem, 0)
+                        //add addMasjidDrawerItem
+                        drawer.addItem(addMasjidDrawerItem)
                     }
 
                     override fun onError(t: Throwable) {
@@ -153,6 +166,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     }
 
     fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment())
+
+    fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment())
 
     fun switchToFragment(fragment: Fragment) {
         fragmentManager.beginTransaction()
