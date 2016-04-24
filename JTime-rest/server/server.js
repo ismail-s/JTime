@@ -1,6 +1,7 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var request = require('request');
+var settings = require('../settings');
 
 var app = module.exports = loopback();
 
@@ -19,8 +20,7 @@ app.get('/auth/googleid', function(req, res) {
     json: true
   };
   request(options, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      //TODO-check that body.aud == clientId
+    if (!error && response.statusCode == 200 && body.aud == settings.clientId) {
       var userModel = app.models.user;
       var username = "google." + body.sub;
       var query = {where: {or: [{username: username}, {email: body.email}]}};
@@ -34,7 +34,6 @@ app.get('/auth/googleid', function(req, res) {
                       res.json("DB Error");
                       return;
                   } else {
-                      console.log('about to login after creating:', instance);
                       userModel.login({email: body.email, password: "TODO"}, function(err, token) {
                           if (err) {
                               console.log('Login error:', err);
@@ -49,7 +48,6 @@ app.get('/auth/googleid', function(req, res) {
               });
               return;
           } else {
-              console.log('am here');
               userModel.login({email: body.email, password: "TODO"}, function(err, token) {
                   if (err) {res.json({error: "Login error"}); return;} else {
                       console.log(token);
@@ -60,7 +58,6 @@ app.get('/auth/googleid', function(req, res) {
       });
       return;
     }
-    console.log('hhhh')
     res.status(404).json({error: "Token validation error"});
   });
 });
