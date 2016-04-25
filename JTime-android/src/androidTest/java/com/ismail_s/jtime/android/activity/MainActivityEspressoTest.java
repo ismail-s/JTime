@@ -14,7 +14,9 @@ import com.ismail_s.jtime.android.R;
 import com.ismail_s.jtime.android.RestClient;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -39,6 +41,16 @@ public class MainActivityEspressoTest extends ActivityInstrumentationTestCase2<M
 
     public MainActivityEspressoTest() {
         super(MainActivity.class);
+    }
+
+    /**
+     * Try to unlock the emulator. The idea behind this method is to unlock the emulator
+     * just before the tests run, so the chances of the emulator timing out and locking
+     * are very slim.
+     */
+    @BeforeClass
+    public static void unlockEmulator() throws IOException {
+        Runtime.getRuntime().exec("adb shell input keyevent 82");
     }
 
     @Before
