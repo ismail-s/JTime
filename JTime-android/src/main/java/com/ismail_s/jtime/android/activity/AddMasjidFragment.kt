@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -13,9 +15,10 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.ismail_s.jtime.android.R
 
-class AddMasjidFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+class AddMasjidFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener, View.OnClickListener {
     private var current_marker: Marker? = null
     private var googleMap: GoogleMap? = null
+    lateinit private var masjidNameTextbox: EditText
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -24,7 +27,22 @@ class AddMasjidFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongCli
         mapFragment.getMapAsync(this)
         childFragmentManager.beginTransaction()
             .add(R.id.map_container, mapFragment).commit()
+        masjidNameTextbox = rootView.findViewById(R.id.masjid_name_textbox) as EditText
+        val submitButton = rootView.findViewById(R.id.add_masjid_submit_button) as Button
+        submitButton.setOnClickListener(this)
         return rootView
+    }
+
+    override fun onClick(view: View) {
+        if (view.id == R.id.add_masjid_submit_button) {
+            //1. Validate fields
+            if (current_marker == null || masjidNameTextbox.text.toString() == "") {
+                return
+            }
+            //2. TODO-submit form
+            //3. switch to AllMasjidsFragment
+            (activity as MainActivity).switchToAllMasjidsFragment()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
