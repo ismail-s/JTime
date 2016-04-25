@@ -35,7 +35,8 @@ class AddMasjidFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongCli
 
     override fun onMapLongClick(point: LatLng) {
         current_marker?.remove()
-        val marker_options = MarkerOptions().position(point).title("Masjid location")
+        val marker_options = MarkerOptions().position(point)
+            .title("Masjid location").draggable(true)
         current_marker = googleMap?.addMarker(marker_options)
     }
 }
