@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 
 class SharedPreferencesWrapper {
     private var context: Context
-    private var SHARED_PREFERENCES_NAME = SharedPreferencesWrapper::class.qualifiedName
+    private var SHARED_PREFERENCES_NAME = "com.ismail_s.jtime.android.SharedPreferencesWrapper"
     private var PROPERTY_ACCESS_TOKEN = "ACCESS_TOKEN"
     private var PROPERTY_CURRENT_USER_ID = "CURRENT_USER_ID"
     private var PROPERTY_USER_EMAIL = "CURRENT_USER_EMAIL"
