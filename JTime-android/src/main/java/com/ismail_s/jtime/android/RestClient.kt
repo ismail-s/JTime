@@ -40,8 +40,14 @@ class RestClient {
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
 
         if ((Manager.instance.baseHeaders == emptyMap<String, String>() || Manager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
-            Manager.instance.baseHeaders = mapOf("Authorization" to sharedPrefs.accessToken)
+            setHttpHeaders(sharedPrefs.accessToken)
         }
+    }
+
+    private fun setHttpHeaders(accessToken: String) {
+        Manager.instance.baseHeaders = mapOf("Authorization" to accessToken,
+            "Accept" to "application/json",
+            "Content-Type" to "application/json")
     }
 
     fun internetIsAvailable(): Boolean {
@@ -141,7 +147,7 @@ class RestClient {
                     val accessToken = data.getString("access_token")
                     val id = data.getInt("userId")
                     restAdapter.setAccessToken(accessToken)
-                    Manager.instance.baseHeaders = mapOf("Authorization" to accessToken)
+                    setHttpHeaders(accessToken)
                     sharedPrefs.accessToken = accessToken
                     sharedPrefs.userId = id
                     sharedPrefs.email = email
