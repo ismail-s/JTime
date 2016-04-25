@@ -40,8 +40,14 @@ class RestClient {
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
 
         if ((Manager.instance.baseHeaders == emptyMap<String, String>() || Manager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
-            Manager.instance.baseHeaders = mapOf("Authorization" to sharedPrefs.accessToken)
+            setHttpHeaders(sharedPrefs.accessToken)
         }
+    }
+
+    private fun setHttpHeaders(accessToken: String) {
+        Manager.instance.baseHeaders = mapOf("Authorization" to accessToken,
+            "Accept" to "application/json",
+            "Content-Type" to "application/json")
     }
 
     fun internetIsAvailable(): Boolean {
@@ -102,6 +108,27 @@ class RestClient {
         })
     }
 
+    fun createMasjid(name: String, latitude: Double, longitude: Double, cb: MasjidCreatedCallback) {
+        val body = JSONObject()
+        val loc = JSONObject()
+        loc.put("lat", latitude)
+        loc.put("lng", longitude)
+        body.put("name", name)
+        body.put("location", loc)
+        val url = Companion.url + "/Masjids"
+        url.httpPost().body(body.toString()).responseJson { request, response, result ->
+            when (result) {
+                is Result.Failure -> {
+                    cb.onError(result.getAs<FuelError>()!!)
+                }
+                is Result.Success -> {
+                cb.onSuccess()
+                }
+            }
+        }
+
+    }
+
     fun login(code: String, email: String, cb: LoginCallback) {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
@@ -120,7 +147,7 @@ class RestClient {
                     val accessToken = data.getString("access_token")
                     val id = data.getInt("userId")
                     restAdapter.setAccessToken(accessToken)
-                    Manager.instance.baseHeaders = mapOf("Authorization" to accessToken)
+                    setHttpHeaders(accessToken)
                     sharedPrefs.accessToken = accessToken
                     sharedPrefs.userId = id
                     sharedPrefs.email = email
@@ -219,6 +246,8 @@ class RestClient {
         fun onLoggedIn()
         fun onLoggedOut()
     }
+
+    interface MasjidCreatedCallback: LogoutCallback {}
 
     companion object {
         // By having url in the companion object, we can change the url from tests

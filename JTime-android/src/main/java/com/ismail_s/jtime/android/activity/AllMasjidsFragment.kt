@@ -28,7 +28,8 @@ class AllMasjidsFragment : Fragment() {
             }
 
             override fun onError(t: Throwable) {
-                Toast.makeText(activity, "Weren't able to get masjids", Toast.LENGTH_LONG)
+                if (activity != null)
+                    Toast.makeText(activity, "Weren't able to get masjids", Toast.LENGTH_LONG)
                         .show()
             }
         }
