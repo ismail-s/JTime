@@ -102,6 +102,27 @@ class RestClient {
         })
     }
 
+    fun createMasjid(name: String, latitude: Double, longitude: Double, cb: MasjidCreatedCallback) {
+        val body = JSONObject()
+        val loc = JSONObject()
+        loc.put("lat", latitude)
+        loc.put("lng", longitude)
+        body.put("name", name)
+        body.put("location", loc)
+        val url = Companion.url + "/Masjids"
+        url.httpPost().body(body.toString()).responseJson { request, response, result ->
+            when (result) {
+                is Result.Failure -> {
+                    cb.onError(result.getAs<FuelError>()!!)
+                }
+                is Result.Success -> {
+                cb.onSuccess()
+                }
+            }
+        }
+
+    }
+
     fun login(code: String, email: String, cb: LoginCallback) {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
@@ -219,6 +240,8 @@ class RestClient {
         fun onLoggedIn()
         fun onLoggedOut()
     }
+
+    interface MasjidCreatedCallback: LogoutCallback {}
 
     companion object {
         // By having url in the companion object, we can change the url from tests

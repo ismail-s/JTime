@@ -14,11 +14,13 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.ismail_s.jtime.android.R
+import com.ismail_s.jtime.android.RestClient
 
 class AddMasjidFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener, View.OnClickListener {
     private var current_marker: Marker? = null
     private var googleMap: GoogleMap? = null
     lateinit private var masjidNameTextbox: EditText
+    lateinit private var submitButton: Button
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -28,20 +30,35 @@ class AddMasjidFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongCli
         childFragmentManager.beginTransaction()
             .add(R.id.map_container, mapFragment).commit()
         masjidNameTextbox = rootView.findViewById(R.id.masjid_name_textbox) as EditText
-        val submitButton = rootView.findViewById(R.id.add_masjid_submit_button) as Button
+        submitButton = rootView.findViewById(R.id.add_masjid_submit_button) as Button
         submitButton.setOnClickListener(this)
         return rootView
     }
 
     override fun onClick(view: View) {
         if (view.id == R.id.add_masjid_submit_button) {
+            val masjidName = masjidNameTextbox.text.toString()
             //1. Validate fields
-            if (current_marker == null || masjidNameTextbox.text.toString() == "") {
+            if (current_marker == null || masjidName == "") {
                 return
             }
-            //2. TODO-submit form
-            //3. switch to AllMasjidsFragment
-            (activity as MainActivity).switchToAllMasjidsFragment()
+            //2. submit form
+            val showToast = {s: String -> (activity as MainActivity).showShortToast(s)}
+            val cb = object: RestClient.MasjidCreatedCallback {
+                override fun onSuccess() {
+                    showToast("Masjid \"$masjidName\" created")
+                    //3. switch to AllMasjidsFragment
+                    (activity as MainActivity).switchToAllMasjidsFragment()
+                }
+
+                override fun onError(t: Throwable) {
+                    showToast("Error when trying to create masjid: ${t.toString()}")
+                    submitButton.isEnabled = true
+                }
+            }
+            val location = (current_marker as Marker).position
+            RestClient(activity).createMasjid(masjidName, location.latitude, location.longitude, cb)
+            submitButton.isEnabled = false
         }
     }
 
