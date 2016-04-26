@@ -30,9 +30,9 @@ test:
     # Unlock the lockscreen on the emulator
     - fb-adb shell input keyevent 82
     - fb-adb shell input keyevent 92
-    - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(timestamp).png
+    - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
     - (cd JTime-android && ./gradlew connectedAndroidTest)
-    - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(timestamp).png
+    - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
   post:
     - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
