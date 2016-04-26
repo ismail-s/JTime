@@ -50,8 +50,10 @@ public class MainActivityEspressoTest extends ActivityInstrumentationTestCase2<M
      */
     @BeforeClass
     public static void unlockEmulator() throws IOException,InterruptedException {
-        String command = "fb-adb shell input keyevent 82 || adb shell input keyevent 82";
-        Runtime.getRuntime().exec(command).waitFor();
+        String command1 = "fb-adb shell input keyevent 82 || adb shell input keyevent 82";
+        String command2 = "fb-adb shell input keyevent 92 || adb shell input keyevent 92";
+        Runtime.getRuntime().exec(command1).waitFor();
+        Runtime.getRuntime().exec(command2).waitFor();
     }
 
     @Before
