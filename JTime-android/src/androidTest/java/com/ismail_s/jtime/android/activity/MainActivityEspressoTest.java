@@ -49,8 +49,9 @@ public class MainActivityEspressoTest extends ActivityInstrumentationTestCase2<M
      * are very slim.
      */
     @BeforeClass
-    public static void unlockEmulator() throws IOException {
-        Runtime.getRuntime().exec("adb shell input keyevent 82");
+    public static void unlockEmulator() throws IOException,InterruptedException {
+        String command = "fb-adb shell input keyevent 82 || adb shell input keyevent 82";
+        Runtime.getRuntime().exec(command).waitFor();
     }
 
     @Before
