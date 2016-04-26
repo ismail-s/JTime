@@ -27,6 +27,8 @@ test:
     # Sleeping isn't a brilliant fix...
     - sleep 30
     - fb-adb devices
+    - fb-adb shell input keyevent 82
+    - fb-adb shell input keyevent 92
     - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
     # Note the espresso tests include code to unlock the emulator before running the tests
     - (cd JTime-android && ./gradlew connectedAndroidTest)
