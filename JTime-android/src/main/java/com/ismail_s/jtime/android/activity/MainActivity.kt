@@ -27,6 +27,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
     private val LOGOUT_DRAWER_ITEM_IDENTIFIER: Long = 232
     private val ADD_MASJID_DRAWER_ITEM_IDENTIFIER: Long = 785
+    private val CHANGE_MASJID_TIMES_DRAWER_ITEM_IDENTIFIER: Long = 364
 
     private val logoutDrawerItem = PrimaryDrawerItem()
             .withName("Logout")
@@ -41,6 +42,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         drawer?.addItemAtPosition(loginDrawerItem, 0)
                         //remove addMasjidDrawerItem
                         drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                        drawer?.removeItem(CHANGE_MASJID_TIMES_DRAWER_ITEM_IDENTIFIER)
                     }
 
                     override fun onError(t: Throwable) = showShortToast("Logout unsuccessful: ${t.message}")
@@ -63,6 +65,14 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
             .withIdentifier(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
             .withOnDrawerItemClickListener { view, i, iDrawerItem ->
                 switchToAddMasjidFragment()
+                true
+            }
+
+    private val changeMasjidTimesDrawerItem = PrimaryDrawerItem()
+            .withName("Change Masjid Times")
+            .withIdentifier(CHANGE_MASJID_TIMES_DRAWER_ITEM_IDENTIFIER)
+            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                switchToChangeMasjidTimesFragment()
                 true
             }
 
@@ -91,7 +101,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                 val email: String = SharedPreferencesWrapper(this@MainActivity).email
                 header.addProfile(ProfileDrawerItem().withEmail(email), 0)
                 //add addMasjidDrawerItem
-                drawer?.addItem(addMasjidDrawerItem)
+                drawer?.addItems(addMasjidDrawerItem, changeMasjidTimesDrawerItem)
 
             }
         }
@@ -170,6 +180,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment())
 
     fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment())
+
+    fun switchToChangeMasjidTimesFragment() = switchToFragment(ChangeMasjidTimesFragment())
 
     fun switchToFragment(fragment: Fragment) {
         fragmentManager.beginTransaction()
