@@ -20,6 +20,7 @@ class MasjidsFragment : Fragment() {
      * This should be a big number, so that it is as if there are an infinite number of pages.
      */
     private val NUM_OF_PAGES = 1000
+    lateinit private val masjidName: String
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -33,7 +34,7 @@ class MasjidsFragment : Fragment() {
         val mViewPager = view.findViewById(R.id.container) as ViewPager
         mViewPager.adapter = mSectionsPagerAdapter
         mViewPager.currentItem = NUM_OF_PAGES / 2
-        val masjidName = arguments.getString(Constants.MASJID_NAME)
+        masjidName = arguments.getString(Constants.MASJID_NAME)
         val masjidNameView = view.findViewById(R.id.masjid_name) as TextView
         masjidNameView.text = masjidName
         return view
@@ -62,7 +63,7 @@ class MasjidsFragment : Fragment() {
             val date = GregorianCalendar()
             date.add(GregorianCalendar.DAY_OF_YEAR, position - NUM_OF_PAGES / 2)
             val masjidId = arguments.getInt(Constants.MASJID_ID)
-            return MasjidFragment.newInstance(masjidId, date)
+            return MasjidFragment.newInstance(masjidId, masjidName, date)
         }
 
         override fun getCount(): Int {

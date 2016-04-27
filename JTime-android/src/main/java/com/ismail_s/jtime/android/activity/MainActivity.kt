@@ -181,7 +181,10 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
 
     fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment())
 
-    fun switchToChangeMasjidTimesFragment() = switchToFragment(ChangeMasjidTimesFragment())
+    fun switchToChangeMasjidTimesFragment(masjidId: Int, masjidName: String, date: GregorianCalendar) {
+        val fragment = ChangeMasjidTimesFragment(masjidId, masjidName, date)
+        switchToFragment(fragment)
+    }
 
     fun switchToFragment(fragment: Fragment) {
         fragmentManager.beginTransaction()

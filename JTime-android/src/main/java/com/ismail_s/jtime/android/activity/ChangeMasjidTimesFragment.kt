@@ -20,4 +20,19 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View) {
     }
+
+    companion object {
+        private val ARG_DATE = "date"
+        private val MASJID_NAME = "masjid_name"
+
+        fun newInstance(masjidId: Int, masjidName: String, date: GregorianCalendar): ChangeMasjidTimesFragment {
+            val fragment = ChangeMasjidTimesFragment()
+            val args = Bundle()
+            args.putSerializable(ARG_DATE, date)
+            args.putInt(Constants.MASJID_ID, masjidId)
+            args.putString(MASJID_NAME, masjidName)
+            fragment.arguments = args
+            return fragment
+        }
+    }
 }

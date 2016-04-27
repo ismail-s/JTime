@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.ismail_s.jtime.android.MasjidPojo
@@ -56,6 +57,11 @@ class MasjidFragment : Fragment() {
         }
         // TODO-instead of 1, what should the default value be here?
         val masjidId = arguments.getInt(Constants.MASJID_ID)
+        val editButton = rootView.findViewById(R.id.edit_button) as Button
+        editButton.setOnClickListener {view ->
+            val masjidName = arguments.getString(Constants.MASJID_NAME)
+            (activity as MainActivity).switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
+        }
         RestClient(activity).getMasjidTimes(masjidId, cb, date)
         return rootView
     }
@@ -71,11 +77,12 @@ class MasjidFragment : Fragment() {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        fun newInstance(masjidId: Int, date: GregorianCalendar): MasjidFragment {
+        fun newInstance(masjidId: Int, masjidName: String, date: GregorianCalendar): MasjidFragment {
             val fragment = MasjidFragment()
             val args = Bundle()
             args.putSerializable(ARG_DATE, date)
             args.putInt(Constants.MASJID_ID, masjidId)
+            args.putString(Constants.MASJID_NAME, masjidName)
             fragment.arguments = args
             return fragment
         }
