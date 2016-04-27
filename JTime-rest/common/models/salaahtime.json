@@ -48,11 +48,10 @@
         "principalId": "$everyone",
         "permission": "DENY"
     }, {
-        "accessType": "WRITE",
         "principalType": "ROLE",
         "principalId": "$authenticated",
         "permission": "ALLOW",
-        "property": "create"
+        "property": "createOrUpdate"
     }],
     "methods": {}
 }
