@@ -11,21 +11,25 @@
     tools:context=".activity.ChangeMasjidTimesFragment">
 
     <Button
+        android:id="@+id/undo_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="undo"/>
 
     <Button
+        android:id="@+id/up_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="up"/>
 
     <Button
+        android:id="@+id/copy_up_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="copy up"/>
 
     <Button
+        android:id="@+id/left_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="left"/>
@@ -38,16 +42,19 @@
         android:textSize="25sp" />
 
    <Button
+        android:id="@+id/right_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="right"/>
 
     <Button
+        android:id="@+id/down_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="down"/>
 
     <Button
+        android:id="@+id/copy_down_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="copy down"/>

@@ -28,6 +28,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
         masjidId = arguments.getInt(Constants.MASJID_ID)
         masjidName = arguments.getString(MASJID_NAME)
         date = arguments.getSerializable(ARG_DATE) as GregorianCalendar
+        setButtonOnClickListeners(rootView)
         //Get times for date
         val cb = object : RestClient.MasjidTimesCallback {
             override fun onSuccess(times: MasjidPojo) {
@@ -48,6 +49,17 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
         }
         RestClient(activity).getMasjidTimes(masjidId, cb, date)
         return rootView
+    }
+
+    private fun setButtonOnClickListeners(rootView: View) {
+        val buttonIds = listOf(R.id.undo_button, R.id.up_button,
+                                R.id.down_button, R.id.left_button,
+                                R.id.right_button, R.id.copy_up_button,
+                                R.id.copy_down_button)
+        for (buttonId in buttons) {
+            val b = rootView.findViewById(buttonId) as Button
+            b.onClickListener = this
+        }
     }
 
     override fun onClick(view: View) {
