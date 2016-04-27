@@ -71,11 +71,11 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 //Change the time to what it was originally
                 var time: GregorianCalendar? = null
                 when (currentSalaahType) {
-                    SalaahType.FAJR -> {time = currentMasjidPojo.fajrTime}
-                    SalaahType.ZOHAR -> {time = currentMasjidPojo.zoharTime}
-                    SalaahType.ASR -> {time = currentMasjidPojo.asrTime}
-                    SalaahType.MAGRIB -> {time = currentMasjidPojo.magribTime}
-                    SalaahType.ESHA -> {time = currentMasjidPojo.eshaTime}
+                    SalaahType.FAJR -> {time = currentMasjidPojo?.fajrTime}
+                    SalaahType.ZOHAR -> {time = currentMasjidPojo?.zoharTime}
+                    SalaahType.ASR -> {time = currentMasjidPojo?.asrTime}
+                    SalaahType.MAGRIB -> {time = currentMasjidPojo?.magribTime}
+                    SalaahType.ESHA -> {time = currentMasjidPojo?.eshaTime}
                 }
                 if (time == null) {
                     masjidTimeTextbox.setText("")
