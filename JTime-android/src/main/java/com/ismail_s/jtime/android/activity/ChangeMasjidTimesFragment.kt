@@ -81,7 +81,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                     masjidTimeTextbox.setText("")
                 } else {
                     val t = formatCalendarAsTime(time as GregorianCalendar)
-                    masjidTimeTextbox.setText(fTime)
+                    masjidTimeTextbox.setText(t)
                 }
             }
             R.id.up_button -> {
