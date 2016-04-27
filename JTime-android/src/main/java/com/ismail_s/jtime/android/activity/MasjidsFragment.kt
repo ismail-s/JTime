@@ -20,7 +20,7 @@ class MasjidsFragment : Fragment() {
      * This should be a big number, so that it is as if there are an infinite number of pages.
      */
     private val NUM_OF_PAGES = 1000
-    lateinit private val masjidName: String
+    lateinit private var masjidName: String
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

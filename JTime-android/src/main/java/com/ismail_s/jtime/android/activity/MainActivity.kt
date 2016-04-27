@@ -19,6 +19,7 @@ import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
+import java.util.*
 
 class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListener {
      var drawer: Drawer? = null
@@ -172,7 +173,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment())
 
     fun switchToChangeMasjidTimesFragment(masjidId: Int, masjidName: String, date: GregorianCalendar) {
-        val fragment = ChangeMasjidTimesFragment(masjidId, masjidName, date)
+        val fragment = ChangeMasjidTimesFragment.newInstance(masjidId, masjidName, date)
         switchToFragment(fragment)
     }
 

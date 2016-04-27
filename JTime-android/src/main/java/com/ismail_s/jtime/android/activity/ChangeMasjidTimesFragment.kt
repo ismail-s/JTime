@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
 import com.ismail_s.jtime.android.RestClient
@@ -14,11 +15,11 @@ import com.ismail_s.jtime.android.MasjidPojo
 import java.util.*
 
 class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
-    lateinit private val masjidId: Int
-    lateinit private val masjidName: String
+    lateinit private var masjidId: Int
+    lateinit private var masjidName: String
     lateinit private var date: GregorianCalendar
     private var currentMasjidPojo: MasjidPojo? = null
-    lateinit private val masjidTimeTextbox: EditText
+    lateinit private var masjidTimeTextbox: EditText
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
