@@ -10,7 +10,8 @@ import android.widget.Toast
 import com.ismail_s.jtime.android.MasjidPojo
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
-import java.text.SimpleDateFormat
+import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
+import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
 import java.util.*
 
 /**
@@ -57,19 +58,6 @@ class MasjidFragment : Fragment() {
         val masjidId = arguments.getInt(Constants.MASJID_ID)
         RestClient(activity).getMasjidTimes(masjidId, cb, date)
         return rootView
-    }
-
-    private fun formatCalendarAsTime(calendar: GregorianCalendar): String {
-        return formatCalendar(calendar, "HH:mm")
-    }
-
-    private fun formatCalendarAsDate(calendar: GregorianCalendar): String {
-        return formatCalendar(calendar, "yyyy MMM dd")
-    }
-
-    private fun formatCalendar(calendar: GregorianCalendar, formatString: String): String {
-        val formatter = SimpleDateFormat(formatString, Locale.getDefault())
-        return formatter.format(calendar.time)
     }
 
     companion object {
