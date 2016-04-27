@@ -63,6 +63,29 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(view: View) {
+        when (view.id) {
+            R.id.undo_button -> {
+                //Change the time to what it was originally
+            }
+            R.id.up_button -> {
+                //Save time, switch to prev. day
+            }
+            R.id.down_button -> {
+                //Save time, switch to next day
+            }
+            R.id.left_button -> {
+                //Save time, switch to prev. salaah
+            }
+            R.id.right_button -> {
+                //Save time, switch to next salaah
+            }
+            R.id.copy_up_button -> {
+                //Save time, switch to prev. day, set time
+            }
+            R.id.copy_down_button -> {
+                //Save time, switch to next day, set time
+            }
+        }
     }
 
     companion object {
