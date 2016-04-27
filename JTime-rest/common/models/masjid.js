@@ -12,6 +12,7 @@ module.exports = function(Masjid) {
             if (err != null) {
                 console.error(err, instances, id);
                 cb(500);
+                return;
             }
             cb(null, instances);
         });
@@ -57,6 +58,7 @@ module.exports = function(Masjid) {
                 if (err != null) {
                     console.error(err, instances, id, date);
                     cb(500);
+                    return;
                 }
                 cb(null, instances);
             });
