@@ -56,9 +56,9 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                                 R.id.down_button, R.id.left_button,
                                 R.id.right_button, R.id.copy_up_button,
                                 R.id.copy_down_button)
-        for (buttonId in buttons) {
+        for (buttonId in buttonIds) {
             val b = rootView.findViewById(buttonId) as Button
-            b.onClickListener = this
+            b.setOnClickListener(this)
         }
     }
 
