@@ -15,7 +15,7 @@ import com.ismail_s.jtime.android.MasjidPojo
 import java.util.*
 
 class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
-    lateinit private var masjidId: Int
+    private var masjidId: Int = -1
     lateinit private var masjidName: String
     lateinit private var date: GregorianCalendar
     private var currentMasjidPojo: MasjidPojo? = null
@@ -34,7 +34,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 currentMasjidPojo = times
                 if (times.fajrTime != null) {
                     val fTime = formatCalendarAsTime(times.fajrTime as GregorianCalendar)
-                    masjidTimeTextbox.text = fTime
+                    masjidTimeTextbox.setText(fTime)
                 }
             }
 
