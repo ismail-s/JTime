@@ -12,6 +12,7 @@ import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
 import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.MasjidPojo
+import com.ismail_s.jtime.android.SalaahType
 import java.util.*
 
 class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
@@ -19,6 +20,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
     lateinit private var masjidName: String
     lateinit private var date: GregorianCalendar
     private var currentMasjidPojo: MasjidPojo? = null
+    private var currentSalaahType: SalaahType = SalaahType.FAJR
     lateinit private var masjidTimeTextbox: EditText
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -36,6 +38,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 if (times.fajrTime != null) {
                     val fTime = formatCalendarAsTime(times.fajrTime as GregorianCalendar)
                     masjidTimeTextbox.setText(fTime)
+                    currentSalaahType = SalaahType.FAJR
                 }
             }
 
@@ -66,6 +69,20 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
         when (view.id) {
             R.id.undo_button -> {
                 //Change the time to what it was originally
+                var time: GregorianCalendar? = null
+                when (currentSalaahType) {
+                    is SalaahType.FAJR -> {time = times.fajrTime}
+                    is SalaahType.ZOHAR -> {time = times.zoharTime}
+                    is SalaahType.ASR -> {time = times.asrTime}
+                    is SalaahType.MAGRIB -> {time = times.magribTime}
+                    is SalaahType.ESHA -> {time = times.eshaTime}
+                }
+                if (time == null) {
+                    masjidTimeTextbox.setText("")
+                } else {
+                    val t = formatCalendarAsTime(time as GregorianCalendar)
+                    masjidTimeTextbox.setText(fTime)
+                }
             }
             R.id.up_button -> {
                 //Save time, switch to prev. day
