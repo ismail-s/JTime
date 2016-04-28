@@ -81,12 +81,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                     SalaahType.MAGRIB -> {time = currentMasjidPojo?.magribTime}
                     SalaahType.ESHA -> {time = currentMasjidPojo?.eshaTime}
                 }
-                if (time == null) {
-                    masjidTimeTextbox.setText("")
-                } else {
-                    val t = formatCalendarAsTime(time)
-                    masjidTimeTextbox.setText(t)
-                }
+                setTextboxTime(time)
             }
             R.id.up_button -> saveTimeAndSwitchToAnotherDay(dayOffset = -1)
             R.id.down_button -> saveTimeAndSwitchToAnotherDay(dayOffset = 1)
@@ -109,12 +104,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                     SalaahType.MAGRIB -> {timeToDisplay = times.magribTime}
                     SalaahType.ESHA -> {timeToDisplay = times.eshaTime}
                 }
-                if (timeToDisplay == null) {
-                    masjidTimeTextbox.setText("")
-                } else {
-                    val formattedTime = formatCalendarAsTime(timeToDisplay)
-                    masjidTimeTextbox.setText(formattedTime)
-                }
+                setTextboxTime(timeToDisplay)
             }
         }
     }
@@ -182,12 +172,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                     newTime = currentMasjidPojo.fajrTime
                 }
             }
-            if (newTime == null) {
-                masjidTimeTextbox.setText("")
-            } else {
-                val formattedTime = formatCalendarAsTime(newTime)
-                masjidTimeTextbox.setText(formattedTime)
-            }
+            setTextboxTime(newTime)
         }
     }
 
@@ -217,12 +202,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                     newTime = currentMasjidPojo.magribTime
                 }
             }
-            if (newTime == null) {
-                masjidTimeTextbox.setText("")
-            } else {
-                val formattedTime = formatCalendarAsTime(newTime)
-                masjidTimeTextbox.setText(formattedTime)
-            }
+            setTextboxTime(newTime)
         }
     }
 
@@ -273,6 +253,15 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
             } else {
                 return Time(hour, minute)
             }
+        }
+    }
+
+    fun setTextboxTime(newTime: GregorianCalendar?) {
+        if (newTime == null) {
+            masjidTimeTextbox.setText("")
+        } else {
+            val formattedTime = formatCalendarAsTime(newTime)
+            masjidTimeTextbox.setText(formattedTime)
         }
     }
 
