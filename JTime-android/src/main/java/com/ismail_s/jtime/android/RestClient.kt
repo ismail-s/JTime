@@ -126,7 +126,29 @@ class RestClient {
                 }
             }
         }
+    }
 
+    fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar, cb: CreateOrUpdateMasjidTimeCallback) {
+        val type = when (salaahType) {
+            SalaahType.FAJR -> "f"
+            SalaahType.ZOHAR -> "z"
+            SalaahType.ASR -> "a"
+            SalaahType.MAGRIB -> "m"
+            SalaahType.ESHA -> "e"
+        }
+        val datetime = dateFormatter.format(date.time)
+        val url = Companion.url + "/SalaahTimes/create-or-update"
+        url.httpPost(listOf("masjidId" to "$masjidId", "type" to type, "datetime" to datetime))
+            .responseJson { request, response, result ->
+                when (result) {
+                    is Result.Failure -> {
+                        cb.onError(result.getAs<FuelError>()!!)
+                    }
+                    is Result.Success -> {
+                    cb.onSuccess()
+                    }
+                }
+            }
     }
 
     fun login(code: String, email: String, cb: LoginCallback) {
@@ -248,6 +270,8 @@ class RestClient {
     }
 
     interface MasjidCreatedCallback: LogoutCallback {}
+
+    interface CreateOrUpdateMasjidTimeCallback: LogoutCallback {}
 
     companion object {
         // By having url in the companion object, we can change the url from tests
