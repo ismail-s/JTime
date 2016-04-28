@@ -114,7 +114,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
      * If it is, then it is parsed and returned. Else, null is returned.
      */
     private fun getTextboxTimeIfValid(): Time? {
-        val timeString = masjidTimeTextbox.getString()
+        val timeString = masjidTimeTextbox.getText()
         if (timeString.length != 5) {
             return null
         }
