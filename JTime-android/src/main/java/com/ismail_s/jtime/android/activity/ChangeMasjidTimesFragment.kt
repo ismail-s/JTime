@@ -98,7 +98,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                     return;
                 }
                 //Save time
-                val newDate = date.clone()
+                val newDate = date.clone() as GregorianCalendar
                 newDate.set(Calendar.HOUR_OF_DAY, time.hour)
                 newDate.set(Calendar.MINUTE, time.minute)
                 val cb1 = object : RestClient.CreateOrUpdateMasjidTimeCallback {
@@ -110,15 +110,15 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                         showShortToast(s)
                     }
                 }
-                RestClient(activity).createOrUpdate(masjidId, currentSalaahType, newDate, cb1)
+                RestClient(activity).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate, cb1)
                 //Switch to previous day
-                val prevDate = date.clone()
+                val prevDate = date.clone() as GregorianCalendar
                 prevDate.add(Calendar.DAY_OF_MONTH, -1)
                 val cb2 = object : RestClient.MasjidTimesCallback {
                     override fun onSuccess(times: MasjidPojo) {
                         currentMasjidPojo = times
                         date = prevDate
-                        val timeToDisplay: GregorianCalendar? = null
+                        var timeToDisplay: GregorianCalendar? = null
                         when (currentSalaahType) {
                             SalaahType.FAJR -> {timeToDisplay = times.fajrTime}
                             SalaahType.ZOHAR -> {timeToDisplay = times.zoharTime}
