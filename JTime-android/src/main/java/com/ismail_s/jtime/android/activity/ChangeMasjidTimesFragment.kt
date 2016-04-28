@@ -115,7 +115,9 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                     SalaahType.MAGRIB -> {timeToDisplay = times.magribTime}
                     SalaahType.ESHA -> {timeToDisplay = times.eshaTime}
                 }
-                if (timeToDisplay != null) {
+                if (timeToDisplay == null) {
+                    masjidTimeTextbox.setText("")
+                } else {
                     val formattedTime = formatCalendarAsTime(timeToDisplay)
                     masjidTimeTextbox.setText(formattedTime)
                 }
