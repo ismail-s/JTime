@@ -153,23 +153,23 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
             when (currentSalaahType) {
                 SalaahType.FAJR -> {
                     currentSalaahType = SalaahType.ZOHAR
-                    newTime = currentMasjidPojo.zoharTime
+                    newTime = currentMasjidPojo?.zoharTime
                 }
                 SalaahType.ZOHAR -> {
                     currentSalaahType = SalaahType.ASR
-                    newTime = currentMasjidPojo.asrTime
+                    newTime = currentMasjidPojo?.asrTime
                 }
                 SalaahType.ASR -> {
                     currentSalaahType = SalaahType.MAGRIB
-                    newTime = currentMasjidPojo.magribTime
+                    newTime = currentMasjidPojo?.magribTime
                 }
                 SalaahType.MAGRIB -> {
                     currentSalaahType = SalaahType.ESHA
-                    newTime = currentMasjidPojo.eshaTime
+                    newTime = currentMasjidPojo?.eshaTime
                 }
                 SalaahType.ESHA -> {
                     currentSalaahType = SalaahType.FAJR
-                    newTime = currentMasjidPojo.fajrTime
+                    newTime = currentMasjidPojo?.fajrTime
                 }
             }
             setTextboxTime(newTime)
@@ -183,23 +183,23 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
             when (currentSalaahType) {
                 SalaahType.FAJR -> {
                     currentSalaahType = SalaahType.ESHA
-                    newTime = currentMasjidPojo.eshaTime
+                    newTime = currentMasjidPojo?.eshaTime
                 }
                 SalaahType.ZOHAR -> {
                     currentSalaahType = SalaahType.FAJR
-                    newTime = currentMasjidPojo.fajrTime
+                    newTime = currentMasjidPojo?.fajrTime
                 }
                 SalaahType.ASR -> {
                     currentSalaahType = SalaahType.ZOHAR
-                    newTime = currentMasjidPojo.zoharTime
+                    newTime = currentMasjidPojo?.zoharTime
                 }
                 SalaahType.MAGRIB -> {
                     currentSalaahType = SalaahType.ASR
-                    newTime = currentMasjidPojo.asrTime
+                    newTime = currentMasjidPojo?.asrTime
                 }
                 SalaahType.ESHA -> {
                     currentSalaahType = SalaahType.MAGRIB
-                    newTime = currentMasjidPojo.magribTime
+                    newTime = currentMasjidPojo?.magribTime
                 }
             }
             setTextboxTime(newTime)
