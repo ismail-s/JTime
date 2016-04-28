@@ -123,7 +123,8 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
             return null
         } else {
             val (h, m) = match.destructured
-            val (hour, minute) = (h.toInt(), m.toInt())
+            val hour = h.toInt()
+            val minute = m.toInt()
             if (!(0 <= hour && hour <= 23 && 0 <= minute && minute <= 59)) {
                 return null
             } else {
