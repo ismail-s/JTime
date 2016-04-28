@@ -16,6 +16,10 @@ import com.ismail_s.jtime.android.SalaahType
 import java.util.*
 
 class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
+
+    data class Time(val hour: Int, val minute: Int)
+
+    private val timeRegex = Regex("""(?<hour>\d\d)[:\- ](?<minute>\d\d)""")
     private var masjidId: Int = -1
     lateinit private var masjidName: String
     lateinit private var date: GregorianCalendar
@@ -101,6 +105,29 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
             }
             R.id.copy_down_button -> {
                 //Save time, switch to next day, set time
+            }
+        }
+    }
+
+    /**
+     * Get the text that is in the textbox, and see if it is a valid time.
+     * If it is, then it is parsed and returned. Else, null is returned.
+     */
+    private fun getTextboxTimeIfValid(): Time? {
+        val timeString = masjidTimeTextbox.getString()
+        if (timeString.length != 5) {
+            return null
+        }
+        val match = timeRegex.matchEntire(timeString)
+        if (match == null) {
+            return null
+        } else {
+            val (h, m) = match.destructured
+            val (hour, minute) = (h.toInt(), m.toInt())
+            if (!(0 <= hour && hour <= 23 && 0 <= minute && minute <= 59)) {
+                return null
+            } else {
+                return Time(hour, minute)
             }
         }
     }
