@@ -84,27 +84,82 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 if (time == null) {
                     masjidTimeTextbox.setText("")
                 } else {
-                    val t = formatCalendarAsTime(time as GregorianCalendar)
+                    val t = formatCalendarAsTime(time)
                     masjidTimeTextbox.setText(t)
                 }
             }
             R.id.up_button -> {
-                //Save time, switch to prev. day
+                //If invalid time, return straightaway
+                val time = getTextboxTimeIfValid()
+                if (time == null) {
+                    val msg = "Time isn't valid. Change it so it is valid, " +
+                            "or click on the undo button"
+                    showShortToast(msg)
+                    return;
+                }
+                //Save time
+                val newDate = date.clone()
+                newDate.set(Calendar.HOUR_OF_DAY, time.hour)
+                newDate.set(Calendar.MINUTE, time.minute)
+                val cb1 = object : RestClient.CreateOrUpdateMasjidTimeCallback {
+                    override fun onSuccess() {
+                        showShortToast("DB updated with ${time.hour}:${time.minute}")
+                    }
+                    override fun onError(t: Throwable) {
+                        val s = "Failed to update db with new time: " + t.message
+                        showShortToast(s)
+                    }
+                }
+                RestClient(activity).createOrUpdate(masjidId, currentSalaahType, newDate, cb1)
+                //Switch to previous day
+                val prevDate = date.clone()
+                prevDate.add(Calendar.DAY_OF_MONTH, -1)
+                val cb2 = object : RestClient.MasjidTimesCallback {
+                    override fun onSuccess(times: MasjidPojo) {
+                        currentMasjidPojo = times
+                        date = prevDate
+                        val timeToDisplay: GregorianCalendar? = null
+                        when (currentSalaahType) {
+                            SalaahType.FAJR -> {timeToDisplay = times.fajrTime}
+                            SalaahType.ZOHAR -> {timeToDisplay = times.zoharTime}
+                            SalaahType.ASR -> {timeToDisplay = times.asrTime}
+                            SalaahType.MAGRIB -> {timeToDisplay = times.magribTime}
+                            SalaahType.ESHA -> {timeToDisplay = times.eshaTime}
+                        }
+                        if (timeToDisplay != null) {
+                            val formattedTime = formatCalendarAsTime(timeToDisplay)
+                            masjidTimeTextbox.setText(formattedTime)
+                        }
+                    }
+
+                    override fun onError(t: Throwable) {
+                        val s = "Failed to get times: " + t.message
+                        showShortToast(s)
+                        //TODO-should this (next) line be here
+                        (activity as MainActivity).switchToMasjidsFragment(masjidId, masjidName)
+                    }
+                }
+                RestClient(activity).getMasjidTimes(masjidId, cb2, prevDate)
             }
             R.id.down_button -> {
                 //Save time, switch to next day
+                //If invalid time, return straightaway
             }
             R.id.left_button -> {
                 //Save time, switch to prev. salaah
+                //If invalid time, return straightaway
             }
             R.id.right_button -> {
                 //Save time, switch to next salaah
+                //If invalid time, return straightaway
             }
             R.id.copy_up_button -> {
                 //Save time, switch to prev. day, set time
+                //If invalid time, return straightaway
             }
             R.id.copy_down_button -> {
                 //Save time, switch to next day, set time
+                //If invalid time, return straightaway
             }
         }
     }
@@ -131,6 +186,10 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 return Time(hour, minute)
             }
         }
+    }
+
+    private fun showShortToast(s: String) {
+        Toast.makeText(activity.applicationContext, s, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
