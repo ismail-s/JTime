@@ -126,7 +126,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
     private fun changeTimeAndSwitchToAnotherDayAndCopyTime(dayOffset: Int) {
         changeTimeAndSwitchToAnotherDayAndThen(dayOffset) {
             previousDisplayedTime -> {
-                val formattedTime = formatCalendarAsTime(newDate)
+                val formattedTime = formatCalendarAsTime(previousDisplayedTime)
                 masjidTimeTextbox.setText(formattedTime)
             }
         }
