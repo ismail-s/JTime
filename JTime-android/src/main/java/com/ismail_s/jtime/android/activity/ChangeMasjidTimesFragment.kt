@@ -19,7 +19,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
 
     data class Time(val hour: Int, val minute: Int)
 
-    private val timeRegex = Regex("""(?<hour>\d\d)[:\- ](?<minute>\d\d)""")
+    private val timeRegex = Regex("""(\d\d)[:\- ](\d\d)""")
     private var masjidId: Int = -1
     lateinit private var masjidName: String
     lateinit private var date: GregorianCalendar
@@ -93,8 +93,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
     }
 
     private fun saveTimeAndSwitchToAnotherDay(dayOffset: Int) {
-        saveTimeAndSwitchToAnotherDayAndThen(dayOffset) {
-            previousDisplayedTime -> {
+        saveTimeAndSwitchToAnotherDayAndThen(dayOffset) { previousDisplayedTime ->
                 val times = currentMasjidPojo as MasjidPojo
                 var timeToDisplay: GregorianCalendar? = null
                 when (currentSalaahType) {
@@ -105,16 +104,13 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                     SalaahType.ESHA -> {timeToDisplay = times.eshaTime}
                 }
                 setTextboxTime(timeToDisplay)
-            }
         }
     }
 
     private fun saveTimeAndSwitchToAnotherDayAndCopyTime(dayOffset: Int) {
-        saveTimeAndSwitchToAnotherDayAndThen(dayOffset) {
-            previousDisplayedTime -> {
+        saveTimeAndSwitchToAnotherDayAndThen(dayOffset) { previousDisplayedTime ->
                 val formattedTime = formatCalendarAsTime(previousDisplayedTime)
                 masjidTimeTextbox.setText(formattedTime)
-            }
         }
     }
 
@@ -224,7 +220,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 showShortToast("DB updated with ${time.hour}:${time.minute}")
             }
             override fun onError(t: Throwable) {
-                val s = "Failed to update db with new time: " + t.message
+                val s = "Failed to update db with new time: $t"
                 showShortToast(s)
             }
         }
@@ -237,7 +233,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
      * If it is, then it is parsed and returned. Else, null is returned.
      */
     private fun getTextboxTimeIfValid(): Time? {
-        val timeString = masjidTimeTextbox.getText()
+        val timeString = masjidTimeTextbox.text
         if (timeString.length != 5) {
             return null
         }
