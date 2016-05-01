@@ -109,8 +109,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
 
     private fun saveTimeAndSwitchToAnotherDayAndCopyTime(dayOffset: Int) {
         saveTimeAndSwitchToAnotherDayAndThen(dayOffset) { previousDisplayedTime ->
-                val formattedTime = formatCalendarAsTime(previousDisplayedTime)
-                masjidTimeTextbox.setText(formattedTime)
+                setTextboxTime(previousDisplayedTime)
         }
     }
 
@@ -119,7 +118,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
      * switch to a new day as per the dayOffset given. Then, run the "then"
      * parameter function which should sort out what the textbox now displays.
      */
-    private fun saveTimeAndSwitchToAnotherDayAndThen(dayOffset: Int, then: (previousDisplayedTime: GregorianCalendar) -> Unit) {
+    private fun saveTimeAndSwitchToAnotherDayAndThen(dayOffset: Int, then: (previousDisplayedTime: GregorianCalendar?) -> Unit) {
         saveTimeAndThen { newDate ->
             //Switch to next day
             val nextDate = date.clone() as GregorianCalendar
@@ -202,7 +201,12 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun saveTimeAndThen(then: (newDate: GregorianCalendar) -> Unit) {
+    private fun saveTimeAndThen(then: (newDate: GregorianCalendar?) -> Unit) {
+        if (masjidTimeTextbox.text.length == 0) {
+            //If the textbox is empty, don't save
+            then(null)
+            return
+        }
         //If invalid time, return straightaway
         val time = getTextboxTimeIfValid()
         if (time == null) {
