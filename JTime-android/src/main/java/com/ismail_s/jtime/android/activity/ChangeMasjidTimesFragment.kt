@@ -229,6 +229,23 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
             }
         }
         RestClient(activity).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate, cb1)
+        when (currentSalaahType) {
+            SalaahType.FAJR -> {
+                currentMasjidPojo?.fajrTime = newDate
+            }
+            SalaahType.ZOHAR -> {
+                currentMasjidPojo?.zoharTime = newDate
+            }
+            SalaahType.ASR -> {
+                currentMasjidPojo?.asrTime = newDate
+            }
+            SalaahType.MAGRIB -> {
+                currentMasjidPojo?.magribTime = newDate
+            }
+            SalaahType.ESHA -> {
+                currentMasjidPojo?.eshaTime = newDate
+            }
+        }
         then(newDate)
     }
 
