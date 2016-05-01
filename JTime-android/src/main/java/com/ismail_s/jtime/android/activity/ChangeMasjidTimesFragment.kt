@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
+import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
 import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.MasjidPojo
 import com.ismail_s.jtime.android.SalaahType
@@ -26,11 +28,15 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
     private var currentMasjidPojo: MasjidPojo? = null
     private var currentSalaahType: SalaahType = SalaahType.FAJR
     lateinit private var masjidTimeTextbox: EditText
+    lateinit private var dateLabel: TextView
+    lateinit private var salaahTypeLabel: TextView
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_change_masjid_times, container, false)
         masjidTimeTextbox = rootView.findViewById(R.id.masjid_time_textbox) as EditText
+        dateLabel = rootView.findViewById(R.id.label_date) as TextView
+        salaahTypeLabel = rootView.findViewById(R.id.label_salaah_type) as TextView
         masjidId = arguments.getInt(Constants.MASJID_ID)
         masjidName = arguments.getString(MASJID_NAME)
         date = arguments.getSerializable(ARG_DATE) as GregorianCalendar
@@ -39,10 +45,11 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
         val cb = object : RestClient.MasjidTimesCallback {
             override fun onSuccess(times: MasjidPojo) {
                 currentMasjidPojo = times
+                currentSalaahType = SalaahType.FAJR
+                setLabels(date, currentSalaahType)
                 if (times.fajrTime != null) {
                     val fTime = formatCalendarAsTime(times.fajrTime as GregorianCalendar)
                     masjidTimeTextbox.setText(fTime)
-                    currentSalaahType = SalaahType.FAJR
                 }
             }
 
@@ -138,6 +145,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 }
             }
             RestClient(activity).getMasjidTimes(masjidId, cb2, nextDate)
+            setLabels(nextDate, currentSalaahType)
         }
     }
 
@@ -168,6 +176,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 }
             }
             setTextboxTime(newTime)
+            setLabels(date, currentSalaahType)
         }
     }
 
@@ -198,6 +207,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 }
             }
             setTextboxTime(newTime)
+            setLabels(date, currentSalaahType)
         }
     }
 
@@ -280,6 +290,29 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
             val formattedTime = formatCalendarAsTime(newTime)
             masjidTimeTextbox.setText(formattedTime)
         }
+    }
+
+    private fun setLabels(date: GregorianCalendar, salaahType: SalaahType) {
+        dateLabel.setText(formatCalendarAsDate(date))
+        var salaahText = ""
+        when (salaahType) {
+            SalaahType.FAJR -> {
+                salaahText = "Fajr"
+            }
+            SalaahType.ZOHAR -> {
+                salaahText = "Zohar"
+            }
+            SalaahType.ASR -> {
+                salaahText = "Asr"
+            }
+            SalaahType.MAGRIB -> {
+                salaahText = "Magrib"
+            }
+            SalaahType.ESHA -> {
+                salaahText = "Esha"
+            }
+        }
+        salaahTypeLabel.setText(salaahText)
     }
 
     private fun showShortToast(s: String) {
