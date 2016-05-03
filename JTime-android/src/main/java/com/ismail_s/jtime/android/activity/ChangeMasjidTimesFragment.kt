@@ -30,6 +30,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
     lateinit private var masjidTimeTextbox: EditText
     lateinit private var dateLabel: TextView
     lateinit private var salaahTypeLabel: TextView
+    lateinit private var buttons: List<Button>
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -37,6 +38,8 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
         masjidTimeTextbox = rootView.findViewById(R.id.masjid_time_textbox) as EditText
         dateLabel = rootView.findViewById(R.id.label_date) as TextView
         salaahTypeLabel = rootView.findViewById(R.id.label_salaah_type) as TextView
+        val buttonIds = listOf(R.id.undo_button, R.id.up_button, R.id.down_button, R.id.left_button, R.id.right_button, R.id.copy_up_button, R.id.copy_down_button)
+        buttons = buttonIds.map {rootView.findViewById(it) as Button}
         masjidId = arguments.getInt(Constants.MASJID_ID)
         masjidName = arguments.getString(MASJID_NAME)
         date = arguments.getSerializable(ARG_DATE) as GregorianCalendar
@@ -134,6 +137,8 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                 override fun onSuccess(times: MasjidPojo) {
                     currentMasjidPojo = times
                     date = nextDate
+                    //enable all buttons
+                    buttons.map {it.setEnabled(true)}
                     then(newDate)
                 }
 
@@ -144,6 +149,9 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
                     (activity as MainActivity).switchToMasjidsFragment(masjidId, masjidName)
                 }
             }
+            //disable all buttons here whilst we get the masjid times for the
+            // new day
+            buttons.map {it.setEnabled(false)}
             RestClient(activity).getMasjidTimes(masjidId, cb2, nextDate)
             setLabels(nextDate, currentSalaahType)
         }
@@ -232,6 +240,7 @@ class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
         val cb1 = object : RestClient.CreateOrUpdateMasjidTimeCallback {
             override fun onSuccess() {
                 showShortToast("DB updated with ${time.hour}:${time.minute}")
+
             }
             override fun onError(t: Throwable) {
                 val s = "Failed to update db with new time: $t"
