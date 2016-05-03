@@ -217,8 +217,7 @@ class RestClient {
      * is called (including if there is no persisted login).
      */
     fun checkIfStillSignedInOnServer(cb: SignedinCallback) {
-        if (sharedPrefs.accessToken == "" || sharedPrefs.userId == -1) {
-            // We don't have a persisted login
+        if (!sharedPrefs.persistedLoginExists()) {
             cb.onLoggedOut()
             return
         }
