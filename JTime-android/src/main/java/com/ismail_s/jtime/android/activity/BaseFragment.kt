@@ -5,7 +5,7 @@ import android.view.View
 
 
 open class BaseFragment : Fragment() {
-    fun onDrawerOpened(drawerView: View) {}
+    open fun onDrawerOpened(drawerView: View) {}
 
-    fun onDrawerClosed(drawerView: View) {}
+    open fun onDrawerClosed(drawerView: View) {}
 }
