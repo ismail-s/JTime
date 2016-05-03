@@ -1,6 +1,8 @@
 package com.ismail_s.jtime.android.activity
 
 import android.os.Bundle
+import android.content.Context
+import android.view.inputmethod.InputMethodManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,6 +66,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             }
         }
         RestClient(activity).getMasjidTimes(masjidId, cb, date)
+        showKeyboard()
         return rootView
     }
 
@@ -75,6 +78,20 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         for (buttonId in buttonIds) {
             val b = rootView.findViewById(buttonId) as Button
             b.setOnClickListener(this)
+        }
+    }
+
+    override fun onDrawerOpened(drawerView: View) {
+        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(masjidTimeTextbox.getWindowToken(), 0);
+    }
+
+    override fun onDrawerClosed(drawerView: View) = showKeyboard()
+
+    private fun showKeyboard() {
+        if (masjidTimeTextbox.requestFocus()) {
+            val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(masjidTimeTextbox, InputMethodManager.SHOW_IMPLICIT)
         }
     }
 
