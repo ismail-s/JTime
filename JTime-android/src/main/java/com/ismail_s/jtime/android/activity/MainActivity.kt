@@ -45,6 +45,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         drawer?.addItemAtPosition(loginDrawerItem, 0)
                         //remove addMasjidDrawerItem
                         drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                        currentFragment.onLogout()
                     }
 
                     override fun onError(t: Throwable) = showShortToast("Logout unsuccessful: ${t.message}")
@@ -167,6 +168,7 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         drawer?.addItemAtPosition(logoutDrawerItem, 0)
                         //add addMasjidDrawerItem
                         drawer?.addItem(addMasjidDrawerItem)
+                        currentFragment.onLogin()
                     }
 
                     override fun onError(t: Throwable) {

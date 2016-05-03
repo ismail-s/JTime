@@ -8,4 +8,8 @@ open class BaseFragment : Fragment() {
     open fun onDrawerOpened(drawerView: View) {}
 
     open fun onDrawerClosed(drawerView: View) {}
+
+    open fun onLogin() {}
+
+    open fun onLogout() {}
 }
