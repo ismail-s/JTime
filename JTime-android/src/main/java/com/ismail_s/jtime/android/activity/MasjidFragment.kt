@@ -19,6 +19,7 @@ import java.util.*
  * A placeholder fragment containing a simple view.
  */
 class MasjidFragment : BaseFragment() {
+    lateinit private var editButton: Button
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -57,17 +58,26 @@ class MasjidFragment : BaseFragment() {
         }
         // TODO-instead of 1, what should the default value be here?
         val masjidId = arguments.getInt(Constants.MASJID_ID)
-        val editButton = rootView.findViewById(R.id.edit_button) as Button
+        editButton = rootView.findViewById(R.id.edit_button) as Button
+        editButton.setOnClickListener {view ->
+            val masjidName = arguments.getString(Constants.MASJID_NAME)
+            (activity as MainActivity).switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
+        }
         if (SharedPreferencesWrapper(activity).persistedLoginExists()) {
-            editButton.setOnClickListener {view ->
-                val masjidName = arguments.getString(Constants.MASJID_NAME)
-                (activity as MainActivity).switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
-            }
+            onLogin()
         } else {
-            editButton.setVisibility(View.INVISIBLE)
+            onLogout()
         }
         RestClient(activity).getMasjidTimes(masjidId, cb, date)
         return rootView
+    }
+
+    override fun onLogin() {
+        editButton.setVisibility(View.VISIBLE)
+    }
+
+    override fun onLogout() {
+        editButton.setVisibility(View.INVISIBLE)
     }
 
     companion object {

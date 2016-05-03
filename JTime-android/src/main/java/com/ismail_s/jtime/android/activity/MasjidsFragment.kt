@@ -21,6 +21,7 @@ class MasjidsFragment : BaseFragment() {
      */
     private val NUM_OF_PAGES = 1000
     lateinit private var masjidName: String
+    private var activeChildFragments: MutableMap<Int, BaseFragment> = mutableMapOf()
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -39,6 +40,15 @@ class MasjidsFragment : BaseFragment() {
         masjidNameView.text = masjidName
         return view
     }
+
+    override fun onLogin() {
+        activeChildFragments.forEach {it.value.onLogin()}
+    }
+
+    override fun onLogout() {
+        activeChildFragments.forEach {it.value.onLogout()}
+    }
+
 
     companion object {
         fun newInstance(masjidId: Int, masjidName: String): MasjidsFragment {
@@ -64,6 +74,17 @@ class MasjidsFragment : BaseFragment() {
             date.add(GregorianCalendar.DAY_OF_YEAR, position - NUM_OF_PAGES / 2)
             val masjidId = arguments.getInt(Constants.MASJID_ID)
             return MasjidFragment.newInstance(masjidId, masjidName, date)
+        }
+
+        override fun instantiateItem(container: ViewGroup, position: Int): Any {
+            val fragment = super.instantiateItem(container, position) as BaseFragment
+            activeChildFragments.put(position, fragment)
+            return fragment
+        }
+
+        override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {
+            super.destroyItem(container, position, obj)
+            activeChildFragments.remove(position)
         }
 
         override fun getCount(): Int {
