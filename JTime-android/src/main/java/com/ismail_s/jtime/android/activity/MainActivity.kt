@@ -4,6 +4,7 @@ import android.app.Fragment
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
+import android.view.View
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -125,12 +126,24 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     }
 
     private fun setUpNavDrawer(loginOutButton: PrimaryDrawerItem) {
+        val drawerListener = object: Drawer.OnDrawerListener {
+            override fun onDrawerOpened(drawerView: View) {
+                currentFragment.onDrawerOpened(drawerView)
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                currentFragment.onDrawerClosed(drawerView)
+            }
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+        }
         header = AccountHeaderBuilder().withActivity(this)
                 .withProfileImagesVisible(false).withCompactStyle(true)
                 .build()
         drawer = DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(header)
+                .withOnDrawerListener(drawerListener)
                 .addDrawerItems(loginOutButton, PrimaryDrawerItem()
                         .withName("All Masjids")
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
