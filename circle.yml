@@ -17,7 +17,7 @@ test:
     - (cd JTime-android &&./gradlew assembleDebug)
     - android create avd -n custom-android21-googleapis -t "Google Inc.:Google APIs:21" --abi google_apis/armeabi-v7a
   # start the emulator
-    - emulator -avd custom-android21-googleapis -no-audio -no-window:
+    - emulator -avd circleci-android21 -no-audio -no-window:
         background: true
         parallel: true
     - fb-adb start-server:
