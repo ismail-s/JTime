@@ -1,6 +1,5 @@
 package com.ismail_s.jtime.android.activity
 
-import android.app.Fragment
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -13,7 +12,7 @@ import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 import java.util.*
 
-class AllMasjidsFragment : Fragment() {
+class AllMasjidsFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

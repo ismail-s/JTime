@@ -15,7 +15,7 @@ import com.ismail_s.jtime.android.R
 import java.util.*
 
 
-class MasjidsFragment : Fragment() {
+class MasjidsFragment : BaseFragment() {
     /**
      * This should be a big number, so that it is as if there are an infinite number of pages.
      */
@@ -57,7 +57,7 @@ class MasjidsFragment : Fragment() {
      */
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
-        override fun getItem(position: Int): android.app.Fragment {
+        override fun getItem(position: Int): Fragment {
             // getItem is called to instantiate the fragment for the given page.
             // Return a MasjidFragment (defined as a static inner class below).
             val date = GregorianCalendar()

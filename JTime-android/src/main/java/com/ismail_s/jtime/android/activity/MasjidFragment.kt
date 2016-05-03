@@ -1,6 +1,5 @@
 package com.ismail_s.jtime.android.activity
 
-import android.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +17,7 @@ import java.util.*
 /**
  * A placeholder fragment containing a simple view.
  */
-class MasjidFragment : Fragment() {
+class MasjidFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

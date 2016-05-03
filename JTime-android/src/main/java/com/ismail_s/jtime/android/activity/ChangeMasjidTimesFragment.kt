@@ -1,6 +1,5 @@
 package com.ismail_s.jtime.android.activity
 
-import android.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +16,7 @@ import com.ismail_s.jtime.android.MasjidPojo
 import com.ismail_s.jtime.android.SalaahType
 import java.util.*
 
-class ChangeMasjidTimesFragment : Fragment(), View.OnClickListener {
+class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
     data class Time(val hour: Int, val minute: Int)
 

@@ -1,6 +1,5 @@
 package com.ismail_s.jtime.android.activity
 
-import android.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +15,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 
-class AddMasjidFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener, View.OnClickListener {
+class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener, View.OnClickListener {
     private var current_marker: Marker? = null
     private var googleMap: GoogleMap? = null
     lateinit private var masjidNameTextbox: EditText

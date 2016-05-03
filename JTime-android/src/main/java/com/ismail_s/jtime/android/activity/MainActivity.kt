@@ -25,6 +25,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
      var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var googleApiClient: GoogleApiClient
+    val currentFragment: BaseFragment
+        get() = fragmentManager.findFragmentById(R.id.fragment_container) as BaseFragment
     private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
     private val LOGOUT_DRAWER_ITEM_IDENTIFIER: Long = 232
     private val ADD_MASJID_DRAWER_ITEM_IDENTIFIER: Long = 785
