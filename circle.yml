@@ -15,9 +15,9 @@ test:
     # robolectric
     #- (cd JTime-android && (./gradlew test assembleDebug || ./gradlew test assembleDebug))
     - (cd JTime-android &&./gradlew assembleDebug)
-    - android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
+    - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
   # start the emulator
-    - echo | emulator -avd custom-android21-googleapis -no-audio -no-window:
+    - emulator -avd custom-android21-googleapis -no-audio -no-window:
         background: true
         parallel: true
     - fb-adb start-server:
