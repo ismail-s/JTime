@@ -64,7 +64,7 @@ class MasjidFragment : BaseFragment() {
                 (activity as MainActivity).switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
             }
         } else {
-            editButton.setVisibility(View.GONE)
+            editButton.setVisibility(View.INVISIBLE)
         }
         RestClient(activity).getMasjidTimes(masjidId, cb, date)
         return rootView
