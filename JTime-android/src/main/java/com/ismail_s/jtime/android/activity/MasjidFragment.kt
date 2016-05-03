@@ -12,6 +12,7 @@ import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
+import com.ismail_s.jtime.android.SharedPreferencesWrapper
 import java.util.*
 
 /**
@@ -57,9 +58,13 @@ class MasjidFragment : BaseFragment() {
         // TODO-instead of 1, what should the default value be here?
         val masjidId = arguments.getInt(Constants.MASJID_ID)
         val editButton = rootView.findViewById(R.id.edit_button) as Button
-        editButton.setOnClickListener {view ->
-            val masjidName = arguments.getString(Constants.MASJID_NAME)
-            (activity as MainActivity).switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
+        if (SharedPreferencesWrapper(activity).persistedLoginExists()) {
+            editButton.setOnClickListener {view ->
+                val masjidName = arguments.getString(Constants.MASJID_NAME)
+                (activity as MainActivity).switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
+            }
+        } else {
+            editButton.setVisibility(View.GONE)
         }
         RestClient(activity).getMasjidTimes(masjidId, cb, date)
         return rootView
