@@ -150,6 +150,11 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
                             switchToAllMasjidsFragment()
                             true
+                        }, PrimaryDrawerItem()
+                        .withName("Help")
+                        .withOnDrawerItemClickListener {view, position, drawerItem ->
+                            switchToHelpFragment()
+                            true
                         })
                 .build()
     }
@@ -188,6 +193,8 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment())
 
     fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment())
+
+    fun switchToHelpFragment() = switchToFragment(HelpFragment())
 
     fun switchToChangeMasjidTimesFragment(masjidId: Int, masjidName: String, date: GregorianCalendar) {
         val fragment = ChangeMasjidTimesFragment.newInstance(masjidId, masjidName, date)

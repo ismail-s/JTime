@@ -79,6 +79,8 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             val b = rootView.findViewById(buttonId) as Button
             b.setOnClickListener(this)
         }
+        val helpButton = rootView.findViewById(R.id.help_button) as Button
+        helpButton.setOnClickListener { (activity as MainActivity).switchToHelpFragment() }
     }
 
     override fun onDrawerOpened(drawerView: View) {
