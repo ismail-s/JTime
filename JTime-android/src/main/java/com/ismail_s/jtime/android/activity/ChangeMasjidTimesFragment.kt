@@ -80,13 +80,13 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             b.setOnClickListener(this)
         }
         val helpButton = rootView.findViewById(R.id.help_button) as Button
-        helpButton.setOnClickListener { (activity as MainActivity).switchToHelpFragment() }
+        helpButton.setOnClickListener {
+            hideKeyboard()
+            (activity as MainActivity).switchToHelpFragment()
+        }
     }
 
-    override fun onDrawerOpened(drawerView: View) {
-        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(masjidTimeTextbox.getWindowToken(), 0)
-    }
+    override fun onDrawerOpened(drawerView: View) = hideKeyboard()
 
     override fun onDrawerClosed(drawerView: View) = showKeyboard()
 
@@ -95,6 +95,11 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
         }
+    }
+
+    private fun hideKeyboard() {
+        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(masjidTimeTextbox.windowToken, 0)
     }
 
     override fun onClick(view: View) {
