@@ -126,7 +126,33 @@ class RestClient {
                 }
             }
         }
+    }
 
+    fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar, cb: CreateOrUpdateMasjidTimeCallback) {
+        val fuelInstance = Manager.instance
+        val type = when (salaahType) {
+            SalaahType.FAJR -> "f"
+            SalaahType.ZOHAR -> "z"
+            SalaahType.ASR -> "a"
+            SalaahType.MAGRIB -> "m"
+            SalaahType.ESHA -> "e"
+        }
+        val datetime = dateFormatter.format(date.time)
+        val url = Companion.url + "/SalaahTimes/create-or-update"
+        fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/x-www-form-urlencoded"))
+        url.httpPost(listOf("masjidId" to "$masjidId", "type" to type, "datetime" to datetime))
+            .responseJson { request, response, result ->
+                when (result) {
+                    is Result.Failure -> {
+                        cb.onError(result.getAs<FuelError>()!!)
+                        fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
+                    }
+                    is Result.Success -> {
+                    cb.onSuccess()
+                    fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
+                }
+            }
+        }
     }
 
     fun login(code: String, email: String, cb: LoginCallback) {
@@ -191,8 +217,7 @@ class RestClient {
      * is called (including if there is no persisted login).
      */
     fun checkIfStillSignedInOnServer(cb: SignedinCallback) {
-        if (sharedPrefs.accessToken == "" || sharedPrefs.userId == -1) {
-            // We don't have a persisted login
+        if (!sharedPrefs.persistedLoginExists()) {
             cb.onLoggedOut()
             return
         }
@@ -248,6 +273,8 @@ class RestClient {
     }
 
     interface MasjidCreatedCallback: LogoutCallback {}
+
+    interface CreateOrUpdateMasjidTimeCallback: LogoutCallback {}
 
     companion object {
         // By having url in the companion object, we can change the url from tests

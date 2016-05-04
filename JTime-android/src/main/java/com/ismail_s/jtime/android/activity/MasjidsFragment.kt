@@ -15,11 +15,13 @@ import com.ismail_s.jtime.android.R
 import java.util.*
 
 
-class MasjidsFragment : Fragment() {
+class MasjidsFragment : BaseFragment() {
     /**
      * This should be a big number, so that it is as if there are an infinite number of pages.
      */
     private val NUM_OF_PAGES = 1000
+    lateinit private var masjidName: String
+    private var activeChildFragments: MutableMap<Int, BaseFragment> = mutableMapOf()
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -33,11 +35,20 @@ class MasjidsFragment : Fragment() {
         val mViewPager = view.findViewById(R.id.container) as ViewPager
         mViewPager.adapter = mSectionsPagerAdapter
         mViewPager.currentItem = NUM_OF_PAGES / 2
-        val masjidName = arguments.getString(Constants.MASJID_NAME)
+        masjidName = arguments.getString(Constants.MASJID_NAME)
         val masjidNameView = view.findViewById(R.id.masjid_name) as TextView
         masjidNameView.text = masjidName
         return view
     }
+
+    override fun onLogin() {
+        activeChildFragments.forEach {it.value.onLogin()}
+    }
+
+    override fun onLogout() {
+        activeChildFragments.forEach {it.value.onLogout()}
+    }
+
 
     companion object {
         fun newInstance(masjidId: Int, masjidName: String): MasjidsFragment {
@@ -56,13 +67,24 @@ class MasjidsFragment : Fragment() {
      */
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
-        override fun getItem(position: Int): android.app.Fragment {
+        override fun getItem(position: Int): Fragment {
             // getItem is called to instantiate the fragment for the given page.
             // Return a MasjidFragment (defined as a static inner class below).
             val date = GregorianCalendar()
             date.add(GregorianCalendar.DAY_OF_YEAR, position - NUM_OF_PAGES / 2)
             val masjidId = arguments.getInt(Constants.MASJID_ID)
-            return MasjidFragment.newInstance(masjidId, date)
+            return MasjidFragment.newInstance(masjidId, masjidName, date)
+        }
+
+        override fun instantiateItem(container: ViewGroup, position: Int): Any {
+            val fragment = super.instantiateItem(container, position) as BaseFragment
+            activeChildFragments.put(position, fragment)
+            return fragment
+        }
+
+        override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {
+            super.destroyItem(container, position, obj)
+            activeChildFragments.remove(position)
         }
 
         override fun getCount(): Int {

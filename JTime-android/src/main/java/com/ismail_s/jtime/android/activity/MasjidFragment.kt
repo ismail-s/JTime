@@ -1,22 +1,25 @@
 package com.ismail_s.jtime.android.activity
 
-import android.app.Fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.ismail_s.jtime.android.MasjidPojo
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
-import java.text.SimpleDateFormat
+import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
+import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
+import com.ismail_s.jtime.android.SharedPreferencesWrapper
 import java.util.*
 
 /**
  * A placeholder fragment containing a simple view.
  */
-class MasjidFragment : Fragment() {
+class MasjidFragment : BaseFragment() {
+    lateinit private var editButton: Button
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -55,21 +58,26 @@ class MasjidFragment : Fragment() {
         }
         // TODO-instead of 1, what should the default value be here?
         val masjidId = arguments.getInt(Constants.MASJID_ID)
+        editButton = rootView.findViewById(R.id.edit_button) as Button
+        editButton.setOnClickListener {view ->
+            val masjidName = arguments.getString(Constants.MASJID_NAME)
+            (activity as MainActivity).switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
+        }
+        if (SharedPreferencesWrapper(activity).persistedLoginExists()) {
+            onLogin()
+        } else {
+            onLogout()
+        }
         RestClient(activity).getMasjidTimes(masjidId, cb, date)
         return rootView
     }
 
-    private fun formatCalendarAsTime(calendar: GregorianCalendar): String {
-        return formatCalendar(calendar, "HH:mm")
+    override fun onLogin() {
+        editButton.setVisibility(View.VISIBLE)
     }
 
-    private fun formatCalendarAsDate(calendar: GregorianCalendar): String {
-        return formatCalendar(calendar, "yyyy MMM dd")
-    }
-
-    private fun formatCalendar(calendar: GregorianCalendar, formatString: String): String {
-        val formatter = SimpleDateFormat(formatString, Locale.getDefault())
-        return formatter.format(calendar.time)
+    override fun onLogout() {
+        editButton.setVisibility(View.INVISIBLE)
     }
 
     companion object {
@@ -83,11 +91,12 @@ class MasjidFragment : Fragment() {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        fun newInstance(masjidId: Int, date: GregorianCalendar): MasjidFragment {
+        fun newInstance(masjidId: Int, masjidName: String, date: GregorianCalendar): MasjidFragment {
             val fragment = MasjidFragment()
             val args = Bundle()
             args.putSerializable(ARG_DATE, date)
             args.putInt(Constants.MASJID_ID, masjidId)
+            args.putString(Constants.MASJID_NAME, masjidName)
             fragment.arguments = args
             return fragment
         }

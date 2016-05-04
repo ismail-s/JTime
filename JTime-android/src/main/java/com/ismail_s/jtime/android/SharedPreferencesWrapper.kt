@@ -39,4 +39,12 @@ class SharedPreferencesWrapper {
         accessToken = ""
         userId = -1
     }
+
+    fun persistedLoginExists(): Boolean {
+        if (this.accessToken == "" || this.userId == -1) {
+            // We don't have a persisted login
+            return false
+        }
+        return true
+    }
 }

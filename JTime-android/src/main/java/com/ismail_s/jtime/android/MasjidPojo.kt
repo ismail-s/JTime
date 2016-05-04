@@ -34,3 +34,7 @@ class MasjidPojo {
     val times: Array<GregorianCalendar>
         get() = arrayOf(fajrTime!!, zoharTime!!, asrTime!!, magribTime!!, eshaTime!!)
 }
+
+enum class SalaahType {
+    FAJR, ZOHAR, ASR, MAGRIB, ESHA
+}
