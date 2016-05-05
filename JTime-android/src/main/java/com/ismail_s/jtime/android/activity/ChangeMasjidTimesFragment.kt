@@ -79,12 +79,14 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             val b = rootView.findViewById(buttonId) as Button
             b.setOnClickListener(this)
         }
+        val helpButton = rootView.findViewById(R.id.help_button) as Button
+        helpButton.setOnClickListener {
+            hideKeyboard()
+            (activity as MainActivity).switchToHelpFragment()
+        }
     }
 
-    override fun onDrawerOpened(drawerView: View) {
-        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(masjidTimeTextbox.getWindowToken(), 0)
-    }
+    override fun onDrawerOpened(drawerView: View) = hideKeyboard()
 
     override fun onDrawerClosed(drawerView: View) = showKeyboard()
 
@@ -93,6 +95,11 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
         }
+    }
+
+    private fun hideKeyboard() {
+        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(masjidTimeTextbox.windowToken, 0)
     }
 
     override fun onClick(view: View) {
@@ -154,7 +161,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
                     currentMasjidPojo = times
                     date = nextDate
                     //enable all buttons
-                    buttons.map {it.setEnabled(true)}
+                    buttons.map { it.isEnabled = true }
                     then(newDate)
                 }
 
@@ -167,7 +174,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             }
             //disable all buttons here whilst we get the masjid times for the
             // new day
-            buttons.map {it.setEnabled(false)}
+            buttons.map { it.isEnabled = false }
             RestClient(activity).getMasjidTimes(masjidId, cb2, nextDate)
             setLabels(nextDate, currentSalaahType)
         }
@@ -318,7 +325,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun setLabels(date: GregorianCalendar, salaahType: SalaahType) {
-        dateLabel.setText(formatCalendarAsDate(date))
+        dateLabel.text = formatCalendarAsDate(date)
         var salaahText = ""
         when (salaahType) {
             SalaahType.FAJR -> {
@@ -337,7 +344,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
                 salaahText = "Esha"
             }
         }
-        salaahTypeLabel.setText(salaahText)
+        salaahTypeLabel.text = salaahText
     }
 
     private fun showShortToast(s: String) {
