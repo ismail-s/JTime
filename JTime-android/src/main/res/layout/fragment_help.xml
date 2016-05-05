@@ -8,12 +8,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".activity.HelpFragment">
 
-    <TextView
-        android:id="@+id/label_help"
+    <ScrollView android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:layout_alignParentTop="true"
-        android:text="@string/help_text"/>
-
+        android:scrollbars="vertical"
+        android:fillViewport="true">
+        <TextView
+            android:id="@+id/label_help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:text="@string/help_text"/>
+    </ScrollView>
 </RelativeLayout>
