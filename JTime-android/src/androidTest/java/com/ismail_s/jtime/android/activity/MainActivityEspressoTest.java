@@ -160,6 +160,12 @@ public class MainActivityEspressoTest extends ActivityInstrumentationTestCase2<M
         onView(allOf(withId(R.id.content), withText("one"))).check(matches(isCompletelyDisplayed()));
     }
 
+    public void testThatHelpFragmentCanBeReachedFromNavbar() {
+        onView(withId(R.id.fragment_container)).perform(swipeInNavigationDrawer());
+        onView(allOf(withId(R.id.material_drawer_name), withText("Help"))).perform(click());
+        onView(withId(R.id.label_help)).check(matches(withText(R.string.help_text)));
+    }
+
     private ViewAction swipeInNavigationDrawer() {
         return actionWithAssertions(new GeneralSwipeAction(Swipe.FAST,
                 GeneralLocation.CENTER_LEFT,
