@@ -49,7 +49,13 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
             @Throws(InterruptedException::class)
             override fun dispatch(recordedRequest: RecordedRequest): MockResponse {
                 if (recordedRequest.path.startsWith("/Masjids/1/times")) {
-                    val mockJsonResponse = """{"times": [{"id": 1,"type": "f","datetime": "2016-03-28T05:30:00.000Z"},{"id": 2,"type": "z","datetime": "2016-03-28T12:00:00.000Z"},{"id": 3,"type": "a","datetime": "2016-03-28T15:00:00.000Z"},{"id": 4,"type": "m","datetime": "2016-03-28T15:12:00.000Z"},{"id": 5,"type": "e","datetime": "2016-03-28T19:45:00.000Z"}]}"""
+                    val mockJsonResponse = """{"times": [
+                    {"id": 1,"type": "f","datetime": "2016-03-28T05:30:00.000Z"},
+                    {"id": 2,"type": "z","datetime": "2016-03-28T12:00:00.000Z"},
+                    {"id": 3,"type": "a","datetime": "2016-03-28T15:00:00.000Z"},
+                    {"id": 4,"type": "m","datetime": "2016-03-28T15:12:00.000Z"},
+                    {"id": 5,"type": "e","datetime": "2016-03-28T19:45:00.000Z"}
+                    ]}"""
                     return MockResponse().setBody(mockJsonResponse)
                 }
                 if (recordedRequest.path.startsWith("/Masjids")) {
