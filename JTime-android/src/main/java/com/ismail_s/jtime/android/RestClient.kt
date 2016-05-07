@@ -161,7 +161,7 @@ class RestClient {
         }
         val requestParams = RequestParams()
         requestParams.put("code", code)
-        val url = Companion.url.substringBeforeLast('/') + "/auth/googleid"
+        val url = Companion.url + "/users/googleid"
 
         Fuel.get(url, listOf("id_token" to code)).responseJson { request, response, result ->
             when (result) {
