@@ -25,6 +25,13 @@
     "principalId": "$owner",
     "permission": "ALLOW",
     "property": "findById"
+  },
+  {
+    "accessType": "READ",
+    "principalType": "ROLE",
+    "principalId": "$everyone",
+    "permission": "ALLOW",
+    "property": ["googleId"]
   }],
   "methods": []
 }
