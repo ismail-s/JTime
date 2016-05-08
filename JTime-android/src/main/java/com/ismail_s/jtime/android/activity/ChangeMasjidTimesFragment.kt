@@ -193,11 +193,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
                     currentSalaahType = SalaahType.ASR
                     newTime = currentMasjidPojo?.asrTime
                 }
-                SalaahType.ASR -> {
-                    currentSalaahType = SalaahType.MAGRIB
-                    newTime = currentMasjidPojo?.magribTime
-                }
-                SalaahType.MAGRIB -> {
+                SalaahType.ASR, SalaahType.MAGRIB -> {
                     currentSalaahType = SalaahType.ESHA
                     newTime = currentMasjidPojo?.eshaTime
                 }
@@ -228,13 +224,9 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
                     currentSalaahType = SalaahType.ZOHAR
                     newTime = currentMasjidPojo?.zoharTime
                 }
-                SalaahType.MAGRIB -> {
+                SalaahType.MAGRIB, SalaahType.ESHA -> {
                     currentSalaahType = SalaahType.ASR
                     newTime = currentMasjidPojo?.asrTime
-                }
-                SalaahType.ESHA -> {
-                    currentSalaahType = SalaahType.MAGRIB
-                    newTime = currentMasjidPojo?.magribTime
                 }
             }
             setTextboxTime(newTime)
@@ -254,7 +246,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             val msg = "Time isn't valid. Change it so it is valid, " +
                     "or click on the undo button"
             showShortToast(msg)
-            return;
+            return
         }
         //Save time
         val newDate = date.clone() as GregorianCalendar

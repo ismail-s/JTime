@@ -12,7 +12,8 @@ function inString(char, str) {
 
 module.exports = function(SalaahTime) {
     SalaahTime.observe('before save', updateTimestamp);
-    SalaahTime.validatesInclusionOf('type', { in : 'fzamej'.split(''),
+    //Magrib times are not to be stored in the db, but computed
+    SalaahTime.validatesInclusionOf('type', { in : 'fzaej'.split(''),
             message: 'is not an allowed salaah type.'
     });
     SalaahTime.validatesLengthOf('type', {
@@ -25,13 +26,14 @@ module.exports = function(SalaahTime) {
         //Check if there is a salaah time with matching masjidId & type
         //  If yes, then update this instance with the new datetime
         //  If no, then create a new instance
+        console.log("creating/updating", masjidId, type, datetime);
 
-        var badTypeError = new Error("type should be one of f, z, a, m, e or j");
+        var badTypeError = new Error("type should be one of f, z, a, e or j");
         if (type.length !== 1) {
             cb(badTypeError);
             return;
         }
-        if (!inString(type, "fzame")) {
+        if (!inString(type, "fzae")) {
             cb(badTypeError);
             return;
         }
