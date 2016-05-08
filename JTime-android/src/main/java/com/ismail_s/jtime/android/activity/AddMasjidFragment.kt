@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -20,6 +21,7 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
     private var googleMap: GoogleMap? = null
     lateinit private var masjidNameTextbox: EditText
     lateinit private var submitButton: Button
+    lateinit private var mapHelpLabel: TextView
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -29,6 +31,7 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
         childFragmentManager.beginTransaction()
             .add(R.id.map_container, mapFragment).commit()
         masjidNameTextbox = rootView.findViewById(R.id.masjid_name_textbox) as EditText
+        mapHelpLabel = rootView.findViewById(R.id.map_help_label) as TextView
         submitButton = rootView.findViewById(R.id.add_masjid_submit_button) as Button
         submitButton.setOnClickListener(this)
         return rootView
@@ -62,8 +65,10 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        //TODO-add padding to take into account submit button
         googleMap.setOnMapLongClickListener(this)
+        val submitButtonHeight = submitButton.height
+        val mapHelpLabelHeight = mapHelpLabel.height
+        googleMap.setPadding(0, mapHelpLabelHeight, 0, submitButtonHeight)
         this.googleMap = googleMap
     }
 
