@@ -192,25 +192,25 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
     fun switchToMasjidsFragment(masjidId: Int, masjidName: String) {
         val fragment = MasjidsFragment.newInstance(masjidId, masjidName)
-        switchToFragment(fragment)
+        switchToFragment(fragment, "Masjid times")
     }
 
-    fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment())
+    fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment(), "All masjids")
 
-    fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment())
+    fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment(), "Create a new masjid")
 
-    fun switchToHelpFragment() = switchToFragment(HelpFragment())
+    fun switchToHelpFragment() = switchToFragment(HelpFragment(), "Help")
 
     fun switchToChangeMasjidTimesFragment(masjidId: Int, masjidName: String, date: GregorianCalendar) {
         val fragment = ChangeMasjidTimesFragment.newInstance(masjidId, masjidName, date)
-        switchToFragment(fragment)
+        switchToFragment(fragment, "Change salaah times")
     }
 
-    fun switchToFragment(fragment: Fragment) {
+    fun switchToFragment(fragment: Fragment, title: String) {
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
         drawer?.closeDrawer()
-
+        toolbar.title = title
     }
 
     fun showShortToast(s: String) = Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
