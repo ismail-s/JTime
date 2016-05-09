@@ -84,8 +84,12 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         toolbar = findViewById(R.id.toolbar) as Toolbar
+        toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp)
         toolbar.title = ""
         setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener {
+            drawer?.openDrawer()
+        }
         setUpGoogleApiClient()
 
         val cb = object: RestClient.SignedinCallback {
