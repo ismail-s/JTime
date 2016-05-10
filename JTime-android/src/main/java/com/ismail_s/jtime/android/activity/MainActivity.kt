@@ -3,7 +3,8 @@ package com.ismail_s.jtime.android.activity
 import android.app.Fragment
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
@@ -22,10 +23,11 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import java.util.*
 
-class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListener {
-     var drawer: Drawer? = null
+class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
+    var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var googleApiClient: GoogleApiClient
+    lateinit var toolbar: Toolbar
     val currentFragment: BaseFragment
         get() = fragmentManager.findFragmentById(R.id.fragment_container) as BaseFragment
     private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
@@ -81,6 +83,13 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        toolbar = findViewById(R.id.toolbar) as Toolbar
+        toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp)
+        toolbar.title = ""
+        setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener {
+            drawer?.openDrawer()
+        }
         setUpGoogleApiClient()
 
         val cb = object: RestClient.SignedinCallback {
@@ -187,25 +196,25 @@ class MainActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedListe
 
     fun switchToMasjidsFragment(masjidId: Int, masjidName: String) {
         val fragment = MasjidsFragment.newInstance(masjidId, masjidName)
-        switchToFragment(fragment)
+        switchToFragment(fragment, "Masjid times")
     }
 
-    fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment())
+    fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment(), "All masjids")
 
-    fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment())
+    fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment(), "Create a new masjid")
 
-    fun switchToHelpFragment() = switchToFragment(HelpFragment())
+    fun switchToHelpFragment() = switchToFragment(HelpFragment(), "Help")
 
     fun switchToChangeMasjidTimesFragment(masjidId: Int, masjidName: String, date: GregorianCalendar) {
         val fragment = ChangeMasjidTimesFragment.newInstance(masjidId, masjidName, date)
-        switchToFragment(fragment)
+        switchToFragment(fragment, "Change salaah times")
     }
 
-    fun switchToFragment(fragment: Fragment) {
+    fun switchToFragment(fragment: Fragment, title: String) {
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
         drawer?.closeDrawer()
-
+        toolbar.title = title
     }
 
     fun showShortToast(s: String) = Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
