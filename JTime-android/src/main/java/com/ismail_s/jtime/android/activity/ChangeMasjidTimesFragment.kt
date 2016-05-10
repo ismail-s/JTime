@@ -248,6 +248,23 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             showShortToast(msg)
             return
         }
+        //Get the salaah time that is currently saved on the server, so we can see if the time we
+        // are about to save is different. If it is different, then we will save the new time to
+        //the server.
+        var currentSavedTimeOrNull: GregorianCalendar? = null
+        when (currentSalaahType) {
+            SalaahType.FAJR -> {currentSavedTimeOrNull = currentMasjidPojo?.fajrTime}
+            SalaahType.ZOHAR -> {currentSavedTimeOrNull = currentMasjidPojo?.zoharTime}
+            SalaahType.ASR -> {currentSavedTimeOrNull = currentMasjidPojo?.asrTime}
+            SalaahType.MAGRIB -> {currentSavedTimeOrNull = currentMasjidPojo?.magribTime}
+            SalaahType.ESHA -> {currentSavedTimeOrNull = currentMasjidPojo?.eshaTime}
+        }
+        var currentSavedTime: String
+        if (currentSavedTimeOrNull == null) {
+            currentSavedTime = ""
+        } else {
+            currentSavedTime = formatCalendarAsTime(currentSavedTimeOrNull)
+        }
         //Save time
         val newDate = date.clone() as GregorianCalendar
         newDate.set(Calendar.HOUR_OF_DAY, time.hour)
@@ -262,7 +279,9 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
                 showShortToast(s)
             }
         }
-        RestClient(activity).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate, cb1)
+        if (formatCalendarAsTime(newDate) != currentSavedTime) {
+            RestClient(activity).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate, cb1)
+        }
         when (currentSalaahType) {
             SalaahType.FAJR -> {
                 currentMasjidPojo?.fajrTime = newDate
