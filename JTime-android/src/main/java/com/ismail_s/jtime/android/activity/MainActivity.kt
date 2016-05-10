@@ -28,11 +28,17 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     lateinit var header: AccountHeader
     lateinit var googleApiClient: GoogleApiClient
     lateinit var toolbar: Toolbar
+    /**
+    * Login status is 0 for don't know, 1 for logged in and 2 for logged out
+    */
+    private var loginStatus = 0
     val currentFragment: BaseFragment
         get() = fragmentManager.findFragmentById(R.id.fragment_container) as BaseFragment
     private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
     private val LOGOUT_DRAWER_ITEM_IDENTIFIER: Long = 232
     private val ADD_MASJID_DRAWER_ITEM_IDENTIFIER: Long = 785
+    private val TOOLBAR_TITLE = "toolbar_title"
+    private val LOGIN_STATUS = "login_status"
 
     private val logoutDrawerItem = PrimaryDrawerItem()
             .withName("Logout")
@@ -40,6 +46,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             .withOnDrawerItemClickListener { view, i, iDrawerItem ->
                 val cb = object : RestClient.LogoutCallback {
                     override fun onSuccess() {
+                        loginStatus = 2
                         showShortToast("Have successfully logged out")
                         //Remove logout button, add login button to nav drawer
                         header.removeProfile(0)
@@ -85,7 +92,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         setContentView(R.layout.activity_main)
         toolbar = findViewById(R.id.toolbar) as Toolbar
         toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp)
-        toolbar.title = ""
+        toolbar.title = savedInstanceState?.getCharSequence(TOOLBAR_TITLE, "") ?: ""
         setSupportActionBar(toolbar)
         toolbar.setNavigationOnClickListener {
             drawer?.openDrawer()
@@ -94,22 +101,28 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
         val cb = object: RestClient.SignedinCallback {
             override fun onLoggedOut() {
+                loginStatus = 2
                 showShortToast("Not logged in atm")
                 //Set button to be login, create drawer
                 setUpNavDrawer(loginDrawerItem)
             }
 
             override fun onLoggedIn() {
+                loginStatus = 1
                 //Set button to be logout, create drawer
                 setUpNavDrawer(logoutDrawerItem)
                 val email: String = SharedPreferencesWrapper(this@MainActivity).email
                 header.addProfile(ProfileDrawerItem().withEmail(email), 0)
                 //add addMasjidDrawerItem
                 drawer?.addItem(addMasjidDrawerItem)
-
             }
         }
-        RestClient(this).checkIfStillSignedInOnServer(cb)
+        val loggedInStatus = savedInstanceState?.getInt(LOGIN_STATUS, 0) ?: 0
+        when (loggedInStatus) {
+            1 -> cb.onLoggedIn()
+            2 -> cb.onLoggedOut()
+            else -> RestClient(this).checkIfStillSignedInOnServer(cb)
+        }
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -118,7 +131,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             // then we don't need to do anything and should return or else
             // we could end up with overlapping fragments.
             if (savedInstanceState != null) {
-                return;
+                return
             }
             switchToAllMasjidsFragment()
         }
@@ -168,10 +181,19 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 .build()
     }
 
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        //Save current title
+        savedInstanceState.putCharSequence(TOOLBAR_TITLE, toolbar.title)
+        //Save logged in state
+        savedInstanceState.putInt(LOGIN_STATUS, loginStatus)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         if (requestCode == Constants.RC_SIGN_IN) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
             if (result.isSuccess) {
+                loginStatus = 1
                 val acct = result.signInAccount as GoogleSignInAccount
                 showShortToast("email: ${acct.email}")
                 val cb = object: RestClient.LoginCallback {
