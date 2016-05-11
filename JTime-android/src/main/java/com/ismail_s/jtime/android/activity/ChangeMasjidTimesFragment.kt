@@ -61,7 +61,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         salaahTypeLabel = rootView.findViewById(R.id.label_salaah_type) as TextView
         val buttonIds = listOf(R.id.undo_button, R.id.up_button, R.id.down_button, R.id.left_button, R.id.right_button, R.id.copy_up_button, R.id.copy_down_button)
         buttons = buttonIds.map {rootView.findViewById(it) as Button}
-        setButtonOnClickListeners(rootView)
+        setButtonOnClickListeners(rootView, buttons)
         //Get times for date
         val cb = object : RestClient.MasjidTimesCallback {
             override fun onSuccess(times: MasjidPojo) {
@@ -83,15 +83,8 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         return rootView
     }
 
-    private fun setButtonOnClickListeners(rootView: View) {
-        val buttonIds = listOf(R.id.undo_button, R.id.up_button,
-                                R.id.down_button, R.id.left_button,
-                                R.id.right_button, R.id.copy_up_button,
-                                R.id.copy_down_button)
-        for (buttonId in buttonIds) {
-            val b = rootView.findViewById(buttonId) as Button
-            b.setOnClickListener(this)
-        }
+    private fun setButtonOnClickListeners(rootView: View, buttons: List<Button>) {
+        buttons.forEach {it.setOnClickListener(this)}
         val helpButton = rootView.findViewById(R.id.help_button) as Button
         helpButton.setOnClickListener {
             hideKeyboard()
