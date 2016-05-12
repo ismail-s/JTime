@@ -32,6 +32,26 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
     lateinit private var dateLabel: TextView
     lateinit private var salaahTypeLabel: TextView
     lateinit private var buttons: List<Button>
+    private val DATE = "date"
+    private val SALAAH_TYPE = "salaah_type"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        masjidId = arguments.getInt(Constants.MASJID_ID)
+        masjidName = arguments.getString(MASJID_NAME)
+        if (savedInstanceState != null) {
+            currentSalaahType = savedInstanceState.getSerializable(SALAAH_TYPE) as SalaahType
+            date = savedInstanceState.getSerializable(DATE) as GregorianCalendar
+        } else {
+            date = arguments.getSerializable(ARG_DATE) as GregorianCalendar
+        }
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        savedInstanceState.putSerializable(DATE, date)
+        savedInstanceState.putSerializable(SALAAH_TYPE, currentSalaahType)
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -41,20 +61,13 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         salaahTypeLabel = rootView.findViewById(R.id.label_salaah_type) as TextView
         val buttonIds = listOf(R.id.undo_button, R.id.up_button, R.id.down_button, R.id.left_button, R.id.right_button, R.id.copy_up_button, R.id.copy_down_button)
         buttons = buttonIds.map {rootView.findViewById(it) as Button}
-        masjidId = arguments.getInt(Constants.MASJID_ID)
-        masjidName = arguments.getString(MASJID_NAME)
-        date = arguments.getSerializable(ARG_DATE) as GregorianCalendar
-        setButtonOnClickListeners(rootView)
+        setButtonOnClickListeners(rootView, buttons)
         //Get times for date
         val cb = object : RestClient.MasjidTimesCallback {
             override fun onSuccess(times: MasjidPojo) {
                 currentMasjidPojo = times
-                currentSalaahType = SalaahType.FAJR
                 setLabels(date, currentSalaahType)
-                if (times.fajrTime != null) {
-                    val fTime = formatCalendarAsTime(times.fajrTime as GregorianCalendar)
-                    masjidTimeTextbox.setText(fTime)
-                }
+                handleUndoButtonClick()
             }
 
             override fun onError(t: Throwable) {
@@ -70,15 +83,8 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         return rootView
     }
 
-    private fun setButtonOnClickListeners(rootView: View) {
-        val buttonIds = listOf(R.id.undo_button, R.id.up_button,
-                                R.id.down_button, R.id.left_button,
-                                R.id.right_button, R.id.copy_up_button,
-                                R.id.copy_down_button)
-        for (buttonId in buttonIds) {
-            val b = rootView.findViewById(buttonId) as Button
-            b.setOnClickListener(this)
-        }
+    private fun setButtonOnClickListeners(rootView: View, buttons: List<Button>) {
+        buttons.forEach {it.setOnClickListener(this)}
         val helpButton = rootView.findViewById(R.id.help_button) as Button
         helpButton.setOnClickListener {
             hideKeyboard()
@@ -104,18 +110,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.undo_button -> {
-                //Change the time to what it was originally
-                var time: GregorianCalendar? = null
-                when (currentSalaahType) {
-                    SalaahType.FAJR -> {time = currentMasjidPojo?.fajrTime}
-                    SalaahType.ZOHAR -> {time = currentMasjidPojo?.zoharTime}
-                    SalaahType.ASR -> {time = currentMasjidPojo?.asrTime}
-                    SalaahType.MAGRIB -> {time = currentMasjidPojo?.magribTime}
-                    SalaahType.ESHA -> {time = currentMasjidPojo?.eshaTime}
-                }
-                setTextboxTime(time)
-            }
+            R.id.undo_button -> handleUndoButtonClick()
             R.id.up_button -> saveTimeAndSwitchToAnotherDay(dayOffset = -1)
             R.id.down_button -> saveTimeAndSwitchToAnotherDay(dayOffset = 1)
             R.id.left_button -> saveTimeAndSwitchToPrevSalaah()
@@ -123,6 +118,19 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             R.id.copy_up_button -> saveTimeAndSwitchToAnotherDayAndCopyTime(-1)
             R.id.copy_down_button -> saveTimeAndSwitchToAnotherDayAndCopyTime(1)
         }
+    }
+
+    fun handleUndoButtonClick() {
+        //Change the time to what it was originally
+        var time: GregorianCalendar? = null
+        when (currentSalaahType) {
+            SalaahType.FAJR -> {time = currentMasjidPojo?.fajrTime}
+            SalaahType.ZOHAR -> {time = currentMasjidPojo?.zoharTime}
+            SalaahType.ASR -> {time = currentMasjidPojo?.asrTime}
+            SalaahType.MAGRIB -> {time = currentMasjidPojo?.magribTime}
+            SalaahType.ESHA -> {time = currentMasjidPojo?.eshaTime}
+        }
+        setTextboxTime(time)
     }
 
     private fun saveTimeAndSwitchToAnotherDay(dayOffset: Int) {

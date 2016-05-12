@@ -19,13 +19,17 @@ import com.ismail_s.jtime.android.RestClient
 class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener, View.OnClickListener {
     private var current_marker: Marker? = null
     private var googleMap: GoogleMap? = null
+    private var savedInstanceState: Bundle? = null
     lateinit private var masjidNameTextbox: EditText
     lateinit private var submitButton: Button
     lateinit private var mapHelpLabel: TextView
+    private val LATITUDE = "latitude"
+    private val LONGITUDE = "longitude"
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_add_masjid, container, false)
+        this.savedInstanceState = savedInstanceState
         val mapFragment = MapFragment.newInstance()
         mapFragment.getMapAsync(this)
         childFragmentManager.beginTransaction()
@@ -35,6 +39,16 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
         submitButton = rootView.findViewById(R.id.add_masjid_submit_button) as Button
         submitButton.setOnClickListener(this)
         return rootView
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        if (current_marker != null) {
+            val lng = current_marker?.position?.longitude as Double
+            val lat = current_marker?.position?.latitude as Double
+            savedInstanceState.putDouble(LONGITUDE, lng)
+            savedInstanceState.putDouble(LATITUDE, lat)
+        }
     }
 
     override fun onClick(view: View) {
@@ -70,9 +84,19 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
         val mapHelpLabelHeight = mapHelpLabel.height
         googleMap.setPadding(0, mapHelpLabelHeight, 0, submitButtonHeight)
         this.googleMap = googleMap
+        if (savedInstanceState != null) {
+            val lat = savedInstanceState?.getDouble(LATITUDE) as Double
+            val lng = savedInstanceState?.getDouble(LONGITUDE) as Double
+            val point = LatLng(lat, lng)
+            addMarker(point)
+        }
     }
 
     override fun onMapLongClick(point: LatLng) {
+        addMarker(point)
+    }
+
+    fun addMarker(point: LatLng) {
         current_marker?.remove()
         val marker_options = MarkerOptions().position(point)
             .title("Masjid location").draggable(true)
