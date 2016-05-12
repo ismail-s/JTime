@@ -1,6 +1,6 @@
 package com.ismail_s.jtime.android.activity
 
-import android.app.Fragment
+import android.support.v4.app.Fragment
 import android.view.View
 
 

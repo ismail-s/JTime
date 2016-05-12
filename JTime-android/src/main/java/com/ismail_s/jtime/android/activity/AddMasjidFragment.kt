@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapFragment
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -30,7 +30,7 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_add_masjid, container, false)
         this.savedInstanceState = savedInstanceState
-        val mapFragment = MapFragment.newInstance()
+        val mapFragment = SupportMapFragment.newInstance()
         mapFragment.getMapAsync(this)
         childFragmentManager.beginTransaction()
             .add(R.id.map_container, mapFragment).commit()

@@ -1,6 +1,6 @@
 package com.ismail_s.jtime.android.activity
 
-import android.app.Fragment
+import android.support.v4.app.Fragment
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     */
     private var loginStatus = 0
     val currentFragment: BaseFragment
-        get() = fragmentManager.findFragmentById(R.id.fragment_container) as BaseFragment
+        get() = supportFragmentManager.findFragmentById(R.id.fragment_container) as BaseFragment
     private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
     private val LOGOUT_DRAWER_ITEM_IDENTIFIER: Long = 232
     private val ADD_MASJID_DRAWER_ITEM_IDENTIFIER: Long = 785
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     }
 
     fun switchToFragment(fragment: Fragment, title: String) {
-        fragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
         drawer?.closeDrawer()
         toolbar.title = title
