@@ -1,6 +1,4 @@
 <resources>
-    <string name="title_activity_masjid">MasjidActivity</string>
-    <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$s</string>
     <string name="fajr">Fajr</string>
     <string name="zohar">Zohar</string>
