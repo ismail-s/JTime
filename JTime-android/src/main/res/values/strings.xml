@@ -1,11 +1,11 @@
 <resources>
-    <string name="section_format">Hello World from section: %1$s</string>
+    <string name="section_format">Date: %1$s</string>
     <string name="fajr">Fajr</string>
     <string name="zohar">Zohar</string>
     <string name="asr">Asr</string>
     <string name="magrib">Magrib</string>
     <string name="esha">Esha</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">JTime</string>
     <string name="add_masjid_masjid_name_hint">Name of masjid</string>
     <string name="add_masjid_masjid_submit_button">Create Masjid</string>
     <string name="help_text"><b>Help</b>\n
