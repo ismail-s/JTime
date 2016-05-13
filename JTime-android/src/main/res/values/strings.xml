@@ -16,4 +16,13 @@ This app allows you to view masjid jamaat times, as well as add/change the times
 When adding/changing masjid times, please bear in mind that pressing <i>any</i> button (up/down/left/right/copy up/copy down) will save the time you have entered to the server. This will slightly change in the future to allow undoing the save for a brief period after saving, but otherwise, the interface probably won\'t change. The interface is designed for speed of data entry, as this app lives and dies on how easy it is to enter and view the data.\n
 Also bear in mind that this app is a work in progress…</string>
     <string name="map_help_text">Long click on map to select location</string>
+    <string name="edit_salaah_times">Edit</string>
+    <string name="change_times__undo_button">undo</string>
+    <string name="change_times__up_button">up</string>
+    <string name="change_times__copy_up_button">copy up</string>
+    <string name="change_times__left_button">left</string>
+    <string name="change_times__right_button">right</string>
+    <string name="change_times__down_button">down</string>
+    <string name="change_times__copy_down_button">copy down</string>
+    <string name="help_button">Help</string>
 </resources>

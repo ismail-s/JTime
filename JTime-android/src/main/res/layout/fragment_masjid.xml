@@ -22,7 +22,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:id="@+id/edit_button"
-        android:text="Edit" />
+        android:text="@string/edit_salaah_times" />
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
