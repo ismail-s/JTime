@@ -73,11 +73,11 @@ class MasjidFragment : BaseFragment() {
     }
 
     override fun onLogin() {
-        editButton.setVisibility(View.VISIBLE)
+        editButton.visibility = View.VISIBLE
     }
 
     override fun onLogout() {
-        editButton.setVisibility(View.INVISIBLE)
+        editButton.visibility = View.INVISIBLE
     }
 
     companion object {

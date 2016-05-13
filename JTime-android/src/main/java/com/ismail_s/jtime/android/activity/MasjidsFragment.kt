@@ -87,10 +87,6 @@ class MasjidsFragment : BaseFragment() {
             activeChildFragments.remove(position)
         }
 
-        override fun getCount(): Int {
-            return NUM_OF_PAGES
-        }
-
         override fun getPageTitle(position: Int): CharSequence? {
             when (position) {
                 //TODO-sort this out
@@ -100,5 +96,6 @@ class MasjidsFragment : BaseFragment() {
             }
             return null
         }
+        override fun getCount(): Int = NUM_OF_PAGES
     }
 }
