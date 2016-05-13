@@ -144,6 +144,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
 
     fun testThatHelpFragmentCanBeReachedFromNavbar() {
         onView(withId(R.id.fragment_container)).perform(swipeInNavigationDrawer())
+        sleepForSplitSecond()
         onView(allOf(withId(R.id.material_drawer_name), withText("Help"))).perform(click())
         onView(withId(R.id.label_help)).check(matches(withText(R.string.help_text)))
     }
