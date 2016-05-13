@@ -40,45 +40,48 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private val TOOLBAR_TITLE = "toolbar_title"
     private val LOGIN_STATUS = "login_status"
 
-    private val logoutDrawerItem = PrimaryDrawerItem()
-            .withName(getString(R.string.drawer_item_logout))
-            .withIdentifier(LOGOUT_DRAWER_ITEM_IDENTIFIER)
-            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                val cb = object : RestClient.LogoutCallback {
-                    override fun onSuccess() {
-                        loginStatus = 2
-                        showShortToast(getString(R.string.logout_success_toast))
-                        //Remove logout button, add login button to nav drawer
-                        header.removeProfile(0)
-                        drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
-                        drawer?.addItemAtPosition(loginDrawerItem, 0)
-                        //remove addMasjidDrawerItem
-                        drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
-                        currentFragment.onLogout()
+    private val logoutDrawerItem: PrimaryDrawerItem
+        get() = PrimaryDrawerItem()
+                .withName(getString(R.string.drawer_item_logout))
+                .withIdentifier(LOGOUT_DRAWER_ITEM_IDENTIFIER)
+                .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                    val cb = object : RestClient.LogoutCallback {
+                        override fun onSuccess() {
+                            loginStatus = 2
+                            showShortToast(getString(R.string.logout_success_toast))
+                            //Remove logout button, add login button to nav drawer
+                            header.removeProfile(0)
+                            drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
+                            drawer?.addItemAtPosition(loginDrawerItem, 0)
+                            //remove addMasjidDrawerItem
+                            drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                            currentFragment.onLogout()
+                        }
+
+                        override fun onError(t: Throwable) = showShortToast(getString(R.string.logout_failure_toast, t.message))
                     }
-
-                    override fun onError(t: Throwable) = showShortToast(getString(R.string.logout_failure_toast, t.message))
+                    RestClient(this).logout(cb)
+                    true
                 }
-                RestClient(this).logout(cb)
-                true
-            }
 
-    private val loginDrawerItem = PrimaryDrawerItem()
-            .withName(getString(R.string.drawer_item_login))
-            .withIdentifier(LOGIN_DRAWER_ITEM_IDENTIFIER)
-            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
-                startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
-                true
-            }
+    private val loginDrawerItem: PrimaryDrawerItem
+        get() = PrimaryDrawerItem()
+                .withName(getString(R.string.drawer_item_login))
+                .withIdentifier(LOGIN_DRAWER_ITEM_IDENTIFIER)
+                .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                    val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
+                   startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
+                    true
+                }
 
-    private val addMasjidDrawerItem = PrimaryDrawerItem()
-            .withName(getString(R.string.drawer_item_add_masjid))
-            .withIdentifier(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
-            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                switchToAddMasjidFragment()
-                true
-            }
+    private val addMasjidDrawerItem: PrimaryDrawerItem
+        get() = PrimaryDrawerItem()
+                .withName(getString(R.string.drawer_item_add_masjid))
+                .withIdentifier(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                    switchToAddMasjidFragment()
+                    true
+                }
 
     /**
      * Called when Sign in with Google fails
