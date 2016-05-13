@@ -121,7 +121,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     }
 
     private fun sleepForSplitSecond() = try {
-        Thread.sleep(150)
+        Thread.sleep(200)
     } catch (e: InterruptedException) {
         throw RuntimeException("Thread running tests was interrupted.")
     }
