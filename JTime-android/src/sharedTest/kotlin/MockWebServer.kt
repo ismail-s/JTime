@@ -6,7 +6,11 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import com.ismail_s.jtime.android.RestClient
 
-
+/**
+* Create a [MockWebServer], set it up with some default responses to
+* make it look like the REST api, and set the [RestClient] to use
+* our new [MockWebServer] instead of the actual REST api.
+*/
 fun createMockWebServerAndConnectToRestClient(): MockWebServer {
     val server = MockWebServer()
     server.setDispatcher(object : Dispatcher() {
