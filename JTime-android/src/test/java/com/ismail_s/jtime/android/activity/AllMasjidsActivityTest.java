@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.ismail_s.jtime.android.BuildConfig;
+import static com.ismail_s.jtime.android.MockWebServer.MockWebServerKt.createMockWebServerAndConnectToRestClient;
+
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +30,7 @@ public class AllMasjidsActivityTest {
 
     @Before
     public void setupActivity() {
+        createMockWebServerAndConnectToRestClient();
         activity = Robolectric.setupActivity(MainActivity.class);
     }
 
