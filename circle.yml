@@ -10,13 +10,10 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
 test:
   override:
-  # Try running tests twice if they fail first time
-    #Robolectric tests are failing atm, looks like a problem with
-    # robolectric
-    #- (cd JTime-android && (./gradlew test assembleDebug || ./gradlew test assembleDebug))
-    - (cd JTime-android &&./gradlew assembleDebug)
+    # Try running tests twice if they fail first time
+    - (cd JTime-android && (./gradlew test assembleDebug || ./gradlew test assembleDebug))
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
-  # start the emulator
+    # start the emulator
     - emulator -avd custom-android21-googleapis -no-audio -no-window:
         background: true
         parallel: true
@@ -37,7 +34,5 @@ test:
   post:
     - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
-    # This line has been commented out as robolectric tests aren't being
-    # run atm
-    # - find JTime-android/build/test-results -name "*.xml" -exec cp {} $CIRCLE_TEST_REPORTS/ \;
+    - find JTime-android/build/test-results -name "*.xml" -exec cp {} $CIRCLE_TEST_REPORTS/ \;
     - cp -r JTime-android/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
