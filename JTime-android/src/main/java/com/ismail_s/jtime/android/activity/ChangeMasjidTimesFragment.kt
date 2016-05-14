@@ -71,7 +71,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             }
 
             override fun onError(t: Throwable) {
-                val s = "Failed to get times: " + t.message
+                val s = getString(R.string.get_masjid_times_failure_toast, t.message)
                 Toast.makeText(activity.applicationContext, s, Toast.LENGTH_LONG).show()
                 // As we can't get the times (so can't edit them), we switch
                 // back to viewing the times
@@ -174,7 +174,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
                 }
 
                 override fun onError(t: Throwable) {
-                    val s = "Failed to get times: " + t.message
+                    val s = getString(R.string.get_masjid_times_failure_toast, t.message)
                     showShortToast(s)
                     //TODO-should this (next) line be here
                     (activity as MainActivity).switchToMasjidsFragment(masjidId, masjidName)
@@ -251,9 +251,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         //If invalid time, return straightaway
         val time = getTextboxTimeIfValid()
         if (time == null) {
-            val msg = "Time isn't valid. Change it so it is valid, " +
-                    "or click on the undo button"
-            showShortToast(msg)
+            showShortToast(getString(R.string.invalid_salaah_time_toast))
             return
         }
         //Get the salaah time that is currently saved on the server, so we can see if the time we
@@ -283,8 +281,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
             }
             override fun onError(t: Throwable) {
-                val s = "Failed to update db with new time: $t"
-                showShortToast(s)
+                showShortToast(getString(R.string.salaah_time_update_failure_toast, t.message))
             }
         }
         if (formatCalendarAsTime(newDate) != currentSavedTime) {
@@ -345,25 +342,25 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
     private fun setLabels(date: GregorianCalendar, salaahType: SalaahType) {
         dateLabel.text = formatCalendarAsDate(date)
-        var salaahText = ""
+        var salaahText = 0
         when (salaahType) {
             SalaahType.FAJR -> {
-                salaahText = "Fajr"
+                salaahText = R.string.fajr
             }
             SalaahType.ZOHAR -> {
-                salaahText = "Zohar"
+                salaahText = R.string.zohar
             }
             SalaahType.ASR -> {
-                salaahText = "Asr"
+                salaahText = R.string.asr
             }
             SalaahType.MAGRIB -> {
-                salaahText = "Magrib"
+                salaahText = R.string.magrib
             }
             SalaahType.ESHA -> {
-                salaahText = "Esha"
+                salaahText = R.string.esha
             }
         }
-        salaahTypeLabel.text = salaahText
+        salaahTypeLabel.text = getString(salaahText)
     }
 
     private fun showShortToast(s: String) {

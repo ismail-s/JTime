@@ -1,13 +1,11 @@
 <resources>
-    <string name="title_activity_masjid">MasjidActivity</string>
-    <string name="action_settings">Settings</string>
-    <string name="section_format">Hello World from section: %1$s</string>
+    <string name="section_format">Date: %1$s</string>
     <string name="fajr">Fajr</string>
     <string name="zohar">Zohar</string>
     <string name="asr">Asr</string>
     <string name="magrib">Magrib</string>
     <string name="esha">Esha</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">JTime</string>
     <string name="add_masjid_masjid_name_hint">Name of masjid</string>
     <string name="add_masjid_masjid_submit_button">Create Masjid</string>
     <string name="help_text"><b>Help</b>\n
@@ -16,4 +14,35 @@ This app allows you to view masjid jamaat times, as well as add/change the times
 When adding/changing masjid times, please bear in mind that pressing <i>any</i> button (up/down/left/right/copy up/copy down) will save the time you have entered to the server. This will slightly change in the future to allow undoing the save for a brief period after saving, but otherwise, the interface probably won\'t change. The interface is designed for speed of data entry, as this app lives and dies on how easy it is to enter and view the data.\n
 Also bear in mind that this app is a work in progress…</string>
     <string name="map_help_text">Long click on map to select location</string>
+    <string name="edit_salaah_times">Edit</string>
+    <string name="change_times__undo_button">undo</string>
+    <string name="change_times__up_button">up</string>
+    <string name="change_times__copy_up_button">copy up</string>
+    <string name="change_times__left_button">left</string>
+    <string name="change_times__right_button">right</string>
+    <string name="change_times__down_button">down</string>
+    <string name="change_times__copy_down_button">copy down</string>
+    <string name="help_button">Help</string>
+
+    <string name="logout_success_toast">Have successfully logged out</string>
+    <string name="logout_failure_toast">Logout unsuccessful: %1$s</string>
+    <string name="login_success_toast">Logged in successfully</string>
+    <string name="login_failure_toast">Failed to login, with error: %1$s</string>
+    <string name="get_masjid_times_failure_toast">Failed to get times: %1$s</string>
+    <string name="invalid_salaah_time_toast">Time isn\'t valid. Change it so it is valid, or click on the undo button</string>
+    <string name="salaah_time_update_failure_toast">Failed to update db with new time: %1$s</string>
+
+    <string name="drawer_item_logout">Logout</string>
+    <string name="drawer_item_login">Login</string>
+    <string name="drawer_item_add_masjid">Add Masjid</string>
+    <string name="drawer_item_all_masjids">All Masjids</string>
+    <string name="drawer_item_help">Help</string>
+
+    <string name="fragment_title_all_masjids">All masjids</string>
+    <string name="fragment_title_add_masjid">Create a new masjid</string>
+    <string name="fragment_title_masjid_times">Masjid times</string>
+    <string name="fragment_title_help">Help</string>
+    <string name="fragment_title_change_salaah_times">Change salaah times</string>
+
+    <string name="no_network_exception">Network is not available</string>
 </resources>

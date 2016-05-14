@@ -121,7 +121,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     }
 
     private fun sleepForSplitSecond() = try {
-        Thread.sleep(150)
+        Thread.sleep(200)
     } catch (e: InterruptedException) {
         throw RuntimeException("Thread running tests was interrupted.")
     }
@@ -137,21 +137,24 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
 
     fun testNavigationDrawerHasButtonToReturnToMasjidsList() {
         clickOnMasjidNameToOpenMasjidFragment()
-        onView(withId(R.id.fragment_container)).perform(swipeInNavigationDrawer())
+        swipeInNavigationDrawer()
         onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).perform(click())
         onView(allOf(withId(R.id.content), withText("one"))).check(matches(isCompletelyDisplayed()))
     }
 
     fun testThatHelpFragmentCanBeReachedFromNavbar() {
-        onView(withId(R.id.fragment_container)).perform(swipeInNavigationDrawer())
+        sleepForSplitSecond()
+        swipeInNavigationDrawer()
         onView(allOf(withId(R.id.material_drawer_name), withText("Help"))).perform(click())
         onView(withId(R.id.label_help)).check(matches(withText(R.string.help_text)))
     }
 
-    private fun swipeInNavigationDrawer(): ViewAction {
-        return actionWithAssertions(GeneralSwipeAction(Swipe.FAST,
+    private fun swipeInNavigationDrawer() {
+        val swipe = actionWithAssertions(GeneralSwipeAction(Swipe.FAST,
                 GeneralLocation.CENTER_LEFT,
                 GeneralLocation.CENTER_RIGHT, Press.FINGER))
+        onView(withId(R.id.fragment_container)).perform(swipe)
+        sleepForSplitSecond()
     }
 
     companion object {

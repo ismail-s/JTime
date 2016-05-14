@@ -52,7 +52,7 @@ class MasjidFragment : BaseFragment() {
             }
 
             override fun onError(t: Throwable) {
-                val s = "Failed to get times: " + t.message
+                val s = getString(R.string.get_masjid_times_failure_toast, t.message)
                 Toast.makeText(activity.applicationContext, s, Toast.LENGTH_LONG).show()
             }
         }
@@ -73,11 +73,11 @@ class MasjidFragment : BaseFragment() {
     }
 
     override fun onLogin() {
-        editButton.setVisibility(View.VISIBLE)
+        editButton.visibility = View.VISIBLE
     }
 
     override fun onLogout() {
-        editButton.setVisibility(View.INVISIBLE)
+        editButton.visibility = View.INVISIBLE
     }
 
     companion object {

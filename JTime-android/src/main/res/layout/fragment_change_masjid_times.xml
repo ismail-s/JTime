@@ -28,7 +28,7 @@
         android:id="@+id/undo_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="undo"
+        android:text="@string/change_times__undo_button"
         android:layout_row="1"
         android:layout_column="0" />
 
@@ -36,7 +36,7 @@
         android:id="@+id/up_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="up"
+        android:text="@string/change_times__up_button"
         android:layout_row="1"
         android:layout_column="1" />
 
@@ -44,7 +44,7 @@
         android:id="@+id/copy_up_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="copy up"
+        android:text="@string/change_times__copy_up_button"
         android:layout_row="1"
         android:layout_column="2" />
 
@@ -52,7 +52,7 @@
         android:id="@+id/left_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="left"
+        android:text="@string/change_times__left_button"
         android:layout_row="2"
         android:layout_column="0" />
 
@@ -71,7 +71,7 @@
          android:id="@+id/right_button"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:text="right"
+         android:text="@string/change_times__right_button"
         android:layout_row="2"
         android:layout_column="2" />
 
@@ -79,7 +79,7 @@
         android:id="@+id/down_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="down"
+        android:text="@string/change_times__down_button"
         android:layout_row="3"
         android:layout_column="1" />
 
@@ -87,7 +87,7 @@
         android:id="@+id/copy_down_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="copy down"
+        android:text="@string/change_times__copy_down_button"
         android:layout_row="3"
         android:layout_column="2" />
 
@@ -95,7 +95,7 @@
         android:id="@+id/help_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Help"
+        android:text="@string/help_button"
         android:layout_row="4"
         android:layout_column="1" />
 

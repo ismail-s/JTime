@@ -40,51 +40,54 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private val TOOLBAR_TITLE = "toolbar_title"
     private val LOGIN_STATUS = "login_status"
 
-    private val logoutDrawerItem = PrimaryDrawerItem()
-            .withName("Logout")
-            .withIdentifier(LOGOUT_DRAWER_ITEM_IDENTIFIER)
-            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                val cb = object : RestClient.LogoutCallback {
-                    override fun onSuccess() {
-                        loginStatus = 2
-                        showShortToast("Have successfully logged out")
-                        //Remove logout button, add login button to nav drawer
-                        header.removeProfile(0)
-                        drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
-                        drawer?.addItemAtPosition(loginDrawerItem, 0)
-                        //remove addMasjidDrawerItem
-                        drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
-                        currentFragment.onLogout()
+    private val logoutDrawerItem: PrimaryDrawerItem
+        get() = PrimaryDrawerItem()
+                .withName(getString(R.string.drawer_item_logout))
+                .withIdentifier(LOGOUT_DRAWER_ITEM_IDENTIFIER)
+                .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                    val cb = object : RestClient.LogoutCallback {
+                        override fun onSuccess() {
+                            loginStatus = 2
+                            showShortToast(getString(R.string.logout_success_toast))
+                            //Remove logout button, add login button to nav drawer
+                            header.removeProfile(0)
+                            drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
+                            drawer?.addItemAtPosition(loginDrawerItem, 0)
+                            //remove addMasjidDrawerItem
+                            drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                            currentFragment.onLogout()
+                        }
+
+                        override fun onError(t: Throwable) = showShortToast(getString(R.string.logout_failure_toast, t.message))
                     }
-
-                    override fun onError(t: Throwable) = showShortToast("Logout unsuccessful: ${t.message}")
+                    RestClient(this).logout(cb)
+                    true
                 }
-                RestClient(this).logout(cb)
-                true
-            }
 
-    private val loginDrawerItem = PrimaryDrawerItem()
-            .withName("Login")
-            .withIdentifier(LOGIN_DRAWER_ITEM_IDENTIFIER)
-            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
-                startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
-                true
-            }
+    private val loginDrawerItem: PrimaryDrawerItem
+        get() = PrimaryDrawerItem()
+                .withName(getString(R.string.drawer_item_login))
+                .withIdentifier(LOGIN_DRAWER_ITEM_IDENTIFIER)
+                .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                    val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
+                   startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
+                    true
+                }
 
-    private val addMasjidDrawerItem = PrimaryDrawerItem()
-            .withName("Add Masjid")
-            .withIdentifier(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
-            .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                switchToAddMasjidFragment()
-                true
-            }
+    private val addMasjidDrawerItem: PrimaryDrawerItem
+        get() = PrimaryDrawerItem()
+                .withName(getString(R.string.drawer_item_add_masjid))
+                .withIdentifier(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                    switchToAddMasjidFragment()
+                    true
+                }
 
     /**
      * Called when Sign in with Google fails
      */
     override fun onConnectionFailed(connectionResult: ConnectionResult) {
-        showShortToast("Failed to login, with error: ${connectionResult.toString()}")
+        showShortToast(getString(R.string.login_failure_toast, connectionResult.toString()))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,7 +105,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         val cb = object: RestClient.SignedinCallback {
             override fun onLoggedOut() {
                 loginStatus = 2
-                showShortToast("Not logged in atm")
                 //Set button to be login, create drawer
                 setUpNavDrawer(loginDrawerItem)
             }
@@ -168,12 +170,12 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 .withAccountHeader(header)
                 .withOnDrawerListener(drawerListener)
                 .addDrawerItems(loginOutButton, PrimaryDrawerItem()
-                        .withName("All Masjids")
+                        .withName(getString(R.string.drawer_item_all_masjids))
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
                             switchToAllMasjidsFragment()
                             true
                         }, PrimaryDrawerItem()
-                        .withName("Help")
+                        .withName(getString(R.string.drawer_item_help))
                         .withOnDrawerItemClickListener {view, position, drawerItem ->
                             switchToHelpFragment()
                             true
@@ -195,7 +197,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             if (result.isSuccess) {
                 loginStatus = 1
                 val acct = result.signInAccount as GoogleSignInAccount
-                showShortToast("email: ${acct.email}")
                 val cb = object: RestClient.LoginCallback {
                     override fun onSuccess(id: Int, accessToken: String) {
                         header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
@@ -204,11 +205,12 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                         drawer?.addItemAtPosition(logoutDrawerItem, 0)
                         //add addMasjidDrawerItem
                         drawer?.addItem(addMasjidDrawerItem)
+                        showShortToast(getString(R.string.login_success_toast))
                         currentFragment.onLogin()
                     }
 
                     override fun onError(t: Throwable) {
-                        showShortToast("Error when trying to login on server: ${t.message}")
+                        showShortToast(getString(R.string.login_failure_toast, t.message))
                     }
                 }
                 RestClient(this).login(acct.idToken!!, acct.email!!, cb)
@@ -218,25 +220,27 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
     fun switchToMasjidsFragment(masjidId: Int, masjidName: String) {
         val fragment = MasjidsFragment.newInstance(masjidId, masjidName)
-        switchToFragment(fragment, "Masjid times")
+        switchToFragment(fragment, R.string.fragment_title_masjid_times)
     }
 
-    fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment(), "All masjids")
+    fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment(),
+            R.string.fragment_title_all_masjids)
 
-    fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment(), "Create a new masjid")
+    fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment(),
+            R.string.fragment_title_add_masjid)
 
-    fun switchToHelpFragment() = switchToFragment(HelpFragment(), "Help")
+    fun switchToHelpFragment() = switchToFragment(HelpFragment(), R.string.fragment_title_help)
 
     fun switchToChangeMasjidTimesFragment(masjidId: Int, masjidName: String, date: GregorianCalendar) {
         val fragment = ChangeMasjidTimesFragment.newInstance(masjidId, masjidName, date)
-        switchToFragment(fragment, "Change salaah times")
+        switchToFragment(fragment, R.string.fragment_title_change_salaah_times)
     }
 
-    fun switchToFragment(fragment: Fragment, title: String) {
+    fun switchToFragment(fragment: Fragment, title: Int) {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
         drawer?.closeDrawer()
-        toolbar.title = title
+        toolbar.title = getString(title)
     }
 
     fun showShortToast(s: String) = Toast.makeText(this, s, Toast.LENGTH_SHORT).show()

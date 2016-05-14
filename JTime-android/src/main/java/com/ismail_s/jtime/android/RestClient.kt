@@ -29,10 +29,11 @@ class RestClient {
     private var restAdapter: RestAdapter
     private var masjidRepo: ModelRepository<Model>
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    private val noNetworkException = NoRouteToHostException("Network is not available")
+    private var noNetworkException: NoRouteToHostException
 
     constructor(context: Context) {
         this.context = context
+        this.noNetworkException = NoRouteToHostException(context.getString(R.string.no_network_exception))
         this.restAdapter = RestAdapter(context, Companion.url)
         this.sharedPrefs = SharedPreferencesWrapper(context)
         this.masjidRepo = this.restAdapter.createRepository("Masjid")
@@ -53,7 +54,7 @@ class RestClient {
     fun internetIsAvailable(): Boolean {
         val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo
-        if (networkInfo != null && networkInfo.isConnected()) {
+        if (networkInfo != null && networkInfo.isConnected) {
             return true
         } else {
             return false
