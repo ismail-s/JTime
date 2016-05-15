@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
     private val LOGOUT_DRAWER_ITEM_IDENTIFIER: Long = 232
     private val ADD_MASJID_DRAWER_ITEM_IDENTIFIER: Long = 785
-    @JvmField val HELP_DRAWER_ITEM_IDENTIFIER: Long = 365
+    val HELP_DRAWER_ITEM_IDENTIFIER: Long = 365
 
     private val TOOLBAR_TITLE = "toolbar_title"
     private val LOGIN_STATUS = "login_status"
