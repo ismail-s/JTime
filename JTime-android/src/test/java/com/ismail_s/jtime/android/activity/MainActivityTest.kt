@@ -4,6 +4,10 @@ import com.ismail_s.jtime.android.BuildConfig
 import com.ismail_s.jtime.android.R
 import com.mikepenz.materialdrawer.model.AbstractDrawerItem
 
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
+
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,9 +18,7 @@ import org.robolectric.annotation.Config
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertThat
-import org.junit.Assert.assertTrue
 
 @RunWith(RobolectricGradleTestRunner::class)
 @Config(constants = BuildConfig::class, sdk = intArrayOf(21))
@@ -41,7 +43,8 @@ class MainActivityTest {
         val drawerItem = activity.drawer?.getDrawerItem(activity.HELP_DRAWER_ITEM_IDENTIFIER) as AbstractDrawerItem?
         drawerItem?.onDrawerItemClickListener?.onItemClick(null, 0, null)
         assertThat(activity.currentFragment, instanceOf(HelpFragment::class.java))
-        assertNotNull(activity.findViewById(R.id.label_help))
-        assertTrue(activity.findViewById(R.id.label_help)!!.isShown)
+        assertNotNull(activity.findViewById(R.id.label_help)) {
+            assertTrue(it.isShown, "Help text is not being displayed")
+        }
     }
 }
