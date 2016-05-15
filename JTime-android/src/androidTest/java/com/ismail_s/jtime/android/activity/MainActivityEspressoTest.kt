@@ -12,17 +12,14 @@ import android.test.suitebuilder.annotation.LargeTest
 
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
+import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
+
 
 import org.junit.Before
 import org.junit.BeforeClass
 
 import java.io.IOException
 import java.util.Calendar
-
-import okhttp3.mockwebserver.Dispatcher
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.actionWithAssertions
@@ -43,28 +40,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     @Throws(Exception::class)
     public override fun setUp() {
         super.setUp()
-        val server = MockWebServer()
-        RestClient.url = server.url("/").toString()
-        server.setDispatcher(object : Dispatcher() {
-            @Throws(InterruptedException::class)
-            override fun dispatch(recordedRequest: RecordedRequest): MockResponse {
-                if (recordedRequest.path.startsWith("/Masjids/1/times")) {
-                    val mockJsonResponse = """{"times": [
-                    {"id": 1,"type": "f","datetime": "2016-03-28T05:30:00.000Z"},
-                    {"id": 2,"type": "z","datetime": "2016-03-28T12:00:00.000Z"},
-                    {"id": 3,"type": "a","datetime": "2016-03-28T15:00:00.000Z"},
-                    {"id": 4,"type": "m","datetime": "2016-03-28T15:12:00.000Z"},
-                    {"id": 5,"type": "e","datetime": "2016-03-28T19:45:00.000Z"}
-                    ]}"""
-                    return MockResponse().setBody(mockJsonResponse)
-                }
-                if (recordedRequest.path.startsWith("/Masjids")) {
-                    val mockJsonResponse = "[{\"id\": 1, \"name\": \"one\"}]"
-                    return MockResponse().setBody(mockJsonResponse)
-                }
-                return MockResponse().setResponseCode(404)
-            }
-        })
+        createMockWebServerAndConnectToRestClient()
         injectInstrumentation(InstrumentationRegistry.getInstrumentation())
         activity
     }
@@ -140,13 +116,6 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         swipeInNavigationDrawer()
         onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).perform(click())
         onView(allOf(withId(R.id.content), withText("one"))).check(matches(isCompletelyDisplayed()))
-    }
-
-    fun testThatHelpFragmentCanBeReachedFromNavbar() {
-        sleepForSplitSecond()
-        swipeInNavigationDrawer()
-        onView(allOf(withId(R.id.material_drawer_name), withText("Help"))).perform(click())
-        onView(withId(R.id.label_help)).check(matches(withText(R.string.help_text)))
     }
 
     private fun swipeInNavigationDrawer() {

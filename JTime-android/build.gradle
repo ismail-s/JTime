@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.0.1'
+    ext.kotlin_version = '1.0.2'
     repositories {
         jcenter()
         mavenCentral()
@@ -33,6 +33,8 @@ android {
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/sharedTest/kotlin'
+        androidTest.java.srcDirs += 'src/sharedTest/kotlin'
     }
 
     signingConfigs {
@@ -72,7 +74,10 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'org.apache.maven:maven-ant-tasks:2.1.3' // fixes issue on linux/mac
-    testCompile 'org.robolectric:robolectric:3.0'
+    testCompile 'org.robolectric:robolectric:3.1-rc1'
+    testCompile 'org.robolectric:shadows-support-v4:3.0'
+    //This line is needed to avoid dep conflicts
+    compile 'com.google.guava:guava:19.0-rc2'
 
     // Loopback SDK
     compile 'com.strongloop:loopback-sdk-android:1.6.0'
@@ -88,9 +93,12 @@ dependencies {
 
     //Kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 
     //Okhttp mockwebserver
     androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.2.0'
+    testCompile 'com.squareup.okhttp3:mockwebserver:3.2.0'
+
 
     //Recyclerview
     compile 'com.android.support:recyclerview-v7:23.2.1'
