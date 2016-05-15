@@ -118,13 +118,6 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         onView(allOf(withId(R.id.content), withText("one"))).check(matches(isCompletelyDisplayed()))
     }
 
-    fun testThatHelpFragmentCanBeReachedFromNavbar() {
-        sleepForSplitSecond()
-        swipeInNavigationDrawer()
-        onView(allOf(withId(R.id.material_drawer_name), withText("Help"))).perform(click())
-        onView(withId(R.id.label_help)).check(matches(withText(R.string.help_text)))
-    }
-
     private fun swipeInNavigationDrawer() {
         val swipe = actionWithAssertions(GeneralSwipeAction(Swipe.FAST,
                 GeneralLocation.CENTER_LEFT,
