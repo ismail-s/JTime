@@ -75,10 +75,9 @@ module.exports = function(Masjid) {
                     }
                     if (instances != null && instances.length > 0) {
                         //Check if we have a conflicting instance. If no, then create.apply
-                        console.log('am here');
                         for (var i = 0; i < instances.length; i++) {
                             var inst = instances[i];
-                            var distance = loopback.GeoPoint.distanceBetween(data.location, inst.location, 'meters');
+                            var distance = loopback.GeoPoint.distanceBetween(data.location, inst.location, {type: 'meters'});
                             var match = inst.name.match(new RegExp(RegExp.escape(data.name), 'i'));
                             if (match != null) {
                                 if (distance < settings.minDistanceBetweenMasjidsWithSameName) {

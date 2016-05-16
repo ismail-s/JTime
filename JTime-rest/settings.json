@@ -1,5 +1,5 @@
 {
     "clientId": "TODO-put client id here",
-    "minDistanceBetweenMasjidsWithSameName": 100,
+    "minDistanceBetweenMasjidsWithSameName": 75,
     "minDistanceBetweenMasjidsWithDiffName": 50
 }
