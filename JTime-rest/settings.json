@@ -1,5 +1,6 @@
 {
     "clientId": "TODO-put client id here",
+    "googleMapsKey": "TODO-put key here...",
     "minDistanceBetweenMasjidsWithSameName": 75,
     "minDistanceBetweenMasjidsWithDiffName": 50
 }

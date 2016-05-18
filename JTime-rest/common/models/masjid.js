@@ -2,6 +2,8 @@ var updateTimestamp = require("../updateTimestamp");
 var async = require('async');
 var loopback = require('loopback');
 var settings = require('../../settings');
+var gmAPI = require("googlemaps");
+var GoogleMapsAPI = new gmAPI({key: settings.googleMapsKey, secure: true});
 
 //Taken from http://stackoverflow.com/a/3561711
 RegExp.escape= function(s) {
@@ -24,6 +26,26 @@ module.exports = function(Masjid) {
         var create = Masjid.create;
         Masjid.create = function(data, cb) {
             var originalThis = this;
+
+            var doReverseGeocodeAndThenCreateMasjid = function(data) {
+                var reverseGeocodeParams = {
+                    "latlng": data.location.lat.toString() + "," + data.location.lng.toString(),
+                    "language": "en"
+                };
+                GoogleMapsAPI.reverseGeocode(reverseGeocodeParams,
+                function(err, result) {
+                    if (err || result.status !== "OK") {//TODO-check result.status
+                        console.error("Didn't get at least 1 address.",
+                        "Creating masjid without human-readable address", err, result);
+                        return create.apply(originalThis, [data, cb]);
+                    }
+                    console.log("got google maps reverse geocode results: ", result);
+                    var formattedAddress = result.results[0].formatted_address;
+                    data.humanReadableAddress = formattedAddress;
+                    return create.apply(originalThis, [data, cb]);
+                });
+            };
+
             if (Array.isArray(data)) {
                 // Undefined item will be skipped by async.map() which internally uses
                 // Array.prototype.map(). The following loop makes sure all items are
@@ -95,9 +117,9 @@ module.exports = function(Masjid) {
                                 }
                             }
                         }
-                        return create.apply(originalThis, [data, cb]);
+                        return doReverseGeocodeAndThenCreateMasjid(data);
                     } else {
-                        return create.apply(originalThis, [data, cb]);
+                        return doReverseGeocodeAndThenCreateMasjid(data);
                     }
                 });
             }
