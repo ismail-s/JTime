@@ -28,6 +28,7 @@ Also bear in mind that this app is a work in progress…</string>
     <string name="logout_failure_toast">Logout unsuccessful: %1$s</string>
     <string name="login_success_toast">Logged in successfully</string>
     <string name="login_failure_toast">Failed to login, with error: %1$s</string>
+    <string name="get_masjids_failure_toast">Weren\'t able to get masjids</string>
     <string name="get_masjid_times_failure_toast">Failed to get times: %1$s</string>
     <string name="invalid_salaah_time_toast">Time isn\'t valid. Change it so it is valid, or click on the undo button</string>
     <string name="salaah_time_update_failure_toast">Failed to update db with new time: %1$s</string>
