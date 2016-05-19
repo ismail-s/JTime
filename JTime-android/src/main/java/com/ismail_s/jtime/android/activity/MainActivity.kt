@@ -2,6 +2,7 @@ package com.ismail_s.jtime.android.activity
 
 import android.support.v4.app.Fragment
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -12,6 +13,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.LocationServices
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.SharedPreferencesWrapper
@@ -23,11 +25,12 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import java.util.*
 
-class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
+class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var googleApiClient: GoogleApiClient
     lateinit var toolbar: Toolbar
+    var lastLocation: Location? = null
     /**
     * Login status is 0 for don't know, 1 for logged in and 2 for logged out
     */
@@ -92,6 +95,12 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         showShortToast(getString(R.string.login_failure_toast, connectionResult.toString()))
     }
 
+    override fun onConnected(connectionHint: Bundle?) {
+       lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
+    }
+
+    override fun onConnectionSuspended(cause: Int) {}
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -149,6 +158,9 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         googleApiClient = GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
                 .build()
     }
 
@@ -184,6 +196,16 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                             true
                         })
                 .build()
+    }
+
+    override fun onStart() {
+        googleApiClient.connect()
+        super.onStart()
+    }
+
+    override fun onStop() {
+        googleApiClient.disconnect()
+        super.onStop()
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
