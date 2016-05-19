@@ -1,5 +1,6 @@
 package com.ismail_s.jtime.android.activity
 
+import android.location.Location.distanceBetween
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -20,7 +21,7 @@ class AllMasjidsFragment : BaseFragment() {
 
         val cb = object: RestClient.MasjidsCallback {
             override fun onSuccess(masjids: List<MasjidPojo>) {
-                view.adapter = MyItemRecyclerViewAdapter(masjids, activity as MainActivity)
+                view.adapter = MyItemRecyclerViewAdapter(sortMasjids(masjids), activity as MainActivity)
             }
 
             override fun onError(t: Throwable) {
@@ -31,5 +32,19 @@ class AllMasjidsFragment : BaseFragment() {
         }
         RestClient(activity).getMasjids(cb)
         return view
+    }
+
+    private fun sortMasjids(masjids: List<MasjidPojo>): List<MasjidPojo> {
+        val userLocation = (activity as MainActivity).lastLocation
+        if (userLocation == null) {
+            return masjids
+        }
+        return masjids.sortedBy {
+            //For some weird reason, distanceBetween doesn't return the distance, but instead
+            //stores the computed distance on a result array that is passed in
+            val result = FloatArray(size = 1)
+            distanceBetween(userLocation.latitude, userLocation.longitude, it.latitude, it.longitude, result)
+            result[0]
+        }
     }
 }
