@@ -22,7 +22,8 @@ class MyItemRecyclerViewAdapter(private val mValues: List<MasjidPojo>, private v
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val masjidPojo = mValues[position]
         holder.mItem = masjidPojo
-        holder.mContentView.text = masjidPojo.name
+        holder.mNameView.text = masjidPojo.name
+        holder.mAddressView.text = masjidPojo.address
         holder.mView.setOnClickListener {
             val text = masjidPojo.name
             val toast = Toast.makeText(mainActivity.applicationContext, text, Toast.LENGTH_SHORT)
@@ -36,15 +37,17 @@ class MyItemRecyclerViewAdapter(private val mValues: List<MasjidPojo>, private v
     }
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        val mContentView: TextView
+        val mNameView: TextView
+        val mAddressView: TextView
         var mItem: MasjidPojo = MasjidPojo()
 
         init {
-            mContentView = mView.findViewById(R.id.content) as TextView
+            mNameView = mView.findViewById(R.id.content) as TextView
+            mAddressView = mView.findViewById(R.id.address) as TextView
         }
 
         override fun toString(): String {
-            return super.toString() + " '" + mContentView.text + "'"
+            return "${super.toString()} '${mNameView.text}' ${mAddressView.text}'"
         }
     }
 }

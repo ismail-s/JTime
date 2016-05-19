@@ -70,8 +70,9 @@ class RestClient {
                 var res = mutableListOf<MasjidPojo>()
                 for (m in masjids) {
                     val name = m.get("name") as String
+                    val address = m.get("humanReadableAddress") as String? ?: ""
                     val id = m.id as Int
-                    res.add(MasjidPojo(name, id))
+                    res.add(MasjidPojo(name, id, address))
                 }
                 cb.onSuccess(res)
             }

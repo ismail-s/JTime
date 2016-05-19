@@ -6,8 +6,8 @@
     android:name="com.ismail_s.jtime.android.activity.AllMasjidsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
+    android:layout_marginLeft="5sp"
+    android:layout_marginRight="5sp"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.ismail_s.jtime.android.activity.AllMasjidsFragment"
     tools:listitem="@layout/fragment_item" />
