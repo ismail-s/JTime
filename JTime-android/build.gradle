@@ -8,7 +8,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.gms:google-services:2.0.0-alpha5'
+        classpath 'com.google.gms:google-services:3.0.0'
     }
 }
 
@@ -88,8 +88,9 @@ dependencies {
     androidTestCompile 'com.android.support:support-annotations:23.2.1'
 
     //Google play services
-    compile 'com.google.android.gms:play-services-auth:8.4.0'
-    compile 'com.google.android.gms:play-services-maps:8.4.0'
+    compile 'com.google.android.gms:play-services-auth:9.0.0'
+    compile 'com.google.android.gms:play-services-maps:9.0.0'
+    compile 'com.google.android.gms:play-services-location:9.0.0'
 
     //Kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
