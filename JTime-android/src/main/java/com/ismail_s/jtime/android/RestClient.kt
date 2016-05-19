@@ -72,7 +72,10 @@ class RestClient {
                     val name = m.get("name") as String
                     val address = m.get("humanReadableAddress") as String? ?: ""
                     val id = m.id as Int
-                    res.add(MasjidPojo(name, id, address))
+                    val location = m.get("location") as HashMap<*, *>
+                    val latitude = location.get("lat") as Double
+                    val longitude = location.get("lng") as Double
+                    res.add(MasjidPojo(name, id, address, latitude, longitude))
                 }
                 cb.onSuccess(res)
             }

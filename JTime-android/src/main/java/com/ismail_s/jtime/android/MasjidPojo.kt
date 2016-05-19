@@ -6,6 +6,8 @@ class MasjidPojo {
     var name: String? = null
     var id: Int? = null
     var address: String = ""
+    var latitude: Double = 0.0
+    var longitude: Double = 0.0
     var fajrTime: GregorianCalendar? = null
     var zoharTime: GregorianCalendar? = null
     var asrTime: GregorianCalendar? = null
@@ -25,10 +27,12 @@ class MasjidPojo {
         this.name = name
     }
 
-    constructor(name: String, id: Int, address: String) {
+    constructor(name: String, id: Int, address: String, latitude: Double, longitude: Double) {
         this.name = name
         this.id = id
         this.address = address
+        this.latitude = latitude
+        this.longitude = longitude
     }
 
     constructor()
