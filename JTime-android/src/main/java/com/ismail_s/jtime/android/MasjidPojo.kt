@@ -5,6 +5,7 @@ import java.util.GregorianCalendar
 class MasjidPojo {
     var name: String? = null
     var id: Int? = null
+    var address: String = ""
     var fajrTime: GregorianCalendar? = null
     var zoharTime: GregorianCalendar? = null
     var asrTime: GregorianCalendar? = null
@@ -24,9 +25,10 @@ class MasjidPojo {
         this.name = name
     }
 
-    constructor(name: String, id: Int) {
+    constructor(name: String, id: Int, address: String) {
         this.name = name
         this.id = id
+        this.address = address
     }
 
     constructor()
