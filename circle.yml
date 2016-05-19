@@ -12,8 +12,13 @@ test:
   override:
     # Try running tests twice if they fail first time
     - (cd JTime-android && (./gradlew test assembleDebug || ./gradlew test assembleDebug))
-    # Build the release apk if we have the secure keys required
-    - (cd JTime-android && gpg -d -o android.jks --passphrase $ANDROID_RELEASE_ENCRYPTION_PASSWORD android.jks.gpg && ./gradlew assembleRelease && rm android.jks) || true
+    # Build the release apk if we have the secure keys required, reporting the status codes
+    # correctly
+    - >
+       (cd JTime-android;
+       gpg -d -o android.jks --passphrase $ANDROID_RELEASE_ENCRYPTION_PASSWORD android.jks.gpg;
+       if test $? == 0; then (./gradlew assembleRelease && rm android.jks);
+       else true; fi)
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
     # start the emulator
     - emulator -avd custom-android21-googleapis -no-audio -no-window:
