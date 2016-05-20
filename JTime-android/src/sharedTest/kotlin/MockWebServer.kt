@@ -28,8 +28,8 @@ fun createMockWebServerAndConnectToRestClient(): MockWebServer {
             }
             if (recordedRequest.path.startsWith("/Masjids")) {
                 val mockJsonResponse = """[
-                {"id": 1, "name": "one"},
-                {"id": 2, "name": "two",
+                {"id": 1, "name": "one", "location": {"lat": 0.0, "lng": 0.0}},
+                {"id": 2, "name": "two", "location": {"lng": 0.1, "lat": 0.1},
                   "humanReadableAddress": "some made-up address..."}]"""
                 return MockResponse().setBody(mockJsonResponse)
             }
