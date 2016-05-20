@@ -116,6 +116,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        startKovenant()
         toolbar = findViewById(R.id.toolbar) as Toolbar
         toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp)
         toolbar.title = savedInstanceState?.getCharSequence(TOOLBAR_TITLE, "") ?: ""
@@ -218,6 +219,11 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     override fun onStop() {
         googleApiClient.disconnect()
         super.onStop()
+    }
+
+    override fun onDestroy() {
+        stopKovenant()
+        super.onDestroy()
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
