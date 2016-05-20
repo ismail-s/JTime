@@ -31,7 +31,7 @@ class AllMasjidsFragment : BaseFragment() {
             }
         } failUi {
             if (activity != null)
-                Toast.makeText(activity, getString(R.string.get_masjids_failure_toast), Toast.LENGTH_LONG)
+                Toast.makeText(activity, getString(R.string.get_masjids_failure_toast, it.message), Toast.LENGTH_LONG)
                     .show()
         }
         return view
