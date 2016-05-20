@@ -110,6 +110,10 @@ dependencies {
 
     compile 'com.google.code.findbugs:jsr305:3.0.1'
     androidTestCompile 'com.google.code.findbugs:jsr305:3.0.1'
+
+    //Kotlin promises
+    compile 'nl.komponents.kovenant:kovenant-core:3.2.2'
+    compile 'nl.komponents.kovenant:kovenant-android:3.2.2'
 }
 repositories {
     mavenCentral()
