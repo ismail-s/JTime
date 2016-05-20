@@ -25,9 +25,9 @@ class AllMasjidsFragment : BaseFragment() {
         RestClient(activity).getMasjids() successUi {
             val masjids = it
             (activity as MainActivity).location successUi {
-                view.adapter = MyItemRecyclerViewAdapter(sortMasjids(masjids, it), activity as MainActivity)
+                view.adapter = MyItemRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), activity as MainActivity)
             } failUi {
-                view.adapter = MyItemRecyclerViewAdapter(masjids, activity as MainActivity)
+                view.adapter = MyItemRecyclerViewAdapter(sortMasjidsByName(masjids), activity as MainActivity)
             }
         } failUi {
             if (activity != null)
@@ -37,7 +37,7 @@ class AllMasjidsFragment : BaseFragment() {
         return view
     }
 
-    private fun sortMasjids(masjids: List<MasjidPojo>, userLocation: Location): List<MasjidPojo> {
+    private fun sortMasjidsByLocation(masjids: List<MasjidPojo>, userLocation: Location): List<MasjidPojo> {
         return masjids.sortedBy {
             //For some weird reason, distanceBetween doesn't return the distance, but instead
             //stores the computed distance on a result array that is passed in
@@ -46,4 +46,6 @@ class AllMasjidsFragment : BaseFragment() {
             result[0]
         }
     }
+
+    private fun sortMasjidsByName(masjids: List<MasjidPojo>) = masjids.sortedBy {it.name}
 }
