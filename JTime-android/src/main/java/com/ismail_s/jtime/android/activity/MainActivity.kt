@@ -24,13 +24,17 @@ import com.mikepenz.materialdrawer.DrawerBuilder
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import java.util.*
+import nl.komponents.kovenant.deferred
+import nl.komponents.kovenant.Promise
+import nl.komponents.kovenant.android.*
 
 class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var googleApiClient: GoogleApiClient
     lateinit var toolbar: Toolbar
-    var lastLocation: Location? = null
+    private var locationDeferred = deferred<Location, Exception>()
+    var location = locationDeferred.promise
     /**
     * Login status is 0 for don't know, 1 for logged in and 2 for logged out
     */
@@ -96,7 +100,15 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     }
 
     override fun onConnected(connectionHint: Bundle?) {
-       lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
+       if (location.isDone()) {
+           return
+       }
+       val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
+       if (loc == null) {
+           locationDeferred.reject(Exception("Location could not be obtained"))
+       } else {
+           locationDeferred.resolve(loc)
+       }
     }
 
     override fun onConnectionSuspended(cause: Int) {}

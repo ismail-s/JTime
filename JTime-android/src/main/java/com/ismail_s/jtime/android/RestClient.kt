@@ -22,6 +22,8 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.net.NoRouteToHostException
 import java.util.*
+import nl.komponents.kovenant.deferred
+import nl.komponents.kovenant.Promise
 
 class RestClient {
     private var sharedPrefs: SharedPreferencesWrapper
@@ -61,9 +63,11 @@ class RestClient {
         }
     }
 
-    fun getMasjids(cb: MasjidsCallback) {
+    fun getMasjids(): Promise<List<MasjidPojo>, Throwable> {
+        val deferred = deferred<List<MasjidPojo>, Throwable>()
         if (!internetIsAvailable()) {
-            cb.onError(noNetworkException)
+            deferred.reject(noNetworkException)
+            return deferred.promise
         }
         this.masjidRepo.findAll(object: ListCallback<Model> {
             override fun onSuccess(masjids: List<Model>) {
@@ -77,11 +81,12 @@ class RestClient {
                     val longitude = location.get("lng") as Double
                     res.add(MasjidPojo(name, id, address, latitude, longitude))
                 }
-                cb.onSuccess(res)
+                deferred.resolve(res)
             }
 
-            override fun onError(t: Throwable) = cb.onError(t)
+            override fun onError(t: Throwable) = deferred.reject(t)
         })
+        return deferred.promise
     }
 
     fun getMasjidTimes(masjidId: Int, cb: MasjidTimesCallback, date: GregorianCalendar) {
