@@ -8,6 +8,7 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter android-23
     - echo y | android update sdk --no-ui --all --filter android-21
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
+    - (cd JTime-android && ./gradlew dependencies)
 test:
   override:
     # Try running tests twice if they fail first time
