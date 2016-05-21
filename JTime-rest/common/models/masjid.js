@@ -207,10 +207,9 @@ module.exports = function(Masjid) {
     Masjid.getTimes = function(id, date, cb) {
         var SalaahTime = Masjid.app.models.SalaahTime;
         // Create date objs for start and end of day
-        var end_date = new Date(date.getTime());
-        end_date.setHours(23, 59, 59, 999);
-        var start_date = new Date(date.getTime());
-        start_date.setHours(0, 0, 0, 0);
+        var end_date = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999));
+        var start_date = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
+        console.info("Getting times for masjid id", id, "start date is", start_date, "end date is", end_date);
         // Find salaah times for the specified masjid for the specified day
         SalaahTime.find({
                 where: {
