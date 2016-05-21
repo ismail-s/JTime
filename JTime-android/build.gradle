@@ -90,6 +90,7 @@ dependencies {
     //Google play services
     compile 'com.google.android.gms:play-services-auth:8.4.0'
     compile 'com.google.android.gms:play-services-maps:8.4.0'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
 
     //Kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -109,6 +110,10 @@ dependencies {
 
     compile 'com.google.code.findbugs:jsr305:3.0.1'
     androidTestCompile 'com.google.code.findbugs:jsr305:3.0.1'
+
+    //Kotlin promises
+    compile 'nl.komponents.kovenant:kovenant-core:3.2.2'
+    compile 'nl.komponents.kovenant:kovenant-android:3.2.2'
 }
 repositories {
     mavenCentral()
