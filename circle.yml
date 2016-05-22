@@ -7,6 +7,7 @@ dependencies:
     - (cd JTime-android && ./gradlew):
         background: true
     - echo y | android update sdk --no-ui --all --filter tools
+    - echo y | android update sdk --no-ui --all --filter platform-tools
     - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
     - echo y | android update sdk --no-ui --all --filter extra-android-support
     - echo y | android update sdk --no-ui --all --filter extra-google-google_play_services
@@ -14,8 +15,6 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter android-23
     - echo y | android update sdk --no-ui --all --filter android-21
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
-    - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-21
-    - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-google_apis-21
     - (cd JTime-android && ./gradlew dependencies --console=plain)
 test:
   override:
