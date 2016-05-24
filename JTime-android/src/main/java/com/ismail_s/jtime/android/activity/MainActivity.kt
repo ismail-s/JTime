@@ -118,12 +118,8 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         setContentView(R.layout.activity_main)
         startKovenant()
         toolbar = findViewById(R.id.toolbar) as Toolbar
-        toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp)
         toolbar.title = savedInstanceState?.getCharSequence(TOOLBAR_TITLE, "") ?: ""
         setSupportActionBar(toolbar)
-        toolbar.setNavigationOnClickListener {
-            drawer?.openDrawer()
-        }
         setUpGoogleApiClient()
 
         val cb = object: RestClient.SignedinCallback {
@@ -195,6 +191,8 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         drawer = DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(header)
+                .withToolbar(toolbar)
+                .withActionBarDrawerToggle(true)
                 .withOnDrawerListener(drawerListener)
                 .addDrawerItems(loginOutButton, PrimaryDrawerItem()
                         .withName(getString(R.string.drawer_item_all_masjids))
