@@ -30,7 +30,7 @@ class RestClient {
     private var context: Context
     private var restAdapter: RestAdapter
     private var masjidRepo: ModelRepository<Model>
-    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
     private var noNetworkException: NoRouteToHostException
 
     constructor(context: Context) {
@@ -71,14 +71,14 @@ class RestClient {
         }
         this.masjidRepo.findAll(object: ListCallback<Model> {
             override fun onSuccess(masjids: List<Model>) {
-                var res = mutableListOf<MasjidPojo>()
+                val res = mutableListOf<MasjidPojo>()
                 for (m in masjids) {
                     val name = m.get("name") as String
                     val address = m.get("humanReadableAddress") as String? ?: ""
                     val id = m.id as Int
                     val location = m.get("location") as HashMap<*, *>
-                    val latitude = location.get("lat") as Double
-                    val longitude = location.get("lng") as Double
+                    val latitude = location["lat"] as Double
+                    val longitude = location["lng"] as Double
                     res.add(MasjidPojo(name, id, address, latitude, longitude))
                 }
                 deferred.resolve(res)
@@ -97,11 +97,11 @@ class RestClient {
         this.masjidRepo.invokeStaticMethod("getTimes", map, object : Adapter.JsonObjectCallback() {
             override fun onSuccess(response: JSONObject) {
                 val times = response.getJSONArray("times")
-                var res = MasjidPojo()
+                val res = MasjidPojo()
                 for (i in 0..times.length()-1) {
                     val type = (times[i] as JSONObject).getString("type")
                     val datetimeStr = (times[i] as JSONObject).getString("datetime")
-                    var datetime = GregorianCalendar()
+                    val datetime = GregorianCalendar()
                     datetime.time = dateFormatter.parse(datetimeStr)
                     when (type) {
                         "f" -> res.fajrTime = datetime
@@ -231,7 +231,7 @@ class RestClient {
             cb.onLoggedOut()
             return
         }
-        var url = Companion.url + "/users/${sharedPrefs.userId}"
+        val url = Companion.url + "/users/${sharedPrefs.userId}"
         url.httpGet().responseJson {request, response, result ->
             when (result) {
                 is Result.Failure -> {
@@ -263,10 +263,6 @@ class RestClient {
 
     interface MasjidTimesCallback: Callback {
         fun onSuccess(times: MasjidPojo)
-    }
-
-    interface MasjidsCallback: Callback {
-        fun onSuccess(masjids: List<MasjidPojo>)
     }
 
     interface LoginCallback: Callback {
