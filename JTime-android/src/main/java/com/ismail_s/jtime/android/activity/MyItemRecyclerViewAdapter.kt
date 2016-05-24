@@ -25,9 +25,6 @@ class MyItemRecyclerViewAdapter(private val mValues: List<MasjidPojo>, private v
         holder.mNameView.text = masjidPojo.name
         holder.mAddressView.text = masjidPojo.address
         holder.mView.setOnClickListener {
-            val text = masjidPojo.name
-            val toast = Toast.makeText(mainActivity.applicationContext, text, Toast.LENGTH_SHORT)
-            toast.show()
             mainActivity.switchToMasjidsFragment(masjidPojo.id!!, masjidPojo.name!!)
         }
     }

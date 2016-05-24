@@ -118,25 +118,21 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         setContentView(R.layout.activity_main)
         startKovenant()
         toolbar = findViewById(R.id.toolbar) as Toolbar
-        toolbar.setNavigationIcon(R.drawable.ic_menu_white_24dp)
         toolbar.title = savedInstanceState?.getCharSequence(TOOLBAR_TITLE, "") ?: ""
         setSupportActionBar(toolbar)
-        toolbar.setNavigationOnClickListener {
-            drawer?.openDrawer()
-        }
         setUpGoogleApiClient()
 
         val cb = object: RestClient.SignedinCallback {
             override fun onLoggedOut() {
                 loginStatus = 2
                 //Set button to be login, create drawer
-                setUpNavDrawer(loginDrawerItem)
+                setUpNavDrawer(loginDrawerItem, savedInstanceState)
             }
 
             override fun onLoggedIn() {
                 loginStatus = 1
                 //Set button to be logout, create drawer
-                setUpNavDrawer(logoutDrawerItem)
+                setUpNavDrawer(logoutDrawerItem, savedInstanceState)
                 val email: String = SharedPreferencesWrapper(this@MainActivity).email
                 header.addProfile(ProfileDrawerItem().withEmail(email), 0)
                 //add addMasjidDrawerItem
@@ -177,7 +173,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 .build()
     }
 
-    private fun setUpNavDrawer(loginOutButton: PrimaryDrawerItem) {
+    private fun setUpNavDrawer(loginOutButton: PrimaryDrawerItem, savedInstance: Bundle?) {
         val drawerListener = object: Drawer.OnDrawerListener {
             override fun onDrawerOpened(drawerView: View) {
                 currentFragment.onDrawerOpened(drawerView)
@@ -195,7 +191,11 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         drawer = DrawerBuilder()
                 .withActivity(this)
                 .withAccountHeader(header)
+                .withToolbar(toolbar)
+                .withActionBarDrawerToggle(true)
+                .withShowDrawerOnFirstLaunch(true)
                 .withOnDrawerListener(drawerListener)
+                .withSavedInstance(savedInstance)
                 .addDrawerItems(loginOutButton, PrimaryDrawerItem()
                         .withName(getString(R.string.drawer_item_all_masjids))
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
