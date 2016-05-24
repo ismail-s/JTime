@@ -149,6 +149,14 @@ module.exports = function(Masjid) {
         Masjid.create = function(data, cb) {
             var originalThis = this;
 
+            // We only want the name and location of a masjid. All other
+            // properties of the masjid model are computed
+            if (data.humanReadableAddress || data.createdAt || data.lastModifiedAt || data.id) {
+                var msg = "Only a name and location should be provided, nothing else";
+                cb(new Error(msg));
+                return;
+            }
+
             if (Array.isArray(data)) {
                 return Masjid.handleCreatingArrayOfMasjids(data, cb);
             }
