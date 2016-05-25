@@ -5,8 +5,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.extension.responseJson
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
@@ -42,15 +41,15 @@ class RestClient {
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times-for-today", "GET"), "Masjid.getTodayTimes")
         this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
 
-        if ((Manager.instance.baseHeaders == emptyMap<String, String>() || Manager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
+        if ((FuelManager.instance.baseHeaders == emptyMap<String, String>() || FuelManager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
             setHttpHeaders(sharedPrefs.accessToken)
         }
     }
 
     private fun setHttpHeaders(accessToken: String) {
-        Manager.instance.baseHeaders = mapOf("Authorization" to accessToken,
-            "Accept" to "application/json",
-            "Content-Type" to "application/json")
+        FuelManager.instance.baseHeaders = mapOf("Authorization" to accessToken,
+                "Accept" to "application/json",
+                "Content-Type" to "application/json")
     }
 
     fun internetIsAvailable(): Boolean {
@@ -139,7 +138,7 @@ class RestClient {
     }
 
     fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar, cb: CreateOrUpdateMasjidTimeCallback) {
-        val fuelInstance = Manager.instance
+        val fuelInstance = FuelManager.instance
         val type = when (salaahType) {
             SalaahType.FAJR -> "f"
             SalaahType.ZOHAR -> "z"
@@ -179,7 +178,7 @@ class RestClient {
                     cb.onError(result.getAs<FuelError>()!!)
                 }
                 is Result.Success -> {
-                    val data = result.get()
+                    val data = result.get().obj()
                     val accessToken = data.getString("access_token")
                     val id = data.getInt("userId")
                     restAdapter.setAccessToken(accessToken)
@@ -253,7 +252,7 @@ class RestClient {
 
     private fun clearSavedUser() {
         restAdapter.clearAccessToken()
-        Manager.instance.baseHeaders = emptyMap()
+        FuelManager.instance.baseHeaders = emptyMap()
         sharedPrefs.clearSavedUser()
     }
 
