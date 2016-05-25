@@ -10,7 +10,6 @@ import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
-import com.loopj.android.http.RequestParams
 import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.deferred
 import org.json.JSONArray
@@ -167,8 +166,6 @@ class RestClient {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
         }
-        val requestParams = RequestParams()
-        requestParams.put("code", code)
         val url = Companion.url + "/users/googleid"
 
         Fuel.get(url, listOf("id_token" to code)).responseJson { request, response, result ->
