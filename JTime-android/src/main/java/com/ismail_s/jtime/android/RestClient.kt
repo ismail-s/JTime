@@ -11,12 +11,6 @@ import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
 import com.loopj.android.http.RequestParams
-import com.strongloop.android.loopback.Model
-import com.strongloop.android.loopback.ModelRepository
-import com.strongloop.android.loopback.RestAdapter
-import com.strongloop.android.loopback.callbacks.ListCallback
-import com.strongloop.android.remoting.adapters.Adapter
-import com.strongloop.android.remoting.adapters.RestContractItem
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -29,19 +23,13 @@ import nl.komponents.kovenant.Promise
 class RestClient {
     private var sharedPrefs: SharedPreferencesWrapper
     private var context: Context
-    private var restAdapter: RestAdapter
-    private var masjidRepo: ModelRepository<Model>
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
     private var noNetworkException: NoRouteToHostException
 
     constructor(context: Context) {
         this.context = context
         this.noNetworkException = NoRouteToHostException(context.getString(R.string.no_network_exception))
-        this.restAdapter = RestAdapter(context, Companion.url)
         this.sharedPrefs = SharedPreferencesWrapper(context)
-        this.masjidRepo = this.restAdapter.createRepository("Masjid")
-        this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times-for-today", "GET"), "Masjid.getTodayTimes")
-        this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
 
         if ((FuelManager.instance.baseHeaders == emptyMap<String, String>() || FuelManager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
             setHttpHeaders(sharedPrefs.accessToken)
@@ -192,7 +180,6 @@ class RestClient {
                     val data = result.get().obj()
                     val accessToken = data.getString("access_token")
                     val id = data.getInt("userId")
-                    restAdapter.setAccessToken(accessToken)
                     setHttpHeaders(accessToken)
                     sharedPrefs.accessToken = accessToken
                     sharedPrefs.userId = id
@@ -262,7 +249,6 @@ class RestClient {
     }
 
     private fun clearSavedUser() {
-        restAdapter.clearAccessToken()
         FuelManager.instance.baseHeaders = emptyMap()
         sharedPrefs.clearSavedUser()
     }
