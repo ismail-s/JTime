@@ -17,6 +17,7 @@ import com.strongloop.android.loopback.RestAdapter
 import com.strongloop.android.loopback.callbacks.ListCallback
 import com.strongloop.android.remoting.adapters.Adapter
 import com.strongloop.android.remoting.adapters.RestContractItem
+import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.net.NoRouteToHostException
@@ -284,5 +285,18 @@ class RestClient {
     companion object {
         // By having url in the companion object, we can change the url from tests
         var url = "http://ismail-laptop:3000/api"
+    }
+}
+
+inline fun <reified T> JSONArray.iterator(): Iterator<T> = object : Iterator<T> {
+    private var index = 0
+    override fun hasNext(): Boolean {
+        return index < this@iterator.length()
+    }
+
+    override fun next(): T {
+        val result = this@iterator.get(index) as T
+        index++
+        return result
     }
 }
