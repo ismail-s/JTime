@@ -18,6 +18,7 @@ import com.strongloop.android.loopback.callbacks.ListCallback
 import com.strongloop.android.remoting.adapters.Adapter
 import com.strongloop.android.remoting.adapters.RestContractItem
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.net.NoRouteToHostException
@@ -69,23 +70,30 @@ class RestClient {
             deferred.reject(noNetworkException)
             return deferred.promise
         }
-        this.masjidRepo.findAll(object: ListCallback<Model> {
-            override fun onSuccess(masjids: List<Model>) {
-                val res = mutableListOf<MasjidPojo>()
-                for (m in masjids) {
-                    val name = m.get("name") as String
-                    val address = m.get("humanReadableAddress") as String? ?: ""
-                    val id = m.id as Int
-                    val location = m.get("location") as HashMap<*, *>
-                    val latitude = location["lat"] as Double
-                    val longitude = location["lng"] as Double
-                    res.add(MasjidPojo(name, id, address, latitude, longitude))
+        "${Companion.url}/Masjids".httpGet().responseJson { request, response, result ->
+            when (result) {
+                is Result.Failure -> deferred.reject(result.getAs<FuelError>()!!)
+                is Result.Success -> {
+                    val data = result.get().array()
+                    val res = mutableListOf<MasjidPojo>()
+                    for (m in data.iterator<JSONObject>()) {
+                        val name = m.getString("name")
+                        val address: String
+                        try {
+                            address = m.getString("humanReadableAddress")
+                        } catch (e: JSONException) {
+                            address = ""
+                        }
+                        val id = m.getInt("id")
+                        val location = m.getJSONObject("location")
+                        val latitude = location["lat"] as Double
+                        val longitude = location["lng"] as Double
+                        res.add(MasjidPojo(name, id, address, latitude, longitude))
+                    }
+                    deferred.resolve(res)
                 }
-                deferred.resolve(res)
             }
-
-            override fun onError(t: Throwable) = deferred.reject(t)
-        })
+        }
         return deferred.promise
     }
 
@@ -93,29 +101,31 @@ class RestClient {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
         }
-        val map = hashMapOf(Pair("id", masjidId), Pair("date", dateFormatter.format(date.time)))
-        this.masjidRepo.invokeStaticMethod("getTimes", map, object : Adapter.JsonObjectCallback() {
-            override fun onSuccess(response: JSONObject) {
-                val times = response.getJSONArray("times")
-                val res = MasjidPojo()
-                for (i in 0..times.length()-1) {
-                    val type = (times[i] as JSONObject).getString("type")
-                    val datetimeStr = (times[i] as JSONObject).getString("datetime")
-                    val datetime = GregorianCalendar()
-                    datetime.time = dateFormatter.parse(datetimeStr)
-                    when (type) {
-                        "f" -> res.fajrTime = datetime
-                        "z" -> res.zoharTime = datetime
-                        "a" -> res.asrTime = datetime
-                        "m" -> res.magribTime = datetime
-                        "e" -> res.eshaTime = datetime
+        "${Companion.url}/Masjids/$masjidId/times"
+                .httpGet(listOf("date" to dateFormatter.format(date.time)))
+                .responseJson { request, response, result ->
+                    when (result) {
+                        is Result.Failure -> cb.onError(result.getAs<FuelError>()!!)
+                        is Result.Success -> {
+                            val times = result.get().obj().getJSONArray("times")
+                            val res = MasjidPojo()
+                            for (time in times.iterator<JSONObject>()) {
+                                val type = time.getString("type")
+                                val datetimeStr = time.getString("datetime")
+                                val datetime = GregorianCalendar()
+                                datetime.time = dateFormatter.parse(datetimeStr)
+                                when (type) {
+                                    "f" -> res.fajrTime = datetime
+                                    "z" -> res.zoharTime = datetime
+                                    "a" -> res.asrTime = datetime
+                                    "m" -> res.magribTime = datetime
+                                    "e" -> res.eshaTime = datetime
+                                }
+                            }
+                            cb.onSuccess(res)
+                        }
                     }
                 }
-                cb.onSuccess(res)
-            }
-
-            override fun onError(t: Throwable) = cb.onError(t)
-        })
     }
 
     fun createMasjid(name: String, latitude: Double, longitude: Double, cb: MasjidCreatedCallback) {
