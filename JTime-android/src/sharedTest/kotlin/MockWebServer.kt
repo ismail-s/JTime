@@ -4,6 +4,7 @@ import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import android.util.Log
 import com.ismail_s.jtime.android.RestClient
 
 /**
@@ -33,9 +34,11 @@ fun createMockWebServerAndConnectToRestClient(): MockWebServer {
                   "humanReadableAddress": "some made-up address..."}]"""
                 return MockResponse().setBody(mockJsonResponse)
             }
+            Log.d("debugging", "HTTP404 for $recordedRequest")
             return MockResponse().setResponseCode(404)
         }
     })
-    RestClient.url = server.url("/").toString()
+    RestClient.url = server.url("/").toString().dropLast(1)
+    Log.d("debugging", "RestClient.url is now ${RestClient.url}")
     return server
 }
