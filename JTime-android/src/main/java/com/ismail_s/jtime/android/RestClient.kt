@@ -11,24 +11,24 @@ import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
 import com.loopj.android.http.RequestParams
+import nl.komponents.kovenant.Promise
+import nl.komponents.kovenant.deferred
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.text.SimpleDateFormat
 import java.net.NoRouteToHostException
+import java.text.SimpleDateFormat
 import java.util.*
-import nl.komponents.kovenant.deferred
-import nl.komponents.kovenant.Promise
 
 class RestClient {
     private var sharedPrefs: SharedPreferencesWrapper
     private var context: Context
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
-    private var noNetworkException: NoRouteToHostException
+    private val noNetworkException: NoRouteToHostException
+        get() = NoRouteToHostException(context.getString(R.string.no_network_exception))
 
     constructor(context: Context) {
         this.context = context
-        this.noNetworkException = NoRouteToHostException(context.getString(R.string.no_network_exception))
         this.sharedPrefs = SharedPreferencesWrapper(context)
 
         if ((FuelManager.instance.baseHeaders == emptyMap<String, String>() || FuelManager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
@@ -130,7 +130,7 @@ class RestClient {
                     cb.onError(result.getAs<FuelError>()!!)
                 }
                 is Result.Success -> {
-                cb.onSuccess()
+                    cb.onSuccess()
                 }
             }
         }
@@ -149,18 +149,18 @@ class RestClient {
         val url = Companion.url + "/SalaahTimes/create-or-update"
         fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/x-www-form-urlencoded"))
         url.httpPost(listOf("masjidId" to "$masjidId", "type" to type, "datetime" to datetime))
-            .responseJson { request, response, result ->
-                when (result) {
-                    is Result.Failure -> {
-                        cb.onError(result.getAs<FuelError>()!!)
-                        fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
+                .responseJson { request, response, result ->
+                    when (result) {
+                        is Result.Failure -> {
+                            cb.onError(result.getAs<FuelError>()!!)
+                            fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
+                        }
+                        is Result.Success -> {
+                            cb.onSuccess()
+                            fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
+                        }
                     }
-                    is Result.Success -> {
-                    cb.onSuccess()
-                    fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                 }
-            }
-        }
     }
 
     fun login(code: String, email: String, cb: LoginCallback) {
@@ -206,8 +206,7 @@ class RestClient {
                         // Clear persisted login tokens
                         clearSavedUser()
                         cb.onSuccess()
-                    }
-                    else {
+                    } else {
                         cb.onError(result.getAs<FuelError>()!!)
                     }
                 }
@@ -229,7 +228,7 @@ class RestClient {
             return
         }
         val url = Companion.url + "/users/${sharedPrefs.userId}"
-        url.httpGet().responseJson {request, response, result ->
+        url.httpGet().responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
                     clearSavedUser()
@@ -238,8 +237,7 @@ class RestClient {
                 is Result.Success -> {
                     if (response.httpStatusCode == 200) {
                         cb.onLoggedIn()
-                    }
-                    else {
+                    } else {
                         clearSavedUser()
                         cb.onLoggedOut()
                     }
@@ -257,15 +255,15 @@ class RestClient {
         fun onError(t: Throwable)
     }
 
-    interface MasjidTimesCallback: Callback {
+    interface MasjidTimesCallback : Callback {
         fun onSuccess(times: MasjidPojo)
     }
 
-    interface LoginCallback: Callback {
+    interface LoginCallback : Callback {
         fun onSuccess(id: Int, accessToken: String)
     }
 
-    interface LogoutCallback: Callback {
+    interface LogoutCallback : Callback {
         fun onSuccess()
     }
 
@@ -274,9 +272,9 @@ class RestClient {
         fun onLoggedOut()
     }
 
-    interface MasjidCreatedCallback: LogoutCallback {}
+    interface MasjidCreatedCallback : LogoutCallback {}
 
-    interface CreateOrUpdateMasjidTimeCallback: LogoutCallback {}
+    interface CreateOrUpdateMasjidTimeCallback : LogoutCallback {}
 
     companion object {
         // By having url in the companion object, we can change the url from tests
