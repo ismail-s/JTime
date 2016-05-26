@@ -5,52 +5,40 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.extension.responseJson
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.Manager
+import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
-import com.loopj.android.http.RequestParams
-import com.strongloop.android.loopback.Model
-import com.strongloop.android.loopback.ModelRepository
-import com.strongloop.android.loopback.RestAdapter
-import com.strongloop.android.loopback.callbacks.ListCallback
-import com.strongloop.android.remoting.adapters.Adapter
-import com.strongloop.android.remoting.adapters.RestContractItem
-import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.net.NoRouteToHostException
-import java.util.*
-import nl.komponents.kovenant.deferred
 import nl.komponents.kovenant.Promise
+import nl.komponents.kovenant.deferred
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.net.NoRouteToHostException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class RestClient {
     private var sharedPrefs: SharedPreferencesWrapper
     private var context: Context
-    private var restAdapter: RestAdapter
-    private var masjidRepo: ModelRepository<Model>
-    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    private var noNetworkException: NoRouteToHostException
+    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+    private val noNetworkException: NoRouteToHostException
+        get() = NoRouteToHostException(context.getString(R.string.no_network_exception))
 
     constructor(context: Context) {
         this.context = context
-        this.noNetworkException = NoRouteToHostException(context.getString(R.string.no_network_exception))
-        this.restAdapter = RestAdapter(context, Companion.url)
         this.sharedPrefs = SharedPreferencesWrapper(context)
-        this.masjidRepo = this.restAdapter.createRepository("Masjid")
-        this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times-for-today", "GET"), "Masjid.getTodayTimes")
-        this.restAdapter.contract.addItem(RestContractItem("/Masjids/:id/times", "GET"), "Masjid.getTimes")
 
-        if ((Manager.instance.baseHeaders == emptyMap<String, String>() || Manager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
+        if ((FuelManager.instance.baseHeaders == emptyMap<String, String>() || FuelManager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
             setHttpHeaders(sharedPrefs.accessToken)
         }
     }
 
     private fun setHttpHeaders(accessToken: String) {
-        Manager.instance.baseHeaders = mapOf("Authorization" to accessToken,
-            "Accept" to "application/json",
-            "Content-Type" to "application/json")
+        FuelManager.instance.baseHeaders = mapOf("Authorization" to accessToken,
+                "Accept" to "application/json",
+                "Content-Type" to "application/json")
     }
 
     fun internetIsAvailable(): Boolean {
@@ -69,23 +57,30 @@ class RestClient {
             deferred.reject(noNetworkException)
             return deferred.promise
         }
-        this.masjidRepo.findAll(object: ListCallback<Model> {
-            override fun onSuccess(masjids: List<Model>) {
-                var res = mutableListOf<MasjidPojo>()
-                for (m in masjids) {
-                    val name = m.get("name") as String
-                    val address = m.get("humanReadableAddress") as String? ?: ""
-                    val id = m.id as Int
-                    val location = m.get("location") as HashMap<*, *>
-                    val latitude = location.get("lat") as Double
-                    val longitude = location.get("lng") as Double
-                    res.add(MasjidPojo(name, id, address, latitude, longitude))
+        "${Companion.url}/Masjids".httpGet().responseJson { request, response, result ->
+            when (result) {
+                is Result.Failure -> deferred.reject(result.getAs<FuelError>()!!)
+                is Result.Success -> {
+                    val data = result.get().array()
+                    val res = mutableListOf<MasjidPojo>()
+                    for (m in data.iterator<JSONObject>()) {
+                        val name = m.getString("name")
+                        val address: String
+                        try {
+                            address = m.getString("humanReadableAddress")
+                        } catch (e: JSONException) {
+                            address = ""
+                        }
+                        val id = m.getInt("id")
+                        val location = m.getJSONObject("location")
+                        val latitude = location["lat"] as Double
+                        val longitude = location["lng"] as Double
+                        res.add(MasjidPojo(name, id, address, latitude, longitude))
+                    }
+                    deferred.resolve(res)
                 }
-                deferred.resolve(res)
             }
-
-            override fun onError(t: Throwable) = deferred.reject(t)
-        })
+        }
         return deferred.promise
     }
 
@@ -93,29 +88,31 @@ class RestClient {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
         }
-        val map = hashMapOf(Pair("id", masjidId), Pair("date", dateFormatter.format(date.time)))
-        this.masjidRepo.invokeStaticMethod("getTimes", map, object : Adapter.JsonObjectCallback() {
-            override fun onSuccess(response: JSONObject) {
-                val times = response.getJSONArray("times")
-                var res = MasjidPojo()
-                for (i in 0..times.length()-1) {
-                    val type = (times[i] as JSONObject).getString("type")
-                    val datetimeStr = (times[i] as JSONObject).getString("datetime")
-                    var datetime = GregorianCalendar()
-                    datetime.time = dateFormatter.parse(datetimeStr)
-                    when (type) {
-                        "f" -> res.fajrTime = datetime
-                        "z" -> res.zoharTime = datetime
-                        "a" -> res.asrTime = datetime
-                        "m" -> res.magribTime = datetime
-                        "e" -> res.eshaTime = datetime
+        "${Companion.url}/Masjids/$masjidId/times"
+                .httpGet(listOf("date" to dateFormatter.format(date.time)))
+                .responseJson { request, response, result ->
+                    when (result) {
+                        is Result.Failure -> cb.onError(result.getAs<FuelError>()!!)
+                        is Result.Success -> {
+                            val times = result.get().obj().getJSONArray("times")
+                            val res = MasjidPojo()
+                            for (time in times.iterator<JSONObject>()) {
+                                val type = time.getString("type")
+                                val datetimeStr = time.getString("datetime")
+                                val datetime = GregorianCalendar()
+                                datetime.time = dateFormatter.parse(datetimeStr)
+                                when (type) {
+                                    "f" -> res.fajrTime = datetime
+                                    "z" -> res.zoharTime = datetime
+                                    "a" -> res.asrTime = datetime
+                                    "m" -> res.magribTime = datetime
+                                    "e" -> res.eshaTime = datetime
+                                }
+                            }
+                            cb.onSuccess(res)
+                        }
                     }
                 }
-                cb.onSuccess(res)
-            }
-
-            override fun onError(t: Throwable) = cb.onError(t)
-        })
     }
 
     fun createMasjid(name: String, latitude: Double, longitude: Double, cb: MasjidCreatedCallback) {
@@ -132,14 +129,14 @@ class RestClient {
                     cb.onError(result.getAs<FuelError>()!!)
                 }
                 is Result.Success -> {
-                cb.onSuccess()
+                    cb.onSuccess()
                 }
             }
         }
     }
 
     fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar, cb: CreateOrUpdateMasjidTimeCallback) {
-        val fuelInstance = Manager.instance
+        val fuelInstance = FuelManager.instance
         val type = when (salaahType) {
             SalaahType.FAJR -> "f"
             SalaahType.ZOHAR -> "z"
@@ -151,26 +148,24 @@ class RestClient {
         val url = Companion.url + "/SalaahTimes/create-or-update"
         fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/x-www-form-urlencoded"))
         url.httpPost(listOf("masjidId" to "$masjidId", "type" to type, "datetime" to datetime))
-            .responseJson { request, response, result ->
-                when (result) {
-                    is Result.Failure -> {
-                        cb.onError(result.getAs<FuelError>()!!)
-                        fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
+                .responseJson { request, response, result ->
+                    when (result) {
+                        is Result.Failure -> {
+                            cb.onError(result.getAs<FuelError>()!!)
+                            fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
+                        }
+                        is Result.Success -> {
+                            cb.onSuccess()
+                            fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
+                        }
                     }
-                    is Result.Success -> {
-                    cb.onSuccess()
-                    fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                 }
-            }
-        }
     }
 
     fun login(code: String, email: String, cb: LoginCallback) {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
         }
-        val requestParams = RequestParams()
-        requestParams.put("code", code)
         val url = Companion.url + "/users/googleid"
 
         Fuel.get(url, listOf("id_token" to code)).responseJson { request, response, result ->
@@ -179,10 +174,9 @@ class RestClient {
                     cb.onError(result.getAs<FuelError>()!!)
                 }
                 is Result.Success -> {
-                    val data = result.get()
+                    val data = result.get().obj()
                     val accessToken = data.getString("access_token")
                     val id = data.getInt("userId")
-                    restAdapter.setAccessToken(accessToken)
                     setHttpHeaders(accessToken)
                     sharedPrefs.accessToken = accessToken
                     sharedPrefs.userId = id
@@ -209,8 +203,7 @@ class RestClient {
                         // Clear persisted login tokens
                         clearSavedUser()
                         cb.onSuccess()
-                    }
-                    else {
+                    } else {
                         cb.onError(result.getAs<FuelError>()!!)
                     }
                 }
@@ -231,8 +224,8 @@ class RestClient {
             cb.onLoggedOut()
             return
         }
-        var url = Companion.url + "/users/${sharedPrefs.userId}"
-        url.httpGet().responseJson {request, response, result ->
+        val url = Companion.url + "/users/${sharedPrefs.userId}"
+        url.httpGet().responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
                     clearSavedUser()
@@ -241,8 +234,7 @@ class RestClient {
                 is Result.Success -> {
                     if (response.httpStatusCode == 200) {
                         cb.onLoggedIn()
-                    }
-                    else {
+                    } else {
                         clearSavedUser()
                         cb.onLoggedOut()
                     }
@@ -252,8 +244,7 @@ class RestClient {
     }
 
     private fun clearSavedUser() {
-        restAdapter.clearAccessToken()
-        Manager.instance.baseHeaders = emptyMap()
+        FuelManager.instance.baseHeaders = emptyMap()
         sharedPrefs.clearSavedUser()
     }
 
@@ -261,19 +252,15 @@ class RestClient {
         fun onError(t: Throwable)
     }
 
-    interface MasjidTimesCallback: Callback {
+    interface MasjidTimesCallback : Callback {
         fun onSuccess(times: MasjidPojo)
     }
 
-    interface MasjidsCallback: Callback {
-        fun onSuccess(masjids: List<MasjidPojo>)
-    }
-
-    interface LoginCallback: Callback {
+    interface LoginCallback : Callback {
         fun onSuccess(id: Int, accessToken: String)
     }
 
-    interface LogoutCallback: Callback {
+    interface LogoutCallback : Callback {
         fun onSuccess()
     }
 
@@ -282,12 +269,25 @@ class RestClient {
         fun onLoggedOut()
     }
 
-    interface MasjidCreatedCallback: LogoutCallback {}
+    interface MasjidCreatedCallback : LogoutCallback {}
 
-    interface CreateOrUpdateMasjidTimeCallback: LogoutCallback {}
+    interface CreateOrUpdateMasjidTimeCallback : LogoutCallback {}
 
     companion object {
         // By having url in the companion object, we can change the url from tests
         var url = "http://ismail-laptop:3000/api"
+    }
+}
+
+inline fun <reified T> JSONArray.iterator(): Iterator<T> = object : Iterator<T> {
+    private var index = 0
+    override fun hasNext(): Boolean {
+        return index < this@iterator.length()
+    }
+
+    override fun next(): T {
+        val result = this@iterator.get(index) as T
+        index++
+        return result
     }
 }
