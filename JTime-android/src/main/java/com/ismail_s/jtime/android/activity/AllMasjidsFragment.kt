@@ -24,10 +24,14 @@ class AllMasjidsFragment : BaseFragment() {
 
         RestClient(activity).getMasjids() successUi {
             val masjids = it
-            (activity as MainActivity).location successUi {
-                view.adapter = MyItemRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), activity as MainActivity)
-            } failUi {
-                view.adapter = MyItemRecyclerViewAdapter(sortMasjidsByName(masjids), activity as MainActivity)
+            if (activity != null) {
+                (activity as MainActivity).location successUi {
+                    if (activity != null)
+                        view.adapter = MyItemRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), activity as MainActivity)
+                } failUi {
+                    if (activity != null)
+                        view.adapter = MyItemRecyclerViewAdapter(sortMasjidsByName(masjids), activity as MainActivity)
+                }
             }
         } failUi {
             if (activity != null)
