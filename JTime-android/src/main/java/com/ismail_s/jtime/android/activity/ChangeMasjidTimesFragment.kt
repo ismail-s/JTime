@@ -75,7 +75,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
                 Toast.makeText(activity.applicationContext, s, Toast.LENGTH_LONG).show()
                 // As we can't get the times (so can't edit them), we switch
                 // back to viewing the times
-                (activity as MainActivity).switchToMasjidsFragment(masjidId, masjidName)
+                (activity as MainActivity?)?.switchToMasjidsFragment(masjidId, masjidName)
             }
         }
         RestClient(activity).getMasjidTimes(masjidId, cb, date)
@@ -88,7 +88,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         val helpButton = rootView.findViewById(R.id.help_button) as Button
         helpButton.setOnClickListener {
             hideKeyboard()
-            (activity as MainActivity).switchToHelpFragment()
+            (activity as MainActivity?)?.switchToHelpFragment()
         }
     }
 
@@ -177,7 +177,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
                     val s = getString(R.string.get_masjid_times_failure_toast, t.message)
                     showShortToast(s)
                     //TODO-should this (next) line be here
-                    (activity as MainActivity).switchToMasjidsFragment(masjidId, masjidName)
+                    (activity as MainActivity?)?.switchToMasjidsFragment(masjidId, masjidName)
                 }
             }
             //disable all buttons here whilst we get the masjid times for the
