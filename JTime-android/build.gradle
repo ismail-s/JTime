@@ -50,8 +50,9 @@ android {
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'),
-                    'proguard-rules.pro', 'proguard-guava.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+            FileCollection proGuardFileCollection = files {file('./proguard-config').listFiles()}
+            proguardFiles(proGuardFileCollection)
         }
     }
 }
