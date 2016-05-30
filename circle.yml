@@ -4,7 +4,7 @@ machine:
 dependencies:
   pre:
     # Start the gradle daemon
-    - (cd JTime-android && ./gradlew):
+    - ./gradlew:
         background: true
     - echo y | android update sdk --no-ui --all --filter tools
     - echo y | android update sdk --no-ui --all --filter platform-tools
@@ -15,7 +15,7 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter android-23
     - echo y | android update sdk --no-ui --all --filter android-21
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
-    - (cd JTime-android && ./gradlew dependencies --console=plain)
+    - ./gradlew dependencies --console=plain
 test:
   override:
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
@@ -26,16 +26,15 @@ test:
     - fb-adb start-server:
         background: true
     # Try running tests twice if they fail first time
-    - (cd JTime-android && (./gradlew test assembleDebug --console=plain || ./gradlew test assembleDebug --console=plain))
+    - (./gradlew test assembleDebug --console=plain || ./gradlew test assembleDebug --console=plain)
     # Build the release apk if we have the secure keys required, reporting the status codes
     # correctly
     - >
-       (cd JTime-android;
        gpg -d -o android.jks --passphrase $ANDROID_RELEASE_ENCRYPTION_PASSWORD android.jks.gpg;
        if test $? == 0; then (./gradlew assembleRelease --console=plain && rm android.jks);
-       else true; fi)
+       else true; fi
     # Build the tests first so the command to run them executes faster
-    - (cd JTime-android && ./gradlew assembleDebugAndroidTest --console=plain)
+    - ./gradlew assembleDebugAndroidTest --console=plain
     # wait for emulator to have booted
     - circle-android wait-for-boot
     # Sleeping isn't a brilliant fix...
@@ -46,7 +45,7 @@ test:
     - fb-adb shell input keyevent 92
     - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
     # Note the espresso tests include code to unlock the emulator before running the tests
-    - (cd JTime-android && ./gradlew connectedAndroidTest --console=plain)
+    - ./gradlew connectedAndroidTest --console=plain
     - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
   post:
     - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
