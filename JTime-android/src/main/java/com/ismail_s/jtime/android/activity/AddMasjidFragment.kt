@@ -59,12 +59,12 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
                 return
             }
             //2. submit form
-            val showToast = {s: String -> (activity as MainActivity).showShortToast(s)}
+            val showToast = {s: String -> (activity as MainActivity?)?.showShortToast(s)}
             val cb = object: RestClient.MasjidCreatedCallback {
                 override fun onSuccess() {
                     showToast("Masjid \"$masjidName\" created")
                     //3. switch to AllMasjidsFragment
-                    (activity as MainActivity).switchToAllMasjidsFragment()
+                    (activity as MainActivity?)?.switchToAllMasjidsFragment()
                 }
 
                 override fun onError(t: Throwable) {

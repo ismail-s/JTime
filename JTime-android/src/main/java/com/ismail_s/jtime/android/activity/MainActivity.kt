@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
@@ -39,8 +40,8 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     * Login status is 0 for don't know, 1 for logged in and 2 for logged out
     */
     private var loginStatus = 0
-    val currentFragment: BaseFragment
-        get() = supportFragmentManager.findFragmentById(R.id.fragment_container) as BaseFragment
+    val currentFragment: BaseFragment?
+        get() = supportFragmentManager.findFragmentById(R.id.fragment_container) as BaseFragment?
     private val LOGIN_DRAWER_ITEM_IDENTIFIER: Long = 546
     private val LOGOUT_DRAWER_ITEM_IDENTIFIER: Long = 232
     private val ADD_MASJID_DRAWER_ITEM_IDENTIFIER: Long = 785
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                             drawer?.addItemAtPosition(loginDrawerItem, 0)
                             //remove addMasjidDrawerItem
                             drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
-                            currentFragment.onLogout()
+                            currentFragment?.onLogout()
                         }
 
                         override fun onError(t: Throwable) = showShortToast(getString(R.string.logout_failure_toast, t.message))
@@ -176,11 +177,11 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private fun setUpNavDrawer(loginOutButton: PrimaryDrawerItem, savedInstance: Bundle?) {
         val drawerListener = object: Drawer.OnDrawerListener {
             override fun onDrawerOpened(drawerView: View) {
-                currentFragment.onDrawerOpened(drawerView)
+                currentFragment?.onDrawerOpened(drawerView)
             }
 
             override fun onDrawerClosed(drawerView: View) {
-                currentFragment.onDrawerClosed(drawerView)
+                currentFragment?.onDrawerClosed(drawerView)
             }
 
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
@@ -249,7 +250,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                         //add addMasjidDrawerItem
                         drawer?.addItem(addMasjidDrawerItem)
                         showShortToast(getString(R.string.login_success_toast))
-                        currentFragment.onLogin()
+                        currentFragment?.onLogin()
                     }
 
                     override fun onError(t: Throwable) {
@@ -280,6 +281,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     }
 
     fun switchToFragment(fragment: Fragment, title: Int) {
+        Log.d("jtime", "Switching to fragment $fragment")
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
         drawer?.closeDrawer()

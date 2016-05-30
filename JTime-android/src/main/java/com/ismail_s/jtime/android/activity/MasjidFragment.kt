@@ -61,7 +61,7 @@ class MasjidFragment : BaseFragment() {
         editButton = rootView.findViewById(R.id.edit_button) as Button
         editButton.setOnClickListener {view ->
             val masjidName = arguments.getString(Constants.MASJID_NAME)
-            (activity as MainActivity).switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
+            (activity as MainActivity?)?.switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
         }
         if (SharedPreferencesWrapper(activity).persistedLoginExists()) {
             onLogin()
