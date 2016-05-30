@@ -58,9 +58,6 @@ android {
 }
 
 dependencies {
-    repositories {
-        jcenter()
-    }
 
     compile('com.mikepenz:materialdrawer:5.1.6@aar') {
         transitive = true
@@ -112,9 +109,6 @@ dependencies {
     //Kotlin promises
     compile 'nl.komponents.kovenant:kovenant-core:3.2.2'
     compile 'nl.komponents.kovenant:kovenant-android:3.2.2'
-}
-repositories {
-    mavenCentral()
 }
 
 apply plugin: 'com.google.gms.google-services'
