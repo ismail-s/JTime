@@ -11,5 +11,12 @@
     "database": "jtime",
     "username": "jtimetest",
     "password": "jtimetest"
+  },
+  "mongo": {
+      "name": "mongo",
+      "connector": "mongodb",
+      "host": "127.0.0.1",
+      "database": "jtime",
+      "port": 27017
   }
 }
