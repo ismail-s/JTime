@@ -30,7 +30,7 @@ test:
     # Build the release apk if we have the secure keys required, reporting the status codes
     # correctly
     - >
-       gpg -d -o android.jks --passphrase $ANDROID_RELEASE_ENCRYPTION_PASSWORD android.jks.gpg;
+       (cd JTime-android && gpg -d -o android.jks --passphrase $ANDROID_RELEASE_ENCRYPTION_PASSWORD android.jks.gpg);
        if test $? == 0; then (./gradlew assembleRelease --console=plain && rm android.jks);
        else true; fi
     # Build the tests first so the command to run them executes faster
