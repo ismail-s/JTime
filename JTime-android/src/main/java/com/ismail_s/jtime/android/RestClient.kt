@@ -275,7 +275,7 @@ class RestClient {
 
     companion object {
         // By having url in the companion object, we can change the url from tests
-        var url = "http://ismail-laptop:3000/api"
+        var url = "https://jtime.ismail-s.com/api"
     }
 }
 
