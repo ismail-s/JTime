@@ -23,7 +23,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
     data class Time(val hour: Int, val minute: Int)
 
     private val timeRegex = Regex("""(\d\d)[:\- ](\d\d)""")
-    private var masjidId: Int = -1
+    private var masjidId: String = ""
     lateinit private var masjidName: String
     lateinit private var date: GregorianCalendar
     private var currentMasjidPojo: MasjidPojo? = null
@@ -37,7 +37,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        masjidId = arguments.getInt(Constants.MASJID_ID)
+        masjidId = arguments.getString(Constants.MASJID_ID)
         masjidName = arguments.getString(MASJID_NAME)
         if (savedInstanceState != null) {
             currentSalaahType = savedInstanceState.getSerializable(SALAAH_TYPE) as SalaahType
@@ -371,11 +371,11 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         private val ARG_DATE = "date"
         private val MASJID_NAME = "masjid_name"
 
-        fun newInstance(masjidId: Int, masjidName: String, date: GregorianCalendar): ChangeMasjidTimesFragment {
+        fun newInstance(masjidId: String, masjidName: String, date: GregorianCalendar): ChangeMasjidTimesFragment {
             val fragment = ChangeMasjidTimesFragment()
             val args = Bundle()
             args.putSerializable(ARG_DATE, date)
-            args.putInt(Constants.MASJID_ID, masjidId)
+            args.putString(Constants.MASJID_ID, masjidId)
             args.putString(MASJID_NAME, masjidName)
             fragment.arguments = args
             return fragment

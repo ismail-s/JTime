@@ -15,10 +15,10 @@ class SharedPreferencesWrapper {
             sharedPrefs?.edit()?.putString(PROPERTY_ACCESS_TOKEN, value)?.apply()
         }
 
-    var userId: Int
-        get() = sharedPrefs?.getInt(PROPERTY_CURRENT_USER_ID, -1) as Int
+    var userId: String
+        get() = sharedPrefs?.getString(PROPERTY_CURRENT_USER_ID, "") as String
         set(value) {
-            sharedPrefs?.edit()?.putInt(PROPERTY_CURRENT_USER_ID, value)?.apply()
+            sharedPrefs?.edit()?.putString(PROPERTY_CURRENT_USER_ID, value)?.apply()
         }
 
     var email: String
@@ -37,11 +37,11 @@ class SharedPreferencesWrapper {
 
     fun clearSavedUser() {
         accessToken = ""
-        userId = -1
+        userId = ""
     }
 
     fun persistedLoginExists(): Boolean {
-        if (this.accessToken == "" || this.userId == -1) {
+        if (this.accessToken == "" || this.userId == "") {
             // We don't have a persisted login
             return false
         }

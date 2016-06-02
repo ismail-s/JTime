@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 loginStatus = 1
                 val acct = result.signInAccount as GoogleSignInAccount
                 val cb = object: RestClient.LoginCallback {
-                    override fun onSuccess(id: Int, accessToken: String) {
+                    override fun onSuccess(id: String, accessToken: String) {
                         header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
                         //Remove login button, add logout button to nav drawer
                         drawer?.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
@@ -262,7 +262,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         }
     }
 
-    fun switchToMasjidsFragment(masjidId: Int, masjidName: String) {
+    fun switchToMasjidsFragment(masjidId: String, masjidName: String) {
         val fragment = MasjidsFragment.newInstance(masjidId, masjidName)
         switchToFragment(fragment, R.string.fragment_title_masjid_times)
     }
@@ -275,7 +275,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
     fun switchToHelpFragment() = switchToFragment(HelpFragment(), R.string.fragment_title_help)
 
-    fun switchToChangeMasjidTimesFragment(masjidId: Int, masjidName: String, date: GregorianCalendar) {
+    fun switchToChangeMasjidTimesFragment(masjidId: String, masjidName: String, date: GregorianCalendar) {
         val fragment = ChangeMasjidTimesFragment.newInstance(masjidId, masjidName, date)
         switchToFragment(fragment, R.string.fragment_title_change_salaah_times)
     }

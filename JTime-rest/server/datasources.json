@@ -3,15 +3,6 @@
     "name": "db",
     "connector": "memory"
   },
-  "postgres": {
-    "name": "postgres",
-    "connector": "postgresql",
-    "host": "localhost",
-    "port": 5432,
-    "database": "jtime",
-    "username": "jtimetest",
-    "password": "jtimetest"
-  },
   "mongo": {
       "name": "mongo",
       "connector": "mongodb",

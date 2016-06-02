@@ -71,7 +71,7 @@ class RestClient {
                         } catch (e: JSONException) {
                             address = ""
                         }
-                        val id = m.getInt("id")
+                        val id = m.getString("id")
                         val location = m.getJSONObject("location")
                         val latitude = location["lat"] as Double
                         val longitude = location["lng"] as Double
@@ -84,7 +84,7 @@ class RestClient {
         return deferred.promise
     }
 
-    fun getMasjidTimes(masjidId: Int, cb: MasjidTimesCallback, date: GregorianCalendar) {
+    fun getMasjidTimes(masjidId: String, cb: MasjidTimesCallback, date: GregorianCalendar) {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
         }
@@ -135,7 +135,7 @@ class RestClient {
         }
     }
 
-    fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar, cb: CreateOrUpdateMasjidTimeCallback) {
+    fun createOrUpdateMasjidTime(masjidId: String, salaahType: SalaahType, date: GregorianCalendar, cb: CreateOrUpdateMasjidTimeCallback) {
         val fuelInstance = FuelManager.instance
         val type = when (salaahType) {
             SalaahType.FAJR -> "f"
@@ -176,7 +176,7 @@ class RestClient {
                 is Result.Success -> {
                     val data = result.get().obj()
                     val accessToken = data.getString("access_token")
-                    val id = data.getInt("userId")
+                    val id = data.getString("userId")
                     setHttpHeaders(accessToken)
                     sharedPrefs.accessToken = accessToken
                     sharedPrefs.userId = id
@@ -257,7 +257,7 @@ class RestClient {
     }
 
     interface LoginCallback : Callback {
-        fun onSuccess(id: Int, accessToken: String)
+        fun onSuccess(id: String, accessToken: String)
     }
 
     interface LogoutCallback : Callback {
