@@ -1,0 +1,7 @@
+from fabric.api import run, cd
+
+def deploy():
+    "Deploy the Rest api to production"
+    with cd('JTime/JTime-rest'):
+        run('git pull')
+        run('pm2 reload .')
