@@ -51,11 +51,11 @@ class MasjidsFragment : BaseFragment() {
 
 
     companion object {
-        fun newInstance(masjidId: Int, masjidName: String): MasjidsFragment {
+        fun newInstance(masjidId: String, masjidName: String): MasjidsFragment {
             val instance = MasjidsFragment()
             val bundle = Bundle()
             bundle.putString(Constants.MASJID_NAME, masjidName)
-            bundle.putInt(Constants.MASJID_ID, masjidId)
+            bundle.putString(Constants.MASJID_ID, masjidId)
             instance.arguments = bundle
             return instance
         }
@@ -72,7 +72,7 @@ class MasjidsFragment : BaseFragment() {
             // Return a MasjidFragment (defined as a static inner class below).
             val date = GregorianCalendar()
             date.add(GregorianCalendar.DAY_OF_YEAR, position - NUM_OF_PAGES / 2)
-            val masjidId = arguments.getInt(Constants.MASJID_ID)
+            val masjidId = arguments.getString(Constants.MASJID_ID)
             return MasjidFragment.newInstance(masjidId, masjidName, date)
         }
 
