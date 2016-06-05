@@ -122,18 +122,19 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         toolbar.title = savedInstanceState?.getCharSequence(TOOLBAR_TITLE, "") ?: ""
         setSupportActionBar(toolbar)
         setUpGoogleApiClient()
+        setUpNavDrawer(savedInstanceState)
 
         val cb = object: RestClient.SignedinCallback {
             override fun onLoggedOut() {
                 loginStatus = 2
                 //Set button to be login, create drawer
-                setUpNavDrawer(loginDrawerItem, savedInstanceState)
+                drawer?.addItemAtPosition(loginDrawerItem, 0)
             }
 
             override fun onLoggedIn() {
                 loginStatus = 1
                 //Set button to be logout, create drawer
-                setUpNavDrawer(logoutDrawerItem, savedInstanceState)
+                drawer?.addItemAtPosition(logoutDrawerItem, 0)
                 val email: String = SharedPreferencesWrapper(this@MainActivity).email
                 header.addProfile(ProfileDrawerItem().withEmail(email), 0)
                 //add addMasjidDrawerItem
@@ -174,7 +175,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 .build()
     }
 
-    private fun setUpNavDrawer(loginOutButton: PrimaryDrawerItem, savedInstance: Bundle?) {
+    private fun setUpNavDrawer(savedInstance: Bundle?) {
         val drawerListener = object: Drawer.OnDrawerListener {
             override fun onDrawerOpened(drawerView: View) {
                 currentFragment?.onDrawerOpened(drawerView)
@@ -197,7 +198,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 .withShowDrawerOnFirstLaunch(true)
                 .withOnDrawerListener(drawerListener)
                 .withSavedInstance(savedInstance)
-                .addDrawerItems(loginOutButton, PrimaryDrawerItem()
+                .addDrawerItems(PrimaryDrawerItem()
                         .withName(getString(R.string.drawer_item_all_masjids))
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
                             switchToAllMasjidsFragment()
