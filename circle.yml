@@ -60,3 +60,7 @@ deployment:
                if [[ $(git diff HEAD^..HEAD JTime-rest) ]];
                then fab -H $PRODUCTION_HOST -u $PRODUCTION_USER deploy | sed -n -e 's/^\(\[[a-zA-Z0-9.]\+]\)\?//p';
                else echo "No changes to JTime-rest folder, so not redeploying rest api"; fi
+            - >
+               if [[ $(git diff HEAD^..HEAD JTime-android) ]];
+               then (gpg -d -o JTime-android/google-play-publisher-keys.json --passphrase $GOOGLE_PLAY_JSON_PUBLISHER_ENCRYPTION_PASSWORD JTime-android/google-play-publisher-keys.json.gpg && (./gradlew publishRelease --console=plain; rm JTime-android/google-play-publisher-keys.json));
+               else echo "No changes to JTime-android folder, so not uploading apk to play store"; fi
