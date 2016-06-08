@@ -12,6 +12,7 @@ import android.test.suitebuilder.annotation.LargeTest
 
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
+import android.view.WindowManager.LayoutParams
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
 
 
@@ -43,6 +44,9 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         createMockWebServerAndConnectToRestClient()
         injectInstrumentation(InstrumentationRegistry.getInstrumentation())
         activity
+        val wakeUpDevice = Runnable { activity.window.addFlags(LayoutParams.FLAG_TURN_SCREEN_ON
+                or LayoutParams.FLAG_SHOW_WHEN_LOCKED or LayoutParams.FLAG_KEEP_SCREEN_ON) }
+        activity.runOnUiThread(wakeUpDevice)
     }
 
     private fun clickOnMasjidNameToOpenMasjidFragment() {
