@@ -3,7 +3,7 @@ package com.ismail_s.jtime.android.activity
 import android.location.Location
 import android.location.Location.distanceBetween
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -12,33 +12,49 @@ import android.widget.Toast
 import com.ismail_s.jtime.android.MasjidPojo
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
-import nl.komponents.kovenant.ui.successUi
 import nl.komponents.kovenant.ui.failUi
+import nl.komponents.kovenant.ui.successUi
 
-class AllMasjidsFragment : BaseFragment() {
+class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
+    private lateinit var layout: SwipeRefreshLayout
+    private lateinit var rView: RecyclerView
+
+    private fun hideRefreshIcon() {
+        layout.isRefreshing = false
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_item_list, container, false) as RecyclerView
-        view.setHasFixedSize(true)
+        layout = inflater!!.inflate(R.layout.fragment_item_list, container, false) as SwipeRefreshLayout
+        layout.setOnRefreshListener(this)
+        rView = layout.findViewById(R.id.list) as RecyclerView
+        rView.setHasFixedSize(true)
 
+        layout.isRefreshing = true
+        onRefresh()
+        return layout
+    }
+
+    override fun onRefresh() {
         RestClient(activity).getMasjids() successUi {
             val masjids = it
             if (activity != null) {
                 (activity as MainActivity).location successUi {
+                    hideRefreshIcon()
                     if (activity != null)
-                        view.adapter = MyItemRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), activity as MainActivity)
+                        rView.adapter = MyItemRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), activity as MainActivity)
                 } failUi {
+                    hideRefreshIcon()
                     if (activity != null)
-                        view.adapter = MyItemRecyclerViewAdapter(sortMasjidsByName(masjids), activity as MainActivity)
+                        rView.adapter = MyItemRecyclerViewAdapter(sortMasjidsByName(masjids), activity as MainActivity)
                 }
             }
         } failUi {
+            hideRefreshIcon()
             if (activity != null)
                 Toast.makeText(activity, getString(R.string.get_masjids_failure_toast, it.message), Toast.LENGTH_LONG)
                     .show()
         }
-        return view
     }
 
     private fun sortMasjidsByLocation(masjids: List<MasjidPojo>, userLocation: Location): List<MasjidPojo> {

@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
-    android:name="com.ismail_s.jtime.android.activity.AllMasjidsFragment"
+    android:id="@+id/pull_to_refresh_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="5sp"
-    android:layout_marginRight="5sp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context="com.ismail_s.jtime.android.activity.AllMasjidsFragment"
-    tools:listitem="@layout/fragment_item" />
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
+        android:name="com.ismail_s.jtime.android.activity.AllMasjidsFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="5sp"
+        android:layout_marginRight="5sp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="com.ismail_s.jtime.android.activity.AllMasjidsFragment"
+        tools:listitem="@layout/fragment_item" />
+</android.support.v4.widget.SwipeRefreshLayout>
