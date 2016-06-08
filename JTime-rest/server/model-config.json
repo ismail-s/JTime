@@ -14,31 +14,31 @@
     ]
   },
   "user": {
-    "dataSource": "mongo",
+    "dataSource": "postgres",
     "public": true
   },
   "accessToken": {
-    "dataSource": "mongo",
+    "dataSource": "postgres",
     "public": false
   },
   "ACL": {
-    "dataSource": "mongo",
+    "dataSource": "postgres",
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "mongo",
+    "dataSource": "postgres",
     "public": false
   },
   "Role": {
-    "dataSource": "mongo",
+    "dataSource": "postgres",
     "public": false
   },
   "Masjid": {
-    "dataSource": "mongo",
+    "dataSource": "postgres",
     "public": true
   },
   "SalaahTime": {
-    "dataSource": "mongo",
+    "dataSource": "postgres",
     "public": true
   }
 }
