@@ -11,7 +11,7 @@ function updateModelIfNecessary(model, dataSource) {
 
 module.exports = function(app) {
     var customTables = ['Masjid', 'SalaahTime'];
-    var builtinTables = ['user', 'accessToken', 'userCredential', 'userIdentity', 'ACL', 'RoleMapping', 'Role'];
+    var builtinTables = ['user_table', 'accessToken', 'ACL', 'RoleMapping', 'Role'];
     var tables = customTables.concat(builtinTables);
     var dataSource = app.dataSources.postgres;
     tables.forEach(function(table) {

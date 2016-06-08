@@ -1,6 +1,5 @@
 {
-  "name": "user",
-  "plural": "users",
+  "name": "user_table",
   "base": "User",
   "relations": {
     "accessTokens": {
