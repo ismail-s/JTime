@@ -106,7 +106,7 @@ SalaahTime.remoteMethod(
                     "the new salaah time. Else, create a new db entry."],
         accepts: [{
             arg: 'masjidId',
-            type: 'string',
+            type: 'number',
             required: true
         }, {
             arg: 'type',
