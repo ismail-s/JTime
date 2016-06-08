@@ -13,7 +13,7 @@
       "./mixins"
     ]
   },
-  "user": {
+  "user_table": {
     "dataSource": "postgres",
     "public": true
   },
