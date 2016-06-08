@@ -199,7 +199,7 @@ module.exports = function(Masjid) {
         'getTodayTimes', {
             accepts: [{
                 arg: 'id',
-                type: 'string',
+                type: 'number',
                 required: true
             }],
             returns: {
@@ -244,7 +244,7 @@ module.exports = function(Masjid) {
         'getTimes', {
             accepts: [{
                 arg: 'id',
-                type: 'string',
+                type: 'number',
                 required: true
             }, {
                 arg: 'date',

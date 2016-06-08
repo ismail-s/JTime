@@ -17,20 +17,20 @@ fun createMockWebServerAndConnectToRestClient(): MockWebServer {
     server.setDispatcher(object : Dispatcher() {
         @Throws(InterruptedException::class)
         override fun dispatch(recordedRequest: RecordedRequest): MockResponse {
-            if (recordedRequest.path.startsWith("/Masjids/1b/times")) {
+            if (recordedRequest.path.startsWith("/Masjids/1/times")) {
                 val mockJsonResponse = """{"times": [
-                {"id": "1a","type": "f","datetime": "2016-03-28T05:30:00.000Z"},
-                {"id": "2a","type": "z","datetime": "2016-03-28T12:00:00.000Z"},
-                {"id": "3a","type": "a","datetime": "2016-03-28T15:00:00.000Z"},
-                {"id": "4a","type": "m","datetime": "2016-03-28T15:12:00.000Z"},
-                {"id": "5a","type": "e","datetime": "2016-03-28T19:45:00.000Z"}
+                {"id": 1,"type": "f","datetime": "2016-03-28T05:30:00.000Z"},
+                {"id": 2,"type": "z","datetime": "2016-03-28T12:00:00.000Z"},
+                {"id": 3,"type": "a","datetime": "2016-03-28T15:00:00.000Z"},
+                {"id": 4,"type": "m","datetime": "2016-03-28T15:12:00.000Z"},
+                {"id": 5,"type": "e","datetime": "2016-03-28T19:45:00.000Z"}
                 ]}"""
                 return MockResponse().setBody(mockJsonResponse)
             }
             if (recordedRequest.path.startsWith("/Masjids")) {
                 val mockJsonResponse = """[
-                {"id": "1b", "name": "one", "location": {"lat": 0.0, "lng": 0.0}},
-                {"id": "2b", "name": "two", "location": {"lng": 0.1, "lat": 0.1},
+                {"id": 1, "name": "one", "location": {"lat": 0.0, "lng": 0.0}},
+                {"id": 2, "name": "two", "location": {"lng": 0.1, "lat": 0.1},
                   "humanReadableAddress": "some made-up address..."}]"""
                 return MockResponse().setBody(mockJsonResponse)
             }

@@ -57,7 +57,7 @@ class MasjidFragment : BaseFragment() {
             }
         }
         // TODO-instead of 1, what should the default value be here?
-        val masjidId = arguments.getString(Constants.MASJID_ID)
+        val masjidId = arguments.getInt(Constants.MASJID_ID)
         editButton = rootView.findViewById(R.id.edit_button) as Button
         editButton.setOnClickListener {view ->
             val masjidName = arguments.getString(Constants.MASJID_NAME)
@@ -91,11 +91,11 @@ class MasjidFragment : BaseFragment() {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        fun newInstance(masjidId: String, masjidName: String, date: GregorianCalendar): MasjidFragment {
+        fun newInstance(masjidId: Int, masjidName: String, date: GregorianCalendar): MasjidFragment {
             val fragment = MasjidFragment()
             val args = Bundle()
             args.putSerializable(ARG_DATE, date)
-            args.putString(Constants.MASJID_ID, masjidId)
+            args.putInt(Constants.MASJID_ID, masjidId)
             args.putString(Constants.MASJID_NAME, masjidName)
             fragment.arguments = args
             return fragment

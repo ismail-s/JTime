@@ -4,7 +4,7 @@ import java.util.GregorianCalendar
 
 class MasjidPojo {
     var name: String? = null
-    var id: String = ""
+    var id: Int? = null
     var address: String = ""
     var latitude: Double = 0.0
     var longitude: Double = 0.0
@@ -27,7 +27,7 @@ class MasjidPojo {
         this.name = name
     }
 
-    constructor(name: String, id: String, address: String, latitude: Double, longitude: Double) {
+    constructor(name: String, id: Int, address: String, latitude: Double, longitude: Double) {
         this.name = name
         this.id = id
         this.address = address
