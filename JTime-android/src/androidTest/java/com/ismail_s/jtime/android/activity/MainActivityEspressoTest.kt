@@ -2,36 +2,23 @@ package com.ismail_s.jtime.android.activity
 
 
 import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.ViewAction
+import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.GeneralLocation
 import android.support.test.espresso.action.GeneralSwipeAction
 import android.support.test.espresso.action.Press
 import android.support.test.espresso.action.Swipe
+import android.support.test.espresso.action.ViewActions.*
+import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.test.ActivityInstrumentationTestCase2
 import android.test.suitebuilder.annotation.LargeTest
-
-import com.ismail_s.jtime.android.R
-import com.ismail_s.jtime.android.RestClient
+import android.view.WindowManager.LayoutParams
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
-
-
-import org.junit.Before
-import org.junit.BeforeClass
-
-import java.io.IOException
-import java.util.Calendar
-
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.actionWithAssertions
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.action.ViewActions.swipeLeft
-import android.support.test.espresso.action.ViewActions.swipeRight
-import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
-import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.espresso.matcher.ViewMatchers.withText
+import com.ismail_s.jtime.android.R
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.containsString
+import org.junit.Before
+import java.util.*
 
 @LargeTest
 class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(MainActivity::class.java) {
@@ -43,6 +30,9 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         createMockWebServerAndConnectToRestClient()
         injectInstrumentation(InstrumentationRegistry.getInstrumentation())
         activity
+        val wakeUpDevice = Runnable { activity.window.addFlags(LayoutParams.FLAG_TURN_SCREEN_ON
+                or LayoutParams.FLAG_SHOW_WHEN_LOCKED or LayoutParams.FLAG_KEEP_SCREEN_ON) }
+        activity.runOnUiThread(wakeUpDevice)
     }
 
     private fun clickOnMasjidNameToOpenMasjidFragment() {
@@ -124,22 +114,5 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
                 GeneralLocation.CENTER_RIGHT, Press.FINGER))
         onView(withId(R.id.fragment_container)).perform(swipe)
         sleepForSplitSecond()
-    }
-
-    companion object {
-
-        /**
-         * Try to unlock the emulator. The idea behind this method is to unlock the emulator
-         * just before the tests run, so the chances of the emulator timing out and locking
-         * are very slim.
-         */
-        @BeforeClass
-        @Throws(IOException::class, InterruptedException::class)
-        fun unlockEmulator() {
-            val command1 = "fb-adb shell input keyevent 82 || adb shell input keyevent 82"
-            val command2 = "fb-adb shell input keyevent 92 || adb shell input keyevent 92"
-            Runtime.getRuntime().exec(command1).waitFor()
-            Runtime.getRuntime().exec(command2).waitFor()
-        }
     }
 }
