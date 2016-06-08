@@ -15,7 +15,6 @@
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^2.1.0",
     "loopback-component-passport": "^2.1.0",
-    "loopback-connector-mongodb": "^1.15.2",
     "loopback-connector-postgresql": "^2.3.0",
     "loopback-datasource-juggler": "^2.39.0",
     "passport-google-oauth": "^0.2.0",
