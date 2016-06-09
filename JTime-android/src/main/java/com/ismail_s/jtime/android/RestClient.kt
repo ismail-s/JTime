@@ -166,7 +166,7 @@ class RestClient {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
         }
-        val url = Companion.url + "/users/googleid"
+        val url = Companion.url + "/user_tables/googleid"
 
         Fuel.get(url, listOf("id_token" to code)).responseJson { request, response, result ->
             when (result) {
@@ -192,7 +192,7 @@ class RestClient {
         if (!internetIsAvailable()) {
             cb.onError(noNetworkException)
         }
-        val url = Companion.url + "/users/logout"
+        val url = Companion.url + "/user_tables/logout"
         url.httpPost().responseString { request, response, result ->
             when (result) {
                 is Result.Failure -> {
@@ -224,7 +224,7 @@ class RestClient {
             cb.onLoggedOut()
             return
         }
-        val url = Companion.url + "/users/${sharedPrefs.userId}"
+        val url = Companion.url + "/user_tables/${sharedPrefs.userId}"
         url.httpGet().responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
