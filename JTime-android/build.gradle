@@ -24,8 +24,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 4
-        versionName "1.0.1"
+        versionCode 5
+        versionName "1.0.2"
         applicationId "com.ismail_s.jtime.android"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
