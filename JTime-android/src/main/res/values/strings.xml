@@ -9,10 +9,17 @@
     <string name="add_masjid_masjid_name_hint">Name of masjid</string>
     <string name="add_masjid_masjid_submit_button">Create Masjid</string>
     <string name="help_text"><b>Help</b>\n
-This app allows you to view masjid jamaat times, as well as add/change the times. If anyone makes any changes, then everyone sees the new version. It\'s a bit like editing wikipedia in that way, although atm there is no history being stored.\n\n
+This app allows you to view masjid jamaat times, as well as add/change the times. If anyone makes any changes, then everyone sees the new version. It\'s a bit like editing wikipedia in that way.\n\n
 <i>Editing times</i>\n
-When adding/changing masjid times, please bear in mind that pressing <i>any</i> button (up/down/left/right/copy up/copy down) will save the time you have entered to the server. This will slightly change in the future to allow undoing the save for a brief period after saving, but otherwise, the interface probably won\'t change. The interface is designed for speed of data entry, as this app lives and dies on how easy it is to enter and view the data.\n
-Also bear in mind that this app is a work in progress…</string>
+The interface for editing jamaat times looks confusing, but is based on a spreadsheet. All times are in 24-hour format.\n
+When editing masjid times, pressing <i>any</i> of the buttons up/down/left/right/copy up/copy down, will save the time you have entered to the server. This will slightly change in the future to allow undoing the save for a brief period after saving, but otherwise, the interface probably won\'t change, unless someone can think of a better way.\n\n
+This app is a work in progress. Any ideas/improvements/issues, please either leave a review on the Play Store or open an issue on <a href="https://www.github.com/ismail-s/jtime/issues">Github</a>.\n\n
+<i>Open source libraries used</i>\n
+<a href="https://kotlinlang.org">Kotlin</a> (Apache license)\n
+<a href="http://kovenant.komponents.nl">Kovenant</a> (MIT license)\n
+<a href="https://github.com/kittinunf/Fuel">Fuel</a> (MIT license)\n
+<a href="https://mikepenz.github.io/MaterialDrawer">MaterialDrawer</a> (Apache license)
+</string>
     <string name="map_help_text">Long click on map to select location</string>
     <string name="edit_salaah_times">Edit</string>
     <string name="change_times__undo_button">undo</string>

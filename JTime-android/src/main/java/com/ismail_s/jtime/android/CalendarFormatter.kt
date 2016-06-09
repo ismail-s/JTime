@@ -8,7 +8,7 @@ fun formatCalendarAsTime(calendar: GregorianCalendar): String {
 }
 
 fun formatCalendarAsDate(calendar: GregorianCalendar): String {
-    return formatCalendar(calendar, "yyyy MMM dd")
+    return formatCalendar(calendar, "EEE dd MMM yyyy")
 }
 
 fun formatCalendar(calendar: GregorianCalendar, formatString: String): String {
