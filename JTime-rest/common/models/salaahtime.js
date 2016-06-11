@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 var updateTimestamp = require("../updateTimestamp");
 
 function inString(char, str) {
@@ -129,56 +130,50 @@ SalaahTime.remoteMethod(
 );
 
     SalaahTime.getTimesForMasjidsForToday = function(salaahType, location, faveMasjidIds, cb) {
+        SalaahTime.findAsync = Promise.promisify(SalaahTime.find, {context: SalaahTime});
         if ((faveMasjidIds === null || faveMasjidIds === undefined) && (location === null || location === undefined)) {
             return cb(null, []);
         }
         var Masjid = SalaahTime.app.models.Masjid;
+        Masjid.findAsync = Promise.promisify(Masjid.find, {context: Masjid});
         faveMasjidIds = faveMasjidIds || [];
+
+        var handleDBError = function(err) {
+                var msg = "Couldn't retrieve data from db";
+                console.error(msg, err, salaahType, location, faveMasjidIds);
+                return cb(new Error(msg));
+            };
 
         // Create date objs for start and end of day
         var today = new Date();
         var end_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 23, 59, 59, 999));
         var start_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0, 0));
 
+        var fieldsToReturn = {type: true, masjidId: true, datetime: true};
         var baseWhereQuery = {datetime: {between: [start_date, end_date]}};
         if (salaahType && inString(salaahType, "fzae")) {
             baseWhereQuery.type = salaahType
         }
         if (location) {
             //get the nearest masjids, add them to faveMasjidIds
-            Masjid.find({limit: 10, fields: {id: true}, where: {location: {near: location}}}, function(err, masjids) {
-                if (err) {
-                    var msg = "Couldn't retrieve data from db";
-                    console.error(msg, masjids, salaahType, location, faveMasjidIds);
-                    return cb(new Error(msg));
-                }
-                faveMasjidIds = faveMasjidIds.concat(masjids.map(function(m){return m.id}));
-                baseWhereQuery.masjidId = {inq: faveMasjidIds};
-                SalaahTime.find({
-                    fields: {type: true, masjidId: true, datetime: true},
-                    where: baseWhereQuery
-                }, function(err, instances) {
-                    if (err) {
-                        var msg = "Couldn't retrieve data from db";
-                        console.error(msg, instances, salaahType, location, faveMasjidIds);
-                        return cb(new Error(msg));
-                    }
+            Masjid.findAsync({limit: 10, fields: {id: true}, where: {location: {near: location}}})
+                .then(function(masjids) {
+                    faveMasjidIds = faveMasjidIds.concat(masjids.map(function(m){return m.id}));
+                    baseWhereQuery.masjidId = {inq: faveMasjidIds}; 
+                    return SalaahTime.findAsync({
+                        fields: fieldsToReturn,
+                        where: baseWhereQuery})
+                }).then(function(instances) {
                     return cb(null, instances);
-                })
-            });
+                }).catch(handleDBError);
         } else {
             baseWhereQuery.masjidId = {inq: faveMasjidIds};
-            SalaahTime.find({
-                fields: {type: true, masjidId: true, datetime: true},
+            SalaahTime.findAsync({
+                fields: fieldsToReturn,
                 where: baseWhereQuery
-            }, function(err, instances) {
-                if (err) {
-                    var msg = "Couldn't retrieve data from db";
-                    console.error(msg, instances, salaahType, location, faveMasjidIds);
-                    return cb(new Error(msg));
-                }
+            }).then(function(instances) {
                 return cb(null, instances);
-            });
+            }).catch(handleDBError);
         }
     };
 
