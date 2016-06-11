@@ -52,6 +52,11 @@
         "principalId": "$authenticated",
         "permission": "ALLOW",
         "property": "createOrUpdate"
+    }, {
+        "principalType": "ROLE",
+        "principalId": "$everyone",
+        "permission": "ALLOW",
+        "property": "getTimesForMasjidsForToday"
     }],
     "methods": {}
 }

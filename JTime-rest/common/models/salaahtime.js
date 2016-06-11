@@ -127,4 +127,87 @@ SalaahTime.remoteMethod(
         }
     }
 );
+
+    SalaahTime.getTimesForMasjidsForToday = function(salaahType, location, faveMasjidIds, cb) {
+        if ((faveMasjidIds === null || faveMasjidIds === undefined) && (location === null || location === undefined)) {
+            return cb(null, []);
+        }
+        var Masjid = SalaahTime.app.models.Masjid;
+        faveMasjidIds = faveMasjidIds || [];
+
+        // Create date objs for start and end of day
+        var today = new Date();
+        var end_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 23, 59, 59, 999));
+        var start_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0, 0));
+
+        var baseWhereQuery = {datetime: {between: [start_date, end_date]}};
+        if (salaahType && inString(salaahType, "fzae")) {
+            baseWhereQuery.type = salaahType
+        }
+        if (location) {
+            //get the nearest masjids, add them to faveMasjidIds
+            Masjid.find({limit: 10, fields: {id: true}, where: {location: {near: location}}}, function(err, masjids) {
+                if (err) {
+                    var msg = "Couldn't retrieve data from db";
+                    console.error(msg, masjids, salaahType, location, faveMasjidIds);
+                    return cb(new Error(msg));
+                }
+                faveMasjidIds = faveMasjidIds.concat(masjids.map(function(m){return m.id}));
+                baseWhereQuery.masjidId = {inq: faveMasjidIds};
+                SalaahTime.find({
+                    fields: {type: true, masjidId: true, datetime: true},
+                    where: baseWhereQuery
+                }, function(err, instances) {
+                    if (err) {
+                        var msg = "Couldn't retrieve data from db";
+                        console.error(msg, instances, salaahType, location, faveMasjidIds);
+                        return cb(new Error(msg));
+                    }
+                    return cb(null, instances);
+                })
+            });
+        } else {
+            baseWhereQuery.masjidId = {inq: faveMasjidIds};
+            SalaahTime.find({
+                fields: {type: true, masjidId: true, datetime: true},
+                where: baseWhereQuery
+            }, function(err, instances) {
+                if (err) {
+                    var msg = "Couldn't retrieve data from db";
+                    console.error(msg, instances, salaahType, location, faveMasjidIds);
+                    return cb(new Error(msg));
+                }
+                return cb(null, instances);
+            });
+        }
+    };
+
+SalaahTime.remoteMethod(
+    'getTimesForMasjidsForToday', {
+        description: ["Get salaah times for today for masjids for a particular ",
+                    "salaah type (optional), for certain masjids and for ",
+                    "masjids near to a certain location"],
+        accepts: [{
+            arg: 'salaahType',
+            type: 'string',
+            required: false
+        }, {
+            arg: 'location',
+            type: 'GeoPoint',
+            required: false
+        }, {
+            arg: 'faveMasjidIds',
+            type: ['number'],
+            required: false
+        }],
+        returns: {
+            arg: 'res',
+            type: 'array'
+        },
+        http: {
+            path: '/times-for-masjids-for-today',
+            verb: 'get'
+        }
+    }
+);
 };
