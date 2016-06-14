@@ -222,7 +222,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     }
 
     private fun setUpRightDrawer(savedInstance: Bundle?) {
-        val drawerItems = SalaahType.values().map {
+        val drawerItems = SalaahType.values().filter { it != SalaahType.MAGRIB }.map {
                 SecondaryDrawerItem()
                     .withName(it.toString(ctx))
                     .withOnDrawerItemClickListener { view, position, drawerItem ->
