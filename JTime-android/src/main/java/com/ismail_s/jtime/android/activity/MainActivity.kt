@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
        }
        val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
        if (loc == null) {
-           locationDeferred.reject(Exception("Location could not be obtained"))
+           locationDeferred.reject(Exception(getString(R.string.no_location_exception)))
        } else {
            locationDeferred.resolve(loc)
        }
@@ -251,7 +251,10 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 .withOnDrawerListener(drawerListener)
                 .withDrawerGravity(Gravity.END)
                 .withSavedInstance(savedInstance)
-                .addDrawerItems(SectionDrawerItem().withName("Nearby times for:"), *drawerItems)
+                .addDrawerItems(
+                        SectionDrawerItem()
+                            .withName(getString(R.string.drawer_item_nearby_times_header)),
+                        *drawerItems)
                 .build()
     }
 

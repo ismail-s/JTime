@@ -27,7 +27,7 @@ class NearbyTimesFragment : BaseFragment(), AnkoLogger {
         val rootView = inflater.inflate(R.layout.fragment_nearby_times, container, false)
         val salaahType = arguments.getSerializable(SALAAH_TYPE) as SalaahType
         val salaahNameLabel = rootView.findViewById(R.id.label_salaah_name) as TextView
-        salaahNameLabel.text = "Nearby times for ${salaahType.toString(ctx)}"
+        salaahNameLabel.text = getString(R.string.nearby_times_title_text, salaahType.toString(ctx))
         val table = rootView.findViewById(R.id.salaah_times_table) as TableLayout
         (activity as MainActivity).location successUi {
             RestClient(activity).getTimesForNearbyMasjids(it.latitude, it.longitude, salaahType)

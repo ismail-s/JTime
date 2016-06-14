@@ -21,6 +21,7 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
 <a href="https://mikepenz.github.io/MaterialDrawer">MaterialDrawer</a> (Apache license)
 </string>
     <string name="map_help_text">Long click on map to select location</string>
+    <string name="nearby_times_title_text">Nearby times for %1$s</string>
     <string name="edit_salaah_times">Edit</string>
     <string name="change_times__undo_button">undo</string>
     <string name="change_times__up_button">up</string>
@@ -46,6 +47,7 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
     <string name="drawer_item_add_masjid">Add Masjid</string>
     <string name="drawer_item_all_masjids">All Masjids</string>
     <string name="drawer_item_help">Help</string>
+    <string name="drawer_item_nearby_times_header">Nearby times for:</string>
 
     <string name="fragment_title_all_masjids">All masjids</string>
     <string name="fragment_title_add_masjid">Create a new masjid</string>
@@ -55,4 +57,5 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
     <string name="fragment_title_nearby_times">Nearby times</string>
 
     <string name="no_network_exception">Network is not available</string>
+    <string name="no_location_exception">Location could not be obtained</string>
 </resources>
