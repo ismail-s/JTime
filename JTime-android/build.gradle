@@ -116,6 +116,10 @@ dependencies {
     //Kotlin promises
     compile 'nl.komponents.kovenant:kovenant-core:3.2.2'
     compile 'nl.komponents.kovenant:kovenant-android:3.2.2'
+
+    //Kotlin anko
+    compile 'org.jetbrains.anko:anko-sdk15:0.9'
+    compile 'org.jetbrains.anko:anko-support-v4:0.9'
 }
 
 apply plugin: 'com.google.gms.google-services'
