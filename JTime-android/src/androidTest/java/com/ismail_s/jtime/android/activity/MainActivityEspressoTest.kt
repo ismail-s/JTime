@@ -3,10 +3,7 @@ package com.ismail_s.jtime.android.activity
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.GeneralLocation
-import android.support.test.espresso.action.GeneralSwipeAction
-import android.support.test.espresso.action.Press
-import android.support.test.espresso.action.Swipe
+import android.support.test.espresso.action.*
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
@@ -101,6 +98,28 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         checkMasjidTimesAreCorrectForCurrentFragment()
     }
 
+    fun testCanSeeNearbyMasjidTimes() {
+        val clickOnDrawerItem = {text: String ->
+            swipeInRightDrawer()
+            onView(allOf(withId(R.id.material_drawer_name), withText(text))).perform(click())
+        }
+        val checkTextIsDisplayed = {text: String ->
+            onView(withText(text)).check(matches(isCompletelyDisplayed()))
+        }
+        clickOnDrawerItem("Fajr")
+        onView(withId(R.id.label_salaah_name)).check(matches(isCompletelyDisplayed()))
+        for (text in listOf("05:30", "06:00", "one", "two"))
+            checkTextIsDisplayed(text)
+
+        clickOnDrawerItem("Zohar")
+        for (text in listOf("12:25", "one"))
+            checkTextIsDisplayed(text)
+
+        // Make sure clicking on the remaining drawer items doesn't crash the app
+        for (i in listOf("Asr", "Esha"))
+            clickOnDrawerItem(i)
+    }
+
     fun testNavigationDrawerHasButtonToReturnToMasjidsList() {
         clickOnMasjidNameToOpenMasjidFragment()
         swipeInNavigationDrawer()
@@ -109,9 +128,16 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     }
 
     private fun swipeInNavigationDrawer() {
+        swipeInDrawer(GeneralLocation.CENTER_LEFT, GeneralLocation.CENTER_RIGHT)
+    }
+
+    private fun swipeInRightDrawer() {
+        swipeInDrawer(GeneralLocation.CENTER_RIGHT, GeneralLocation.CENTER_LEFT)
+    }
+
+    private fun swipeInDrawer(startCoord: CoordinatesProvider, endCoord: CoordinatesProvider) {
         val swipe = actionWithAssertions(GeneralSwipeAction(Swipe.FAST,
-                GeneralLocation.CENTER_LEFT,
-                GeneralLocation.CENTER_RIGHT, Press.FINGER))
+                startCoord, endCoord, Press.FINGER))
         onView(withId(R.id.fragment_container)).perform(swipe)
         sleepForSplitSecond()
     }

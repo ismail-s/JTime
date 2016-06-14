@@ -34,6 +34,22 @@ fun createMockWebServerAndConnectToRestClient(): MockWebServer {
                   "humanReadableAddress": "some made-up address..."}]"""
                 return MockResponse().setBody(mockJsonResponse)
             }
+            if (recordedRequest.path.startsWith("/SalaahTimes/times-for-masjids-for-today", true)) {
+                val mockJsonResponse: String
+                if (recordedRequest.path.contains("salaahType=f")) {
+                    mockJsonResponse = """{"res": [
+                {"masjidId": 1, "masjidName": "one", "type": "f","datetime": "2016-03-28T05:30:00.000Z"},
+                {"masjidId": 2, "masjidName": "two", "type": "f","datetime": "2016-03-28T06:00:00.000Z"}
+                ]}"""
+                } else if (recordedRequest.path.contains("salaahType=z")) {
+                    mockJsonResponse = """{"res": [
+                {"masjidId": 1, "masjidName": "one", "type": "z","datetime": "2016-03-28T12:25:00.000Z"}
+                ]}"""
+                } else {
+                    mockJsonResponse = """{"res": []}"""
+                }
+                return MockResponse().setBody(mockJsonResponse)
+            }
             Log.d("debugging", "HTTP404 for $recordedRequest")
             return MockResponse().setResponseCode(404)
         }
