@@ -189,7 +189,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             }
 
             override fun onDrawerClosed(drawerView: View) {
-                if (!rightDrawer.isDrawerOpen())
+                if (!rightDrawer.isDrawerOpen)
                     currentFragment?.onDrawerClosed(drawerView)
             }
 
@@ -232,7 +232,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             }.toTypedArray()
         val drawerListener = object: Drawer.OnDrawerListener {
             override fun onDrawerOpened(drawerView: View) {
-                if (drawer?.isDrawerOpen() == true) {
+                if (drawer?.isDrawerOpen == true) {
                     drawer?.closeDrawer()
                 } else {
                     currentFragment?.onDrawerOpened(drawerView)
