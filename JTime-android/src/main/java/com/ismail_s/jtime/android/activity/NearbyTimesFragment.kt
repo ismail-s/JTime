@@ -35,8 +35,13 @@ class NearbyTimesFragment : BaseFragment(), AnkoLogger {
                 it.forEach {
                     table.addView(with(AnkoContext.create(activity, table)) {
                         tableRow {
-                            textView(it.masjidName)
-                            textView(formatCalendarAsTime(it.datetime))
+                            val tSize = 18f
+                            textView(it.masjidName) {
+                                textSize = tSize
+                            }
+                            textView(formatCalendarAsTime(it.datetime)) {
+                                textSize = tSize
+                            }
                         }
                     })
                 }
