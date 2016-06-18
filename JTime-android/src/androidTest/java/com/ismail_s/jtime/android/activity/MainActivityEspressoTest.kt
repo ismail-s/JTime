@@ -1,6 +1,7 @@
 package com.ismail_s.jtime.android.activity
 
 
+import android.location.Location
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.*
@@ -12,6 +13,7 @@ import android.test.suitebuilder.annotation.LargeTest
 import android.view.WindowManager.LayoutParams
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
 import com.ismail_s.jtime.android.R
+import nl.komponents.kovenant.deferred
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.Before
@@ -27,9 +29,20 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         createMockWebServerAndConnectToRestClient()
         injectInstrumentation(InstrumentationRegistry.getInstrumentation())
         activity
+        mockOutLocation(activity)
         val wakeUpDevice = Runnable { activity.window.addFlags(LayoutParams.FLAG_TURN_SCREEN_ON
                 or LayoutParams.FLAG_SHOW_WHEN_LOCKED or LayoutParams.FLAG_KEEP_SCREEN_ON) }
         activity.runOnUiThread(wakeUpDevice)
+    }
+
+    private fun mockOutLocation(act: MainActivity) {
+        val mockLocation = Location("mock location")
+        mockLocation.latitude = 51.507
+        mockLocation.longitude = -0.1275
+        val newDeferred = deferred<Location, Exception>()
+        newDeferred.resolve(mockLocation)
+        act.locationDeferred = newDeferred
+        act.location = newDeferred.promise
     }
 
     private fun clickOnMasjidNameToOpenMasjidFragment() {

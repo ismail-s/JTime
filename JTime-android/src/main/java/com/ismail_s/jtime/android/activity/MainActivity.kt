@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     lateinit var rightDrawer: Drawer
     lateinit var googleApiClient: GoogleApiClient
     lateinit var toolbar: Toolbar
-    private var locationDeferred = deferred<Location, Exception>()
+    var locationDeferred = deferred<Location, Exception>()
     var location = locationDeferred.promise
     /**
     * Login status is 0 for don't know, 1 for logged in and 2 for logged out
