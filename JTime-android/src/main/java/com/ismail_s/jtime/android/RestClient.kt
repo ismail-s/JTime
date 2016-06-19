@@ -5,7 +5,8 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.extension.responseJson
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
@@ -30,7 +31,9 @@ class RestClient {
         this.context = context
         this.sharedPrefs = SharedPreferencesWrapper(context)
 
-        if ((FuelManager.instance.baseHeaders == emptyMap<String, String>() || FuelManager.instance.baseHeaders == null) && sharedPrefs.accessToken != "") {
+        if ((FuelManager.instance.baseHeaders == emptyMap<String, String>()
+                || FuelManager.instance.baseHeaders == null)
+                && sharedPrefs.accessToken != "") {
             setHttpHeaders(sharedPrefs.accessToken)
         }
     }
@@ -113,6 +116,36 @@ class RestClient {
                         }
                     }
                 }
+    }
+
+    fun getTimesForNearbyMasjids(latitude: Double, longitude: Double, salaahType: SalaahType)
+            : Promise<List<SalaahTimePojo>, Throwable> {
+        val deferred = deferred<List<SalaahTimePojo>, Throwable>()
+        val loc = JSONObject()
+        loc.put("lat", latitude)
+        loc.put("lng", longitude)
+        "${Companion.url}/SalaahTimes/times-for-masjids-for-today"
+                .httpGet(listOf("salaahType" to salaahType.apiRef, "location" to loc.toString()))
+                .responseJson { request, response, result ->
+                    when (result) {
+                        is Result.Failure -> {deferred.reject(result.error)}
+                        is Result.Success -> {
+                            val times = result.value.obj().getJSONArray("res")
+                            val res = mutableListOf<SalaahTimePojo>()
+                            for (time in times.iterator<JSONObject>()) {
+                                val type = charToSalaahType(time.getString("type")[0])
+                                val masjidId = time.getInt("masjidId")
+                                val masjidName = time.getString("masjidName")
+                                val datetimeStr = time.getString("datetime")
+                                val datetime = GregorianCalendar()
+                                datetime.time = dateFormatter.parse(datetimeStr)
+                                res += SalaahTimePojo(masjidId, masjidName, type, datetime)
+                            }
+                            deferred.resolve(res)
+                        }
+                    }
+                }
+        return deferred.promise
     }
 
     fun createMasjid(name: String, latitude: Double, longitude: Double, cb: MasjidCreatedCallback) {

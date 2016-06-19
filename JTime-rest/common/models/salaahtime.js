@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 var updateTimestamp = require("../updateTimestamp");
 
 function inString(char, str) {
@@ -124,6 +125,98 @@ SalaahTime.remoteMethod(
         http: {
             path: '/create-or-update',
             verb: 'post'
+        }
+    }
+);
+
+    SalaahTime.getTimesForMasjidsForToday = function(salaahType, location, faveMasjidIds, cb) {
+        SalaahTime.findAsync = Promise.promisify(SalaahTime.find, {context: SalaahTime});
+        if ((faveMasjidIds === null || faveMasjidIds === undefined) && (location === null || location === undefined)) {
+            return cb(null, []);
+        }
+        var Masjid = SalaahTime.app.models.Masjid;
+        Masjid.findAsync = Promise.promisify(Masjid.find, {context: Masjid});
+        faveMasjidIds = faveMasjidIds || [];
+
+        var handleDBError = function(err) {
+                var msg = "Couldn't retrieve data from db";
+                console.error(msg, err, salaahType, location, faveMasjidIds);
+                return cb(new Error(msg));
+            };
+        var addMasjidNamesToSalaahTimes = function(salaahTimes, masjidNameMap) {
+                return salaahTimes.map(function(s) {
+                    s.masjidName = masjidNameMap[s.masjidId];
+                    return s;
+                })
+            };
+
+        // Create date objs for start and end of day
+        var today = new Date();
+        var end_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 23, 59, 59, 999));
+        var start_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0, 0));
+
+        Masjid.findAsync({fields: {id: true, name: true}, where: {id: {inq: faveMasjidIds}}})
+            .then(function(faveMasjidNames) {
+            var masjidNameMap = {};
+            faveMasjidIds.forEach(function(m){masjidNameMap[m.id] = m.name});
+
+            var fieldsToReturn = {type: true, masjidId: true, datetime: true};
+            var baseWhereQuery = {datetime: {between: [start_date, end_date]}};
+            if (salaahType && inString(salaahType, "fzae")) {
+                baseWhereQuery.type = salaahType
+            }
+            if (location) {
+                //get the nearest masjids, add them to faveMasjidIds
+                Masjid.findAsync({limit: 10, fields: {id: true, name: true}, where: {location: {near: location}}})
+                    .then(function(masjids) {
+                        faveMasjidIds = faveMasjidIds.concat(masjids.map(function(m){return m.id}));
+                        masjids.forEach(function(m){masjidNameMap[m.id] = m.name});
+                        baseWhereQuery.masjidId = {inq: faveMasjidIds};
+                        return SalaahTime.findAsync({
+                            fields: fieldsToReturn,
+                            where: baseWhereQuery})
+                    }).then(function(instances) {
+                        var result = addMasjidNamesToSalaahTimes(instances, masjidNameMap);
+                        return cb(null, result);
+                    }).catch(handleDBError);
+            } else {
+                baseWhereQuery.masjidId = {inq: faveMasjidIds};
+                SalaahTime.findAsync({
+                    fields: fieldsToReturn,
+                    where: baseWhereQuery
+                }).then(function(instances) {
+                    var result = addMasjidNamesToSalaahTimes(instances, masjidNameMap);
+                    return cb(null, result);
+                }).catch(handleDBError);
+            }
+        }).catch(handleDBError);
+    };
+
+SalaahTime.remoteMethod(
+    'getTimesForMasjidsForToday', {
+        description: ["Get salaah times for today for masjids for a particular ",
+                    "salaah type (optional), for certain masjids and for ",
+                    "masjids near to a certain location"],
+        accepts: [{
+            arg: 'salaahType',
+            type: 'string',
+            required: false
+        }, {
+            arg: 'location',
+            type: 'GeoPoint',
+            required: false
+        }, {
+            arg: 'faveMasjidIds',
+            type: ['number'],
+            required: false
+        }],
+        returns: {
+            arg: 'res',
+            type: 'array'
+        },
+        http: {
+            path: '/times-for-masjids-for-today',
+            verb: 'get'
         }
     }
 );

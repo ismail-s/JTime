@@ -1,22 +1,27 @@
 package com.ismail_s.jtime.android.activity
 
 
+import android.location.Location
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.GeneralLocation
-import android.support.test.espresso.action.GeneralSwipeAction
-import android.support.test.espresso.action.Press
-import android.support.test.espresso.action.Swipe
+import android.support.test.espresso.action.*
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.test.ActivityInstrumentationTestCase2
 import android.test.suitebuilder.annotation.LargeTest
+import android.view.View
 import android.view.WindowManager.LayoutParams
+import android.widget.TableLayout
+import android.widget.TableRow
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
 import com.ismail_s.jtime.android.R
+import nl.komponents.kovenant.deferred
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.TypeSafeMatcher
 import org.junit.Before
 import java.util.*
 
@@ -30,9 +35,20 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         createMockWebServerAndConnectToRestClient()
         injectInstrumentation(InstrumentationRegistry.getInstrumentation())
         activity
+        mockOutLocation(activity)
         val wakeUpDevice = Runnable { activity.window.addFlags(LayoutParams.FLAG_TURN_SCREEN_ON
                 or LayoutParams.FLAG_SHOW_WHEN_LOCKED or LayoutParams.FLAG_KEEP_SCREEN_ON) }
         activity.runOnUiThread(wakeUpDevice)
+    }
+
+    private fun mockOutLocation(act: MainActivity) {
+        val mockLocation = Location("mock location")
+        mockLocation.latitude = 51.507
+        mockLocation.longitude = -0.1275
+        val newDeferred = deferred<Location, Exception>()
+        newDeferred.resolve(mockLocation)
+        act.locationDeferred = newDeferred
+        act.location = newDeferred.promise
     }
 
     private fun clickOnMasjidNameToOpenMasjidFragment() {
@@ -101,6 +117,45 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         checkMasjidTimesAreCorrectForCurrentFragment()
     }
 
+    fun testCanSeeNearbyMasjidTimes() {
+        val clickOnDrawerItem = {text: String ->
+            swipeInRightDrawer()
+            onView(allOf(withId(R.id.material_drawer_name), withText(text))).perform(click())
+        }
+        val checkTextIsDisplayedAtPosition = {x: Int, y: Int, text: String ->
+            onView(atTablePosition(x, y)).check(matches(allOf(isCompletelyDisplayed(), withText(text))))
+        }
+        clickOnDrawerItem("Fajr")
+        onView(withId(R.id.label_salaah_name)).check(matches(isCompletelyDisplayed()))
+        for ((x, y, text) in listOf(Triple(0, 1, "05:30"), Triple(1, 1, "06:00"), Triple(1, 0, "one"), Triple(0, 0, "two")))
+            checkTextIsDisplayedAtPosition(x, y, text)
+
+        clickOnDrawerItem("Zohar")
+        for ((x, y, text) in listOf(Triple(0, 1, "12:25"), Triple(0, 0, "one")))
+            checkTextIsDisplayedAtPosition(x, y, text)
+
+        // Make sure clicking on the remaining drawer items doesn't crash the app
+        for (i in listOf("Asr", "Esha"))
+            clickOnDrawerItem(i)
+    }
+
+    private fun atTablePosition(x: Int, y: Int): Matcher<View> {
+        return object: TypeSafeMatcher<View>() {
+            override fun describeTo(description: Description) {
+                description.appendText("is at position $x, $y")
+            }
+
+            override fun matchesSafely(item: View): Boolean {
+                val tableRow: TableRow = item.parent as? TableRow ?: return false
+                val table: TableLayout = tableRow.parent as? TableLayout ?: return false
+                if (table.indexOfChild(tableRow) != x || tableRow.indexOfChild(item) != y)
+                    return false
+                return true
+            }
+
+        }
+    }
+
     fun testNavigationDrawerHasButtonToReturnToMasjidsList() {
         clickOnMasjidNameToOpenMasjidFragment()
         swipeInNavigationDrawer()
@@ -109,9 +164,16 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     }
 
     private fun swipeInNavigationDrawer() {
+        swipeInDrawer(GeneralLocation.CENTER_LEFT, GeneralLocation.CENTER_RIGHT)
+    }
+
+    private fun swipeInRightDrawer() {
+        swipeInDrawer(GeneralLocation.CENTER_RIGHT, GeneralLocation.CENTER_LEFT)
+    }
+
+    private fun swipeInDrawer(startCoord: CoordinatesProvider, endCoord: CoordinatesProvider) {
         val swipe = actionWithAssertions(GeneralSwipeAction(Swipe.FAST,
-                GeneralLocation.CENTER_LEFT,
-                GeneralLocation.CENTER_RIGHT, Press.FINGER))
+                startCoord, endCoord, Press.FINGER))
         onView(withId(R.id.fragment_container)).perform(swipe)
         sleepForSplitSecond()
     }

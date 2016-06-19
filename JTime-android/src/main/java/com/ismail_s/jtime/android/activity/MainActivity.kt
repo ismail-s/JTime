@@ -1,12 +1,13 @@
 package com.ismail_s.jtime.android.activity
 
-import android.support.v4.app.Fragment
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
@@ -17,6 +18,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationServices
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
+import com.ismail_s.jtime.android.SalaahType
 import com.ismail_s.jtime.android.SharedPreferencesWrapper
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -24,17 +26,21 @@ import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
-import java.util.*
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
+import com.mikepenz.materialdrawer.model.SectionDrawerItem
+import nl.komponents.kovenant.android.startKovenant
+import nl.komponents.kovenant.android.stopKovenant
 import nl.komponents.kovenant.deferred
-import nl.komponents.kovenant.Promise
-import nl.komponents.kovenant.android.*
+import java.util.*
+import org.jetbrains.anko.ctx
 
 class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
+    lateinit var rightDrawer: Drawer
     lateinit var googleApiClient: GoogleApiClient
     lateinit var toolbar: Toolbar
-    private var locationDeferred = deferred<Location, Exception>()
+    var locationDeferred = deferred<Location, Exception>()
     var location = locationDeferred.promise
     /**
     * Login status is 0 for don't know, 1 for logged in and 2 for logged out
@@ -106,7 +112,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
        }
        val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
        if (loc == null) {
-           locationDeferred.reject(Exception("Location could not be obtained"))
+           locationDeferred.reject(Exception(getString(R.string.no_location_exception)))
        } else {
            locationDeferred.resolve(loc)
        }
@@ -123,6 +129,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         setSupportActionBar(toolbar)
         setUpGoogleApiClient()
         setUpNavDrawer(savedInstanceState)
+        setUpRightDrawer(savedInstanceState)
 
         val cb = object: RestClient.SignedinCallback {
             override fun onLoggedOut() {
@@ -182,7 +189,8 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             }
 
             override fun onDrawerClosed(drawerView: View) {
-                currentFragment?.onDrawerClosed(drawerView)
+                if (!rightDrawer.isDrawerOpen)
+                    currentFragment?.onDrawerClosed(drawerView)
             }
 
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
@@ -210,6 +218,43 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                             switchToHelpFragment()
                             true
                         })
+                .build()
+    }
+
+    private fun setUpRightDrawer(savedInstance: Bundle?) {
+        val drawerItems = SalaahType.values().filter { it != SalaahType.MAGRIB }.map {
+                SecondaryDrawerItem()
+                    .withName(it.toString(ctx))
+                    .withOnDrawerItemClickListener { view, position, drawerItem ->
+                        switchToNearbyTimesFragment(it)
+                        true
+                    }
+            }.toTypedArray()
+        val drawerListener = object: Drawer.OnDrawerListener {
+            override fun onDrawerOpened(drawerView: View) {
+                if (drawer?.isDrawerOpen == true) {
+                    drawer?.closeDrawer()
+                } else {
+                    currentFragment?.onDrawerOpened(drawerView)
+                }
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                currentFragment?.onDrawerClosed(drawerView)
+            }
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+        }
+        rightDrawer = DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withOnDrawerListener(drawerListener)
+                .withDrawerGravity(Gravity.END)
+                .withSavedInstance(savedInstance)
+                .addDrawerItems(
+                        SectionDrawerItem()
+                            .withName(getString(R.string.drawer_item_nearby_times_header)),
+                        *drawerItems)
                 .build()
     }
 
@@ -281,11 +326,17 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         switchToFragment(fragment, R.string.fragment_title_change_salaah_times)
     }
 
+    fun switchToNearbyTimesFragment(salaahType: SalaahType) {
+        val fragment = NearbyTimesFragment.newInstance(salaahType)
+        switchToFragment(fragment, R.string.fragment_title_nearby_times)
+    }
+
     fun switchToFragment(fragment: Fragment, title: Int) {
         Log.d("jtime", "Switching to fragment $fragment")
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
         drawer?.closeDrawer()
+        rightDrawer.closeDrawer()
         toolbar.title = getString(title)
     }
 
