@@ -32,7 +32,7 @@ class NearbyTimesFragment : BaseFragment(), AnkoLogger {
         (activity as MainActivity).location successUi {
             RestClient(activity).getTimesForNearbyMasjids(it.latitude, it.longitude, salaahType)
             .successUi {
-                it.forEach {
+                it.sortedBy { it.datetime.timeInMillis }.forEach {
                     table.addView(with(AnkoContext.create(activity, table)) {
                         tableRow {
                             val tSize = 18f

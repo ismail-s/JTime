@@ -10,12 +10,18 @@ import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.test.ActivityInstrumentationTestCase2
 import android.test.suitebuilder.annotation.LargeTest
+import android.view.View
 import android.view.WindowManager.LayoutParams
+import android.widget.TableLayout
+import android.widget.TableRow
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
 import com.ismail_s.jtime.android.R
 import nl.komponents.kovenant.deferred
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.TypeSafeMatcher
 import org.junit.Before
 import java.util.*
 
@@ -116,21 +122,38 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
             swipeInRightDrawer()
             onView(allOf(withId(R.id.material_drawer_name), withText(text))).perform(click())
         }
-        val checkTextIsDisplayed = {text: String ->
-            onView(withText(text)).check(matches(isCompletelyDisplayed()))
+        val checkTextIsDisplayedAtPosition = {x: Int, y: Int, text: String ->
+            onView(atTablePosition(x, y)).check(matches(allOf(isCompletelyDisplayed(), withText(text))))
         }
         clickOnDrawerItem("Fajr")
         onView(withId(R.id.label_salaah_name)).check(matches(isCompletelyDisplayed()))
-        for (text in listOf("05:30", "06:00", "one", "two"))
-            checkTextIsDisplayed(text)
+        for ((x, y, text) in listOf(Triple(0, 1, "05:30"), Triple(1, 1, "06:00"), Triple(1, 0, "one"), Triple(0, 0, "two")))
+            checkTextIsDisplayedAtPosition(x, y, text)
 
         clickOnDrawerItem("Zohar")
-        for (text in listOf("12:25", "one"))
-            checkTextIsDisplayed(text)
+        for ((x, y, text) in listOf(Triple(0, 1, "12:25"), Triple(0, 0, "one")))
+            checkTextIsDisplayedAtPosition(x, y, text)
 
         // Make sure clicking on the remaining drawer items doesn't crash the app
         for (i in listOf("Asr", "Esha"))
             clickOnDrawerItem(i)
+    }
+
+    private fun atTablePosition(x: Int, y: Int): Matcher<View> {
+        return object: TypeSafeMatcher<View>() {
+            override fun describeTo(description: Description) {
+                description.appendText("is at position $x, $y")
+            }
+
+            override fun matchesSafely(item: View): Boolean {
+                val tableRow: TableRow = item.parent as? TableRow ?: return false
+                val table: TableLayout = tableRow.parent as? TableLayout ?: return false
+                if (table.indexOfChild(tableRow) != x || tableRow.indexOfChild(item) != y)
+                    return false
+                return true
+            }
+
+        }
     }
 
     fun testNavigationDrawerHasButtonToReturnToMasjidsList() {
