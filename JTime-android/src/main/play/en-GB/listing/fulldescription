@@ -2,9 +2,18 @@ See jamaat times for local masjids. All jamaat times are added/changed within th
 
 This app is free and open-source, see https://www.github.com/ismail-s/jtime . Feel free to contribute in whatever way.
 
-I plan to add more features, see https://waffle.io/ismail-s/JTime for more details. Note that I am not planning on making an iPhone app, as I'd have to pay them $99 a year (I'm not joking, see https://developer.apple.com/programs/how-it-works/ ).
+I plan to add more features, see https://waffle.io/ismail-s/JTime for more details. Note that I am not planning on making an iPhone app, see https://developer.apple.com/programs/how-it-works/.
+
+Permissions
+=========
+- Internet access (pretty obvious why that's needed)
+- Approximate location (the list of masjids is sorted by how close the masjids are to you)
+
+Privacy Policy
+==========
+By using this app, I may get your email address and approximate location. I am not going to share these with anyone, and will do my best to keep this information secure (tbh I doubt I'll even look at any of this info). Seriously. I won't even send you emails or sell your emails to spammers or whatever. Anyways, all the code is at https://github.com/ismail-s/jtime .
 
 Alternative apps
 ============
-https://play.google.com/store/apps/details?id=com.masjid.timetable (submit jamaat times as an Excel spreadsheet)
-https://play.google.com/store/apps/details?id=com.acs.mymosque (masjids need to submit times)
+https://play.google.com/store/apps/details?id=com.masjid.timetable (submit jamaat times as an Excel spreadsheet on a computer)
+https://play.google.com/store/apps/details?id=com.acs.mymosque (masjids need to submit times themselves. Seems to be more commercial in nature)

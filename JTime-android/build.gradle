@@ -24,8 +24,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.0.2"
+        versionCode 6
+        versionName "1.1.0"
         applicationId "com.ismail_s.jtime.android"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -116,6 +116,10 @@ dependencies {
     //Kotlin promises
     compile 'nl.komponents.kovenant:kovenant-core:3.2.2'
     compile 'nl.komponents.kovenant:kovenant-android:3.2.2'
+
+    //Kotlin anko
+    compile 'org.jetbrains.anko:anko-sdk15:0.9'
+    compile 'org.jetbrains.anko:anko-support-v4:0.9'
 }
 
 apply plugin: 'com.google.gms.google-services'

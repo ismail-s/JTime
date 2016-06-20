@@ -30,7 +30,7 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
         rView = layout.findViewById(R.id.list) as RecyclerView
         rView.setHasFixedSize(true)
 
-        layout.isRefreshing = true
+        layout.post { layout.isRefreshing = true }
         onRefresh()
         return layout
     }

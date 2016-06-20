@@ -1,5 +1,6 @@
 package com.ismail_s.jtime.android
 
+import android.content.Context
 import java.util.GregorianCalendar
 
 class MasjidPojo {
@@ -41,6 +42,19 @@ class MasjidPojo {
         get() = arrayOf(fajrTime!!, zoharTime!!, asrTime!!, magribTime!!, eshaTime!!)
 }
 
-enum class SalaahType {
-    FAJR, ZOHAR, ASR, MAGRIB, ESHA
+enum class SalaahType(val resId: Int, val apiRef: Char) {
+    FAJR(R.string.fajr, 'f'), ZOHAR(R.string.zohar, 'z'),
+    ASR(R.string.asr, 'a'), MAGRIB(R.string.magrib, 'm'), ESHA(R.string.esha, 'e');
+
+    fun toString(context: Context): String {
+        return context.getString(resId)
+    }
+}
+
+fun charToSalaahType(c: Char): SalaahType = when(c) {
+    'f' -> SalaahType.FAJR
+    'z' -> SalaahType.ZOHAR
+    'a' -> SalaahType.ASR
+    'm' -> SalaahType.MAGRIB
+    else -> SalaahType.ESHA
 }
