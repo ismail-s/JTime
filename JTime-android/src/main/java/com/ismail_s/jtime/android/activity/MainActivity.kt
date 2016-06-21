@@ -6,10 +6,8 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -31,10 +29,10 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
 import nl.komponents.kovenant.deferred
+import org.jetbrains.anko.*
 import java.util.*
-import org.jetbrains.anko.ctx
 
-class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var rightDrawer: Drawer
@@ -64,7 +62,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                     val cb = object : RestClient.LogoutCallback {
                         override fun onSuccess() {
                             loginStatus = 2
-                            showShortToast(getString(R.string.logout_success_toast))
+                            toast(getString(R.string.logout_success_toast))
                             //Remove logout button, add login button to nav drawer
                             header.removeProfile(0)
                             drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
@@ -74,7 +72,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                             currentFragment?.onLogout()
                         }
 
-                        override fun onError(t: Throwable) = showShortToast(getString(R.string.logout_failure_toast, t.message))
+                        override fun onError(t: Throwable) = toast(getString(R.string.logout_failure_toast, t.message))
                     }
                     RestClient(this).logout(cb)
                     true
@@ -103,7 +101,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
      * Called when Sign in with Google fails
      */
     override fun onConnectionFailed(connectionResult: ConnectionResult) {
-        showShortToast(getString(R.string.login_failure_toast, connectionResult.toString()))
+        toast(getString(R.string.login_failure_toast, connectionResult.toString()))
     }
 
     override fun onConnected(connectionHint: Bundle?) {
@@ -124,7 +122,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         startKovenant()
-        toolbar = findViewById(R.id.toolbar) as Toolbar
+        toolbar = find<Toolbar>(R.id.toolbar)
         toolbar.title = savedInstanceState?.getCharSequence(TOOLBAR_TITLE, "") ?: ""
         setSupportActionBar(toolbar)
         setUpGoogleApiClient()
@@ -295,12 +293,12 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                         drawer?.addItemAtPosition(logoutDrawerItem, 0)
                         //add addMasjidDrawerItem
                         drawer?.addItem(addMasjidDrawerItem)
-                        showShortToast(getString(R.string.login_success_toast))
+                        toast(getString(R.string.login_success_toast))
                         currentFragment?.onLogin()
                     }
 
                     override fun onError(t: Throwable) {
-                        showShortToast(getString(R.string.login_failure_toast, t.message))
+                        toast(getString(R.string.login_failure_toast, t.message))
                     }
                 }
                 RestClient(this).login(acct.idToken!!, acct.email!!, cb)
@@ -332,13 +330,11 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     }
 
     fun switchToFragment(fragment: Fragment, title: Int) {
-        Log.d("jtime", "Switching to fragment $fragment")
+        debug("Switching to fragment $fragment")
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
         drawer?.closeDrawer()
         rightDrawer.closeDrawer()
         toolbar.title = getString(title)
     }
-
-    fun showShortToast(s: String) = Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
 }

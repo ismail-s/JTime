@@ -12,28 +12,26 @@ import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.SalaahType
 import nl.komponents.kovenant.ui.failUi
 import nl.komponents.kovenant.ui.successUi
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
+import org.jetbrains.anko.*
+import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.support.v4.ctx
 import org.jetbrains.anko.support.v4.toast
-import org.jetbrains.anko.tableRow
-import org.jetbrains.anko.textView
+import org.jetbrains.anko.support.v4.withArguments
 
-class NearbyTimesFragment : BaseFragment(), AnkoLogger {
+class NearbyTimesFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_nearby_times, container, false)
         val salaahType = arguments.getSerializable(SALAAH_TYPE) as SalaahType
-        val salaahNameLabel = rootView.findViewById(R.id.label_salaah_name) as TextView
+        val salaahNameLabel = rootView.find<TextView>(R.id.label_salaah_name)
         salaahNameLabel.text = getString(R.string.nearby_times_title_text, salaahType.toString(ctx))
-        val table = rootView.findViewById(R.id.salaah_times_table) as TableLayout
-        (activity as MainActivity).location successUi {
-            RestClient(activity).getTimesForNearbyMasjids(it.latitude, it.longitude, salaahType)
+        val table = rootView.find<TableLayout>(R.id.salaah_times_table)
+        mainAct.location successUi {
+            RestClient(act).getTimesForNearbyMasjids(it.latitude, it.longitude, salaahType)
             .successUi {
                 it.sortedBy { it.datetime.timeInMillis }.forEach {
-                    table.addView(with(AnkoContext.create(activity, table)) {
+                    table.addView(with(AnkoContext.create(act, table)) {
                         tableRow {
                             val tSize = 18f
                             textView(it.masjidName) {
@@ -59,13 +57,8 @@ class NearbyTimesFragment : BaseFragment(), AnkoLogger {
     companion object {
         private val SALAAH_TYPE = "salaahType"
 
-        fun newInstance(salaahType: SalaahType): NearbyTimesFragment {
-            val fragment = NearbyTimesFragment()
-            val args = Bundle()
-            args.putSerializable(SALAAH_TYPE, salaahType)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(salaahType: SalaahType): NearbyTimesFragment =
+                NearbyTimesFragment().withArguments(SALAAH_TYPE to salaahType)
     }
 
 }
