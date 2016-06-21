@@ -1,21 +1,26 @@
 package com.ismail_s.jtime.android.activity
 
 import android.os.Bundle
-import android.content.Context
-import android.view.inputmethod.InputMethodManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.ismail_s.jtime.android.R
-import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
-import com.ismail_s.jtime.android.RestClient
+import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
 import com.ismail_s.jtime.android.MasjidPojo
+import com.ismail_s.jtime.android.R
+import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.SalaahType
+import org.jetbrains.anko.find
+import org.jetbrains.anko.inputMethodManager
+import org.jetbrains.anko.support.v4.act
+import org.jetbrains.anko.support.v4.longToast
+import org.jetbrains.anko.support.v4.toast
+import org.jetbrains.anko.support.v4.withArguments
 import java.util.*
 
 class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
@@ -56,9 +61,9 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater!!.inflate(R.layout.fragment_change_masjid_times, container, false)
-        masjidTimeTextbox = rootView.findViewById(R.id.masjid_time_textbox) as EditText
-        dateLabel = rootView.findViewById(R.id.label_date) as TextView
-        salaahTypeLabel = rootView.findViewById(R.id.label_salaah_type) as TextView
+        masjidTimeTextbox = rootView.find<EditText>(R.id.masjid_time_textbox)
+        dateLabel = rootView.find<TextView>(R.id.label_date)
+        salaahTypeLabel = rootView.find<TextView>(R.id.label_salaah_type)
         val buttonIds = listOf(R.id.undo_button, R.id.up_button, R.id.down_button, R.id.left_button, R.id.right_button, R.id.copy_up_button, R.id.copy_down_button)
         buttons = buttonIds.map {rootView.findViewById(it) as Button}
         setButtonOnClickListeners(rootView, buttons)
@@ -71,24 +76,23 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             }
 
             override fun onError(t: Throwable) {
-                val s = getString(R.string.get_masjid_times_failure_toast, t.message)
-                Toast.makeText(activity.applicationContext, s, Toast.LENGTH_LONG).show()
+                longToast(getString(R.string.get_masjid_times_failure_toast, t.message))
                 // As we can't get the times (so can't edit them), we switch
                 // back to viewing the times
-                (activity as MainActivity?)?.switchToMasjidsFragment(masjidId, masjidName)
+                (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
             }
         }
-        RestClient(activity).getMasjidTimes(masjidId, cb, date)
+        RestClient(act).getMasjidTimes(masjidId, cb, date)
         showKeyboard()
         return rootView
     }
 
     private fun setButtonOnClickListeners(rootView: View, buttons: List<Button>) {
         buttons.forEach {it.setOnClickListener(this)}
-        val helpButton = rootView.findViewById(R.id.help_button) as Button
+        val helpButton = rootView.find<Button>(R.id.help_button)
         helpButton.setOnClickListener {
             hideKeyboard()
-            (activity as MainActivity?)?.switchToHelpFragment()
+            (act as? MainActivity)?.switchToHelpFragment()
         }
     }
 
@@ -98,14 +102,13 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
     private fun showKeyboard() {
         if (masjidTimeTextbox.requestFocus()) {
-            val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val imm = act.inputMethodManager
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
         }
     }
 
     private fun hideKeyboard() {
-        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(masjidTimeTextbox.windowToken, 0)
+        act.inputMethodManager.hideSoftInputFromWindow(masjidTimeTextbox.windowToken, 0)
     }
 
     override fun onClick(view: View) {
@@ -175,15 +178,15 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
                 override fun onError(t: Throwable) {
                     val s = getString(R.string.get_masjid_times_failure_toast, t.message)
-                    showShortToast(s)
+                    toast(s)
                     //TODO-should this (next) line be here
-                    (activity as MainActivity?)?.switchToMasjidsFragment(masjidId, masjidName)
+                    (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
                 }
             }
             //disable all buttons here whilst we get the masjid times for the
             // new day
             buttons.map { it.isEnabled = false }
-            RestClient(activity).getMasjidTimes(masjidId, cb2, nextDate)
+            RestClient(act).getMasjidTimes(masjidId, cb2, nextDate)
             setLabels(nextDate, currentSalaahType)
         }
     }
@@ -251,7 +254,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         //If invalid time, return straightaway
         val time = getTextboxTimeIfValid()
         if (time == null) {
-            showShortToast(getString(R.string.invalid_salaah_time_toast))
+            toast(getString(R.string.invalid_salaah_time_toast))
             return
         }
         //Get the salaah time that is currently saved on the server, so we can see if the time we
@@ -265,7 +268,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             SalaahType.MAGRIB -> {currentSavedTimeOrNull = currentMasjidPojo?.magribTime}
             SalaahType.ESHA -> {currentSavedTimeOrNull = currentMasjidPojo?.eshaTime}
         }
-        var currentSavedTime: String
+        val currentSavedTime: String
         if (currentSavedTimeOrNull == null) {
             currentSavedTime = ""
         } else {
@@ -277,15 +280,15 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         newDate.set(Calendar.MINUTE, time.minute)
         val cb1 = object : RestClient.CreateOrUpdateMasjidTimeCallback {
             override fun onSuccess() {
-                showShortToast("DB updated with ${time.hour}:${time.minute}")
+                toast("DB updated with ${time.hour}:${time.minute}")
 
             }
             override fun onError(t: Throwable) {
-                showShortToast(getString(R.string.salaah_time_update_failure_toast, t.message))
+                toast(getString(R.string.salaah_time_update_failure_toast, t.message))
             }
         }
         if (formatCalendarAsTime(newDate) != currentSavedTime) {
-            RestClient(activity).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate, cb1)
+            RestClient(act).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate, cb1)
         }
         when (currentSalaahType) {
             SalaahType.FAJR -> {
@@ -363,22 +366,13 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         salaahTypeLabel.text = getString(salaahText)
     }
 
-    private fun showShortToast(s: String) {
-        Toast.makeText(activity.applicationContext, s, Toast.LENGTH_SHORT).show()
-    }
-
     companion object {
         private val ARG_DATE = "date"
         private val MASJID_NAME = "masjid_name"
 
-        fun newInstance(masjidId: Int, masjidName: String, date: GregorianCalendar): ChangeMasjidTimesFragment {
-            val fragment = ChangeMasjidTimesFragment()
-            val args = Bundle()
-            args.putSerializable(ARG_DATE, date)
-            args.putInt(Constants.MASJID_ID, masjidId)
-            args.putString(MASJID_NAME, masjidName)
-            fragment.arguments = args
-            return fragment
-        }
+        fun newInstance(masjidId: Int, masjidName: String, date: GregorianCalendar): ChangeMasjidTimesFragment =
+                ChangeMasjidTimesFragment().withArguments(
+                        ARG_DATE to date, Constants.MASJID_ID to masjidId,
+                        MASJID_NAME to masjidName)
     }
 }

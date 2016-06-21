@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import com.ismail_s.jtime.android.MasjidPojo
 import com.ismail_s.jtime.android.R
+import org.jetbrains.anko.find
 
 /**
  * [RecyclerView.Adapter] that can display a [MasjidPojo].
@@ -39,8 +39,8 @@ class MyItemRecyclerViewAdapter(private val mValues: List<MasjidPojo>, private v
         var mItem: MasjidPojo = MasjidPojo()
 
         init {
-            mNameView = mView.findViewById(R.id.content) as TextView
-            mAddressView = mView.findViewById(R.id.address) as TextView
+            mNameView = mView.find<TextView>(R.id.content)
+            mAddressView = mView.find<TextView>(R.id.address)
         }
 
         override fun toString(): String {

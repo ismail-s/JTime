@@ -15,6 +15,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
+import org.jetbrains.anko.find
+import org.jetbrains.anko.support.v4.act
+import org.jetbrains.anko.support.v4.toast
 
 class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener, View.OnClickListener {
     private var current_marker: Marker? = null
@@ -34,9 +37,9 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
         mapFragment.getMapAsync(this)
         childFragmentManager.beginTransaction()
             .add(R.id.map_container, mapFragment).commit()
-        masjidNameTextbox = rootView.findViewById(R.id.masjid_name_textbox) as EditText
-        mapHelpLabel = rootView.findViewById(R.id.map_help_label) as TextView
-        submitButton = rootView.findViewById(R.id.add_masjid_submit_button) as Button
+        masjidNameTextbox = rootView.find<EditText>(R.id.masjid_name_textbox)
+        mapHelpLabel = rootView.find<TextView>(R.id.map_help_label)
+        submitButton = rootView.find<Button>(R.id.add_masjid_submit_button)
         submitButton.setOnClickListener(this)
         return rootView
     }
@@ -59,21 +62,20 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
                 return
             }
             //2. submit form
-            val showToast = {s: String -> (activity as MainActivity?)?.showShortToast(s)}
             val cb = object: RestClient.MasjidCreatedCallback {
                 override fun onSuccess() {
-                    showToast("Masjid \"$masjidName\" created")
+                    toast("Masjid \"$masjidName\" created")
                     //3. switch to AllMasjidsFragment
-                    (activity as MainActivity?)?.switchToAllMasjidsFragment()
+                    (act as? MainActivity)?.switchToAllMasjidsFragment()
                 }
 
                 override fun onError(t: Throwable) {
-                    showToast("Error when trying to create masjid: ${t.toString()}")
+                    toast("Error when trying to create masjid: ${t.toString()}")
                     submitButton.isEnabled = true
                 }
             }
             val location = (current_marker as Marker).position
-            RestClient(activity).createMasjid(masjidName, location.latitude, location.longitude, cb)
+            RestClient(act).createMasjid(masjidName, location.latitude, location.longitude, cb)
             submitButton.isEnabled = false
         }
     }
@@ -99,7 +101,7 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
     fun addMarker(point: LatLng) {
         current_marker?.remove()
         val marker_options = MarkerOptions().position(point)
-            .title("Masjid location").draggable(true)
+            .title(getString(R.string.add_masjid_marker_title)).draggable(true)
         current_marker = googleMap?.addMarker(marker_options)
     }
 }
