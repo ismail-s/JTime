@@ -101,7 +101,7 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
     fun addMarker(point: LatLng) {
         current_marker?.remove()
         val marker_options = MarkerOptions().position(point)
-            .title("Masjid location").draggable(true)
+            .title(getString(R.string.add_masjid_marker_title)).draggable(true)
         current_marker = googleMap?.addMarker(marker_options)
     }
 }
