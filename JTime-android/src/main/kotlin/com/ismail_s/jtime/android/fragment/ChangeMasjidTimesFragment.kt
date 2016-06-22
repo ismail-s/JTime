@@ -1,4 +1,4 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,13 +8,11 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
+import com.ismail_s.jtime.android.*
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
-import com.ismail_s.jtime.android.MasjidPojo
-import com.ismail_s.jtime.android.R
-import com.ismail_s.jtime.android.RestClient
-import com.ismail_s.jtime.android.SalaahType
+import com.ismail_s.jtime.android.pojo.MasjidPojo
+import com.ismail_s.jtime.android.pojo.SalaahType
 import org.jetbrains.anko.find
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.support.v4.act
@@ -65,7 +63,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         dateLabel = rootView.find<TextView>(R.id.label_date)
         salaahTypeLabel = rootView.find<TextView>(R.id.label_salaah_type)
         val buttonIds = listOf(R.id.undo_button, R.id.up_button, R.id.down_button, R.id.left_button, R.id.right_button, R.id.copy_up_button, R.id.copy_down_button)
-        buttons = buttonIds.map {rootView.findViewById(it) as Button}
+        buttons = buttonIds.map {rootView.findViewById(it) as Button }
         setButtonOnClickListeners(rootView, buttons)
         //Get times for date
         val cb = object : RestClient.MasjidTimesCallback {

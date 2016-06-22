@@ -1,6 +1,7 @@
-package com.ismail_s.jtime.android
+package com.ismail_s.jtime.android.pojo
 
 import android.content.Context
+import com.ismail_s.jtime.android.R
 import java.util.GregorianCalendar
 
 class MasjidPojo {

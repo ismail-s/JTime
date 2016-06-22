@@ -1,4 +1,4 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,13 +8,14 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
+import com.ismail_s.jtime.android.MainActivity
 import org.jetbrains.anko.find
 import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.support.v4.toast

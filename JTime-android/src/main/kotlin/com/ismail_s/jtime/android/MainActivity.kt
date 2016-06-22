@@ -1,4 +1,4 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android
 
 import android.content.Intent
 import android.location.Location
@@ -14,10 +14,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationServices
-import com.ismail_s.jtime.android.R
-import com.ismail_s.jtime.android.RestClient
-import com.ismail_s.jtime.android.SalaahType
-import com.ismail_s.jtime.android.SharedPreferencesWrapper
+import com.ismail_s.jtime.android.fragment.*
+import com.ismail_s.jtime.android.pojo.SalaahType
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer

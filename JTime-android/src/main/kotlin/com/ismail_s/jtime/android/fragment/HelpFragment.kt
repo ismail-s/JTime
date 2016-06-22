@@ -1,4 +1,4 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android.fragment
 
 import android.os.Bundle
 import android.text.method.LinkMovementMethod

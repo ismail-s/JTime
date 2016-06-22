@@ -14,6 +14,6 @@
         android:layout_marginLeft="5sp"
         android:layout_marginRight="5sp"
         app:layoutManager="LinearLayoutManager"
-        tools:context="com.ismail_s.jtime.android.activity.AllMasjidsFragment"
+        tools:context=".activity.AllMasjidsFragment"
         tools:listitem="@layout/fragment_item" />
 </android.support.v4.widget.SwipeRefreshLayout>
