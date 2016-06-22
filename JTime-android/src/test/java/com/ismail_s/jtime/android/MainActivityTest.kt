@@ -3,7 +3,6 @@ package com.ismail_s.jtime.android
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
 import com.ismail_s.jtime.android.fragment.AllMasjidsFragment
 import com.ismail_s.jtime.android.fragment.HelpFragment
-import com.ismail_s.jtime.android.test.BuildConfig
 import com.mikepenz.materialdrawer.model.AbstractDrawerItem
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertThat
