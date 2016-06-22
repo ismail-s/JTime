@@ -1,4 +1,4 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android.fragment
 
 import android.location.Location
 import android.location.Location.distanceBetween
@@ -8,9 +8,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.ismail_s.jtime.android.MasjidPojo
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
+import com.ismail_s.jtime.android.MasjidRecyclerViewAdapter
+import com.ismail_s.jtime.android.pojo.MasjidPojo
 import nl.komponents.kovenant.ui.failUi
 import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.find
@@ -44,11 +45,11 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
                 mainAct.location successUi {
                     hideRefreshIcon()
                     if (activity != null)
-                        rView.adapter = MyItemRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), mainAct)
+                        rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), mainAct)
                 } failUi {
                     hideRefreshIcon()
                     if (activity != null)
-                        rView.adapter = MyItemRecyclerViewAdapter(sortMasjidsByName(masjids), mainAct)
+                        rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByName(masjids), mainAct)
                 }
             }
         } failUi {

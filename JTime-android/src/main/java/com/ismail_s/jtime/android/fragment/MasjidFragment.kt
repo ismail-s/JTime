@@ -1,4 +1,4 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,12 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import com.ismail_s.jtime.android.*
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
-import com.ismail_s.jtime.android.MasjidPojo
-import com.ismail_s.jtime.android.R
-import com.ismail_s.jtime.android.RestClient
-import com.ismail_s.jtime.android.SharedPreferencesWrapper
+import com.ismail_s.jtime.android.pojo.MasjidPojo
 import org.jetbrains.anko.find
 import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.support.v4.longToast

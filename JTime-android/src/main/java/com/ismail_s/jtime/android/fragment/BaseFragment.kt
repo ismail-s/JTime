@@ -1,7 +1,8 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android.fragment
 
 import android.support.v4.app.Fragment
 import android.view.View
+import com.ismail_s.jtime.android.MainActivity
 import org.jetbrains.anko.AnkoLogger
 
 

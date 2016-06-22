@@ -1,4 +1,4 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android
 
 
 import android.location.Location
@@ -15,7 +15,6 @@ import android.view.WindowManager.LayoutParams
 import android.widget.TableLayout
 import android.widget.TableRow
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
-import com.ismail_s.jtime.android.R
 import nl.komponents.kovenant.deferred
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.containsString

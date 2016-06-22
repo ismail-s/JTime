@@ -1,4 +1,4 @@
-package com.ismail_s.jtime.android
+package com.ismail_s.jtime.android.pojo
 
 import java.util.*
 

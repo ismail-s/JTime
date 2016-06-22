@@ -1,17 +1,17 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android.fragment
 
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.os.Bundle
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
 import com.ismail_s.jtime.android.R
+import com.ismail_s.jtime.android.Constants
 import org.jetbrains.anko.find
 import org.jetbrains.anko.support.v4.withArguments
 import java.util.*

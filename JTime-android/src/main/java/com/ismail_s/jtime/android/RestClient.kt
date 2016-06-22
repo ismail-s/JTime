@@ -11,6 +11,10 @@ import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.getAs
+import com.ismail_s.jtime.android.pojo.MasjidPojo
+import com.ismail_s.jtime.android.pojo.SalaahTimePojo
+import com.ismail_s.jtime.android.pojo.SalaahType
+import com.ismail_s.jtime.android.pojo.charToSalaahType
 import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.deferred
 import org.json.JSONArray

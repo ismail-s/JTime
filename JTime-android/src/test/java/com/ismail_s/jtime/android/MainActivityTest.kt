@@ -1,24 +1,21 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android
 
-import com.ismail_s.jtime.android.BuildConfig
-import com.ismail_s.jtime.android.R
+import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
+import com.ismail_s.jtime.android.fragment.AllMasjidsFragment
+import com.ismail_s.jtime.android.fragment.HelpFragment
+import com.ismail_s.jtime.android.test.BuildConfig
 import com.mikepenz.materialdrawer.model.AbstractDrawerItem
-
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
-
+import org.hamcrest.CoreMatchers.instanceOf
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricGradleTestRunner
 import org.robolectric.annotation.Config
-
-import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
-import org.hamcrest.CoreMatchers.instanceOf
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertThat
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @RunWith(RobolectricGradleTestRunner::class)
 @Config(constants = BuildConfig::class, sdk = intArrayOf(21))
