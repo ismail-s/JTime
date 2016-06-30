@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
             if (savedInstanceState != null) {
                 return
             }
-            switchToAllMasjidsFragment()
+            switchToHomeFragment()
         }
     }
 
@@ -203,6 +203,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                 .withOnDrawerListener(drawerListener)
                 .withSavedInstance(savedInstance)
                 .addDrawerItems(PrimaryDrawerItem()
+                        .withName(getString(R.string.drawer_item_home))
+                        .withOnDrawerItemClickListener { view, position, drawerItem ->
+                            switchToHomeFragment()
+                            true
+                        }, PrimaryDrawerItem()
                         .withName(getString(R.string.drawer_item_all_masjids))
                         .withOnDrawerItemClickListener { view, position, drawerItem ->
                             switchToAllMasjidsFragment()
@@ -311,6 +316,9 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
 
     fun switchToAllMasjidsFragment() = switchToFragment(AllMasjidsFragment(),
             R.string.fragment_title_all_masjids)
+
+    fun switchToHomeFragment() = switchToFragment(HomeFragment(),
+            R.string.fragment_title_home)
 
     fun switchToAddMasjidFragment() = switchToFragment(AddMasjidFragment(),
             R.string.fragment_title_add_masjid)

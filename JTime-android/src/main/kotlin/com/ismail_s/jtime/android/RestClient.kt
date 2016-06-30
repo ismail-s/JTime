@@ -1,6 +1,7 @@
 package com.ismail_s.jtime.android
 
 import android.content.Context
+import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import com.github.kittinunf.fuel.Fuel
@@ -122,14 +123,15 @@ class RestClient {
                 }
     }
 
-    fun getTimesForNearbyMasjids(latitude: Double, longitude: Double, salaahType: SalaahType)
+    fun getTimesForNearbyMasjids(latitude: Double, longitude: Double, salaahType: SalaahType? = null)
             : Promise<List<SalaahTimePojo>, Throwable> {
         val deferred = deferred<List<SalaahTimePojo>, Throwable>()
-        val loc = JSONObject()
-        loc.put("lat", latitude)
-        loc.put("lng", longitude)
+        val loc = JSONObject().put("lat", latitude).put("lng", longitude)
+        val params: MutableList<Pair<String, Any>> = mutableListOf("location" to loc.toString())
+        if (salaahType != null)
+            params.add("salaahType" to salaahType.apiRef)
         "${Companion.url}/SalaahTimes/times-for-masjids-for-today"
-                .httpGet(listOf("salaahType" to salaahType.apiRef, "location" to loc.toString()))
+                .httpGet(params)
                 .responseJson { request, response, result ->
                     when (result) {
                         is Result.Failure -> {deferred.reject(result.error)}
@@ -140,10 +142,14 @@ class RestClient {
                                 val type = charToSalaahType(time.getString("type")[0])
                                 val masjidId = time.getInt("masjidId")
                                 val masjidName = time.getString("masjidName")
+                                val masjidLocation = time.getJSONObject("masjidLocation")
+                                val masjidLoc = Location("")
+                                masjidLoc.latitude = masjidLocation.getDouble("lat")
+                                masjidLoc.longitude = masjidLocation.getDouble("lng")
                                 val datetimeStr = time.getString("datetime")
                                 val datetime = GregorianCalendar()
                                 datetime.time = dateFormatter.parse(datetimeStr)
-                                res += SalaahTimePojo(masjidId, masjidName, type, datetime)
+                                res += SalaahTimePojo(masjidId, masjidName, masjidLoc, type, datetime)
                             }
                             deferred.resolve(res)
                         }
