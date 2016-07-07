@@ -55,6 +55,7 @@ class HomeFragment: BaseFragment() {
                     getString(R.string.home_fragment_next_time_future_text, *params)
                 else
                     getString(R.string.home_fragment_next_time_past_text, *params)
+                label_other_times_today.visibility = View.VISIBLE
 
                 val addToTable = {x: AnkoContext<TableLayout>.() -> TableRow ->
                     salaah_times_summary_table.addView(

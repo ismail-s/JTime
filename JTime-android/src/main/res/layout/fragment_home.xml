@@ -31,7 +31,8 @@
             android:id="@+id/label_other_times_today"
             android:layout_below="@+id/label_next_time"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:visibility="invisible"/>
 
         <TableLayout
             android:layout_width="match_parent"
