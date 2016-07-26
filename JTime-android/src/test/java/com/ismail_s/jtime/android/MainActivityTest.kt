@@ -1,7 +1,7 @@
 package com.ismail_s.jtime.android
 
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
-import com.ismail_s.jtime.android.fragment.AllMasjidsFragment
+import com.ismail_s.jtime.android.fragment.HomeFragment
 import com.ismail_s.jtime.android.fragment.HelpFragment
 import com.mikepenz.materialdrawer.model.AbstractDrawerItem
 import org.hamcrest.CoreMatchers.instanceOf
@@ -28,8 +28,8 @@ class MainActivityTest {
     }
 
     @Test
-    fun testThatAllMasjidsFragmentIsDisplayedFirst() {
-        assertThat(activity.currentFragment, instanceOf(AllMasjidsFragment::class.java))
+    fun testThatHomeFragmentIsDisplayedFirst() {
+        assertThat(activity.currentFragment, instanceOf(HomeFragment::class.java))
     }
 
     @Test
