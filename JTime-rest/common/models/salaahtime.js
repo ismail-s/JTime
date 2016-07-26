@@ -144,7 +144,6 @@ SalaahTime.remoteMethod(
                 return cb(new Error(msg));
             };
         var addMasjidNamesAndLocsToSalaahTimes = function(salaahTimes, masjidNameLocMap) {
-                console.log(masjidNameLocMap);
                 return salaahTimes.map(function(s) {
                     s.masjidName = masjidNameLocMap[s.masjidId][0];
                     s.masjidLocation = masjidNameLocMap[s.masjidId][1];
@@ -160,7 +159,6 @@ SalaahTime.remoteMethod(
         Masjid.findAsync({fields: {id: true, name: true, location: true}, where: {id: {inq: faveMasjidIds}}})
             .then(function(faveMasjidNames) {
             var masjidNameLocMap = {};
-            console.log(faveMasjidIds, faveMasjidNames);
             faveMasjidNames.forEach(function(m){masjidNameLocMap[m.id] = [m.name, m.location]});
 
             var fieldsToReturn = {type: true, masjidId: true, datetime: true};
@@ -172,7 +170,6 @@ SalaahTime.remoteMethod(
                 //get the nearest masjids, add them to faveMasjidIds
                 Masjid.findAsync({limit: 10, fields: {id: true, name: true, location: true}, where: {location: {near: location}}})
                     .then(function(masjids) {
-                        console.log(masjids);
                         faveMasjidIds = faveMasjidIds.concat(masjids.map(function(m){return m.id}));
                         masjids.forEach(function(m){masjidNameLocMap[m.id] = [m.name, m.location]});
                         baseWhereQuery.masjidId = {inq: faveMasjidIds};
