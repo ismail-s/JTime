@@ -143,9 +143,11 @@ SalaahTime.remoteMethod(
                 console.error(msg, err, salaahType, location, faveMasjidIds);
                 return cb(new Error(msg));
             };
-        var addMasjidNamesToSalaahTimes = function(salaahTimes, masjidNameMap) {
+        var addMasjidNamesAndLocsToSalaahTimes = function(salaahTimes, masjidNameLocMap) {
+                console.log(masjidNameLocMap);
                 return salaahTimes.map(function(s) {
-                    s.masjidName = masjidNameMap[s.masjidId];
+                    s.masjidName = masjidNameLocMap[s.masjidId][0];
+                    s.masjidLocation = masjidNameLocMap[s.masjidId][1];
                     return s;
                 })
             };
@@ -155,10 +157,11 @@ SalaahTime.remoteMethod(
         var end_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 23, 59, 59, 999));
         var start_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0, 0));
 
-        Masjid.findAsync({fields: {id: true, name: true}, where: {id: {inq: faveMasjidIds}}})
+        Masjid.findAsync({fields: {id: true, name: true, location: true}, where: {id: {inq: faveMasjidIds}}})
             .then(function(faveMasjidNames) {
-            var masjidNameMap = {};
-            faveMasjidIds.forEach(function(m){masjidNameMap[m.id] = m.name});
+            var masjidNameLocMap = {};
+            console.log(faveMasjidIds, faveMasjidNames);
+            faveMasjidNames.forEach(function(m){masjidNameLocMap[m.id] = [m.name, m.location]});
 
             var fieldsToReturn = {type: true, masjidId: true, datetime: true};
             var baseWhereQuery = {datetime: {between: [start_date, end_date]}};
@@ -167,16 +170,17 @@ SalaahTime.remoteMethod(
             }
             if (location) {
                 //get the nearest masjids, add them to faveMasjidIds
-                Masjid.findAsync({limit: 10, fields: {id: true, name: true}, where: {location: {near: location}}})
+                Masjid.findAsync({limit: 10, fields: {id: true, name: true, location: true}, where: {location: {near: location}}})
                     .then(function(masjids) {
+                        console.log(masjids);
                         faveMasjidIds = faveMasjidIds.concat(masjids.map(function(m){return m.id}));
-                        masjids.forEach(function(m){masjidNameMap[m.id] = m.name});
+                        masjids.forEach(function(m){masjidNameLocMap[m.id] = [m.name, m.location]});
                         baseWhereQuery.masjidId = {inq: faveMasjidIds};
                         return SalaahTime.findAsync({
                             fields: fieldsToReturn,
                             where: baseWhereQuery})
                     }).then(function(instances) {
-                        var result = addMasjidNamesToSalaahTimes(instances, masjidNameMap);
+                        var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
                         return cb(null, result);
                     }).catch(handleDBError);
             } else {
@@ -185,7 +189,7 @@ SalaahTime.remoteMethod(
                     fields: fieldsToReturn,
                     where: baseWhereQuery
                 }).then(function(instances) {
-                    var result = addMasjidNamesToSalaahTimes(instances, masjidNameMap);
+                    var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
                     return cb(null, result);
                 }).catch(handleDBError);
             }
