@@ -42,12 +42,18 @@ class HomeFragment: BaseFragment() {
                     return@s
                 }
                 val now = GregorianCalendar()
-                val keyForTime = { x: SalaahTimePojo -> (5L * 60 * 1000) + x.datetime.timeInMillis - now.timeInMillis }
-                val sortedTimes = it.sortedBy { keyForTime(it) }
+                val keyForTime = { x: SalaahTimePojo -> (3L * 60 * 1000) + x.datetime.timeInMillis - now.timeInMillis }
+                var sortedTimes = it.sortedBy { keyForTime(it) }
                         .dropWhile { keyForTime(it) < 0 }
-                val closest = sortedTimes
-                        .takeWhile { keyForTime(it) == keyForTime(sortedTimes.first()) }
-                        .sortedBy { loc.distanceTo(it.masjidLoc) }.first()
+                val closest = if(sortedTimes.isEmpty()) {
+                    val x = it.sortedBy { keyForTime(it) }.reversed()
+                    x.takeWhile { keyForTime(it) == keyForTime(x.first()) }
+                            .sortedBy { loc.distanceTo(it.masjidLoc) }.first()
+                } else {
+                    sortedTimes
+                            .takeWhile { keyForTime(it) == keyForTime(sortedTimes.first()) }
+                            .sortedBy { loc.distanceTo(it.masjidLoc) }.first()
+                }
                 val remaining = (it - closest).groupBy { it.type }.toSortedMap()
 
                 val params = arrayOf(closest.type.toString(ctx), closest.masjidName, formatCalendarAsTime(closest.datetime))
