@@ -51,6 +51,9 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     }
 
     private fun clickOnMasjidNameToOpenMasjidFragment() {
+        // Make sure we are on the AllMasjidsFragment
+        swipeInNavigationDrawer()
+        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).perform(click())
         onView(allOf(withId(R.id.content), withText("one"))).perform(click())
     }
 

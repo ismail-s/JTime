@@ -38,12 +38,15 @@ fun createMockWebServerAndConnectToRestClient(): MockWebServer {
                 val mockJsonResponse: String
                 if (recordedRequest.path.contains("salaahType=f")) {
                     mockJsonResponse = """{"res": [
-                {"masjidId": 1, "masjidName": "one", "type": "f","datetime": "2016-03-28T06:00:00.000Z"},
-                {"masjidId": 2, "masjidName": "two", "type": "f","datetime": "2016-03-28T05:30:00.000Z"}
+                {"masjidId": 1, "masjidLocation": {"lat": 0.0, "lng": 0.0}, "masjidName": "one",
+                    "type": "f","datetime": "2016-03-28T06:00:00.000Z"},
+                {"masjidId": 2, "masjidLocation": {"lat": 0.1, "lng": 0.1}, "masjidName": "two",
+                    "type": "f","datetime": "2016-03-28T05:30:00.000Z"}
                 ]}"""
                 } else if (recordedRequest.path.contains("salaahType=z")) {
                     mockJsonResponse = """{"res": [
-                {"masjidId": 1, "masjidName": "one", "type": "z","datetime": "2016-03-28T12:25:00.000Z"}
+                {"masjidId": 1, "masjidLocation": {"lat": 0.0, "lng": 0.0}, "masjidName": "one",
+                    "type": "z","datetime": "2016-03-28T12:25:00.000Z"}
                 ]}"""
                 } else {
                     mockJsonResponse = """{"res": []}"""

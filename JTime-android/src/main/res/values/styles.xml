@@ -3,8 +3,5 @@
 
     <!-- Base Application theme -->
     <style name="AppTheme" parent="@style/MaterialDrawerTheme">
-        <!-- Hack to get robolectric tests to run, see
-            https://github.com/mikepenz/MaterialDrawer/issues/1336 -->
-        <item name="selectableItemBackground">@color/colorPrimaryLight</item>
     </style>
 </resources>
