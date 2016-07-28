@@ -248,7 +248,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         }
         rightDrawer = DrawerBuilder()
                 .withActivity(this)
-                .withToolbar(toolbar)
                 .withOnDrawerListener(drawerListener)
                 .withDrawerGravity(Gravity.END)
                 .withSavedInstance(savedInstance)
