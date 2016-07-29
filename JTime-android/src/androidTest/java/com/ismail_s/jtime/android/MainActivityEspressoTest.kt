@@ -27,6 +27,9 @@ import java.util.*
 
 @LargeTest
 class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(MainActivity::class.java) {
+    val all_masjids_text: String by lazy {
+        getString(R.string.drawer_item_all_masjids)
+    }
 
     @Before
     @Throws(Exception::class)
@@ -54,7 +57,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     private fun clickOnMasjidNameToOpenMasjidFragment() {
         // Make sure we are on the AllMasjidsFragment
         swipeInNavigationDrawer()
-        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).perform(click())
+        onView(allOf(withId(R.id.material_drawer_name), withText(all_masjids_text))).perform(click())
         onView(allOf(withId(R.id.content), withText("one"))).perform(click())
     }
 
@@ -67,9 +70,9 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     fun getString(resId: Int) = instrumentation.targetContext.getString(resId)
 
     fun testMenuButtonOpensCorrectDrawer() {
-        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).check(matches(not(isDisplayed())))
+        onView(allOf(withId(R.id.material_drawer_name), withText(all_masjids_text))).check(matches(not(isDisplayed())))
         onView(withContentDescription(getString(R.string.material_drawer_open))).perform(click())
-        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).check(matches(isDisplayed()))
+        onView(allOf(withId(R.id.material_drawer_name), withText(all_masjids_text))).check(matches(isDisplayed()))
    }
 
     /**
@@ -170,7 +173,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     fun testNavigationDrawerHasButtonToReturnToMasjidsList() {
         clickOnMasjidNameToOpenMasjidFragment()
         swipeInNavigationDrawer()
-        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).perform(click())
+        onView(allOf(withId(R.id.material_drawer_name), withText(all_masjids_text))).perform(click())
         onView(allOf(withId(R.id.content), withText("one"))).check(matches(isCompletelyDisplayed()))
     }
 
