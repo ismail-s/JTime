@@ -81,8 +81,8 @@ class RestClient {
                         }
                         val id = m.getInt("id")
                         val location = m.getJSONObject("location")
-                        val latitude = location["lat"] as Double
-                        val longitude = location["lng"] as Double
+                        val latitude = location["lat"].toString().toDouble()
+                        val longitude = location["lng"].toString().toDouble()
                         res.add(MasjidPojo(name, id, address, latitude, longitude))
                     }
                     deferred.resolve(res)
