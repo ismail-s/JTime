@@ -18,6 +18,7 @@ import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToR
 import nl.komponents.kovenant.deferred
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
@@ -62,6 +63,14 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         clickOnMasjidNameToOpenMasjidFragment()
         onView(withId(R.id.masjid_name)).check(matches(withText("one")))
     }
+
+    fun getString(resId: Int) = instrumentation.targetContext.getString(resId)
+
+    fun testMenuButtonOpensCorrectDrawer() {
+        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).check(matches(not(isDisplayed())))
+        onView(withContentDescription(getString(R.string.material_drawer_open))).perform(click())
+        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).check(matches(isDisplayed()))
+   }
 
     /**
      * Before calling this method, swipe to the correct fragment. Then call it to make sure that
