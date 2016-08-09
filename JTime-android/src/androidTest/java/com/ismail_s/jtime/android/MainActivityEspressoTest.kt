@@ -18,6 +18,7 @@ import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToR
 import nl.komponents.kovenant.deferred
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
@@ -26,6 +27,9 @@ import java.util.*
 
 @LargeTest
 class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(MainActivity::class.java) {
+    val all_masjids_text: String by lazy {
+        getString(R.string.drawer_item_all_masjids)
+    }
 
     @Before
     @Throws(Exception::class)
@@ -53,7 +57,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     private fun clickOnMasjidNameToOpenMasjidFragment() {
         // Make sure we are on the AllMasjidsFragment
         swipeInNavigationDrawer()
-        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).perform(click())
+        onView(allOf(withId(R.id.material_drawer_name), withText(all_masjids_text))).perform(click())
         onView(allOf(withId(R.id.content), withText("one"))).perform(click())
     }
 
@@ -62,6 +66,14 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         clickOnMasjidNameToOpenMasjidFragment()
         onView(withId(R.id.masjid_name)).check(matches(withText("one")))
     }
+
+    fun getString(resId: Int) = instrumentation.targetContext.getString(resId)
+
+    fun testMenuButtonOpensCorrectDrawer() {
+        onView(allOf(withId(R.id.material_drawer_name), withText(all_masjids_text))).check(matches(not(isDisplayed())))
+        onView(withContentDescription(getString(R.string.material_drawer_open))).perform(click())
+        onView(allOf(withId(R.id.material_drawer_name), withText(all_masjids_text))).check(matches(isDisplayed()))
+   }
 
     /**
      * Before calling this method, swipe to the correct fragment. Then call it to make sure that
@@ -161,7 +173,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     fun testNavigationDrawerHasButtonToReturnToMasjidsList() {
         clickOnMasjidNameToOpenMasjidFragment()
         swipeInNavigationDrawer()
-        onView(allOf(withId(R.id.material_drawer_name), withText("All Masjids"))).perform(click())
+        onView(allOf(withId(R.id.material_drawer_name), withText(all_masjids_text))).perform(click())
         onView(allOf(withId(R.id.content), withText("one"))).check(matches(isCompletelyDisplayed()))
     }
 
