@@ -25,7 +25,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
     data class Time(val hour: Int, val minute: Int)
 
-    private val timeRegex = Regex("""(\d\d)[:\- ](\d\d)""")
+    private val timeRegex = Regex("""(\d?\d)[:\- ](\d\d)""")
     private var masjidId: Int = -1
     lateinit private var masjidName: String
     lateinit private var date: GregorianCalendar
@@ -314,7 +314,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
      */
     private fun getTextboxTimeIfValid(): Time? {
         val timeString = masjidTimeTextbox.text
-        if (timeString.length != 5) {
+        if (!(timeString.length in 4..5)) {
             return null
         }
         val match = timeRegex.matchEntire(timeString)
@@ -324,7 +324,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             val (h, m) = match.destructured
             val hour = h.toInt()
             val minute = m.toInt()
-            if (!(0 <= hour && hour <= 23 && 0 <= minute && minute <= 59)) {
+            if (!(hour in 0..23 && minute in 0..59)) {
                 return null
             } else {
                 return Time(hour, minute)
