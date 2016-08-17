@@ -63,5 +63,5 @@ deployment:
                then ( (cd JTime-android &&
                gpg -d -o google-play-publisher-keys.json --passphrase "$GOOGLE_PLAY_JSON_PUBLISHER_ENCRYPTION_PASSWORD" google-play-publisher-keys.json.gpg &&
                gpg -d -o android.jks --passphrase "$ANDROID_RELEASE_ENCRYPTION_PASSWORD" android.jks.gpg) &&
-               (./gradlew publishRelease --console=plain; rm JTime-android/google-play-publisher-keys.json JTime-android/android.jks;) );
+               (./gradlew publishRelease --console=plain; rm JTime-android/google-play-publisher-keys.json JTime-android/android.jks; cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS;) );
                else echo "No changes to JTime-android folder, so not uploading apk to play store"; fi
