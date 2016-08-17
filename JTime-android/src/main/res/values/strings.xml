@@ -22,6 +22,8 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
 </string>
     <string name="map_help_text">Long click on map to select location</string>
     <string name="nearby_times_title_text">Nearby times for %1$s</string>
+    <string name="home_fragment_next_time_future_text">%1$s at %2$s is at %3$s</string>
+    <string name="home_fragment_next_time_past_text">%1$s at %2$s started at %3$s</string>
     <string name="edit_salaah_times">Edit</string>
     <string name="change_times__undo_button">undo</string>
     <string name="change_times__up_button">up</string>
@@ -41,21 +43,27 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
     <string name="invalid_salaah_time_toast">Time isn\'t valid. Change it so it is valid, or click on the undo button</string>
     <string name="salaah_time_update_failure_toast">Failed to update db with new time: %1$s</string>
     <string name="get_location_for_nearby_masjids_failure_toast">Could not get your current location, so don\'t know which masjids are nearby</string>
+    <string name="no_salaah_times_nearby_masjids_toast">No salaah times for nearby masjids found</string>
 
     <string name="drawer_item_logout">Logout</string>
     <string name="drawer_item_login">Login</string>
     <string name="drawer_item_add_masjid">Add Masjid</string>
     <string name="drawer_item_all_masjids">All Masjids</string>
     <string name="drawer_item_help">Help</string>
+    <string name="drawer_item_home">Home</string>
     <string name="drawer_item_nearby_times_header">Nearby times for:</string>
 
     <string name="fragment_title_all_masjids">All masjids</string>
     <string name="fragment_title_add_masjid">Create a new masjid</string>
     <string name="fragment_title_masjid_times">Masjid times</string>
     <string name="fragment_title_help">Help</string>
+    <string name="fragment_title_home">Home</string>
     <string name="fragment_title_change_salaah_times">Change salaah times</string>
     <string name="fragment_title_nearby_times">Nearby times</string>
 
     <string name="no_network_exception">Network is not available</string>
     <string name="no_location_exception">Location could not be obtained</string>
+
+    <string name="add_masjid_marker_title">Masjid location</string>
+    <string name="label_other_times_today">Other times today:</string>
 </resources>

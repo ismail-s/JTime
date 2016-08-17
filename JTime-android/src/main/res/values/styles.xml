@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base Application theme -->
+    <style name="AppTheme" parent="@style/MaterialDrawerTheme">
+    </style>
+</resources>

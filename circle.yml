@@ -56,7 +56,7 @@ deployment:
         commands:
             - >
                if [[ $(git diff HEAD^..HEAD JTime-rest) ]];
-               then (sudo apt-get install -y fabric && fab -H $PRODUCTION_HOST -u $PRODUCTION_USER deploy | sed -n -e 's/^\(\[[a-zA-Z0-9.]\+]\)\?//p');
+               then (sudo apt-get install -y fabric && fab -H $PRODUCTION_HOST -u $PRODUCTION_USER deploy | sed -n -e 's/^\(\[[a-zA-Z0-9.]\+]\)\?//p' | sed '$ d');
                else echo "No changes to JTime-rest folder, so not redeploying rest api"; fi
             - >
                if [[ $(git diff HEAD^..HEAD JTime-android) ]];

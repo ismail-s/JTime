@@ -15,6 +15,7 @@ buildscript {
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.github.triplet.play'
 
 android {
@@ -24,8 +25,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 6
-        versionName "1.1.0"
+        versionCode 7
+        versionName "1.2.0"
         applicationId "com.ismail_s.jtime.android"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

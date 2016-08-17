@@ -1,17 +1,19 @@
-package com.ismail_s.jtime.android.activity
+package com.ismail_s.jtime.android.fragment
 
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.os.Bundle
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-
 import com.ismail_s.jtime.android.R
+import com.ismail_s.jtime.android.Constants
+import org.jetbrains.anko.find
+import org.jetbrains.anko.support.v4.withArguments
 import java.util.*
 
 
@@ -32,11 +34,11 @@ class MasjidsFragment : BaseFragment() {
         val mSectionsPagerAdapter = SectionsPagerAdapter(childFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        val mViewPager = view.findViewById(R.id.container) as ViewPager
+        val mViewPager = view.find<ViewPager>(R.id.container)
         mViewPager.adapter = mSectionsPagerAdapter
         mViewPager.currentItem = NUM_OF_PAGES / 2
         masjidName = arguments.getString(Constants.MASJID_NAME)
-        val masjidNameView = view.findViewById(R.id.masjid_name) as TextView
+        val masjidNameView = view.find<TextView>(R.id.masjid_name)
         masjidNameView.text = masjidName
         return view
     }
@@ -51,14 +53,9 @@ class MasjidsFragment : BaseFragment() {
 
 
     companion object {
-        fun newInstance(masjidId: Int, masjidName: String): MasjidsFragment {
-            val instance = MasjidsFragment()
-            val bundle = Bundle()
-            bundle.putString(Constants.MASJID_NAME, masjidName)
-            bundle.putInt(Constants.MASJID_ID, masjidId)
-            instance.arguments = bundle
-            return instance
-        }
+        fun newInstance(masjidId: Int, masjidName: String): MasjidsFragment =
+                MasjidsFragment().withArguments(
+                        Constants.MASJID_NAME to masjidName, Constants.MASJID_ID to masjidId)
     }
 
     /**
