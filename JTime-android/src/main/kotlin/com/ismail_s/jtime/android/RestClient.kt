@@ -127,10 +127,11 @@ class RestClient {
             : Promise<List<SalaahTimePojo>, Throwable> {
         val deferred = deferred<List<SalaahTimePojo>, Throwable>()
         val loc = JSONObject().put("lat", latitude).put("lng", longitude)
-        val params: MutableList<Pair<String, Any>> = mutableListOf("location" to loc.toString())
+        val params: MutableList<Pair<String, Any>> = mutableListOf("location" to loc.toString(),
+            "date" to dateFormatter.format(GregorianCalendar().time))
         if (salaahType != null)
             params.add("salaahType" to salaahType.apiRef)
-        "${Companion.url}/SalaahTimes/times-for-masjids-for-today"
+        "${Companion.url}/SalaahTimes/times-for-multiple-masjids"
                 .httpGet(params)
                 .responseJson { request, response, result ->
                     when (result) {

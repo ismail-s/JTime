@@ -129,7 +129,7 @@ SalaahTime.remoteMethod(
     }
 );
 
-    SalaahTime.getTimesForMasjidsForToday = function(salaahType, location, faveMasjidIds, cb) {
+    SalaahTime.getTimesForMultipleMasjids = function(date, salaahType, location, faveMasjidIds, cb) {
         SalaahTime.findAsync = Promise.promisify(SalaahTime.find, {context: SalaahTime});
         if ((faveMasjidIds === null || faveMasjidIds === undefined) && (location === null || location === undefined)) {
             return cb(null, []);
@@ -152,7 +152,7 @@ SalaahTime.remoteMethod(
             };
 
         // Create date objs for start and end of day
-        var today = new Date();
+        var today = date;
         var end_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 23, 59, 59, 999));
         var start_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0, 0));
 
@@ -194,11 +194,15 @@ SalaahTime.remoteMethod(
     };
 
 SalaahTime.remoteMethod(
-    'getTimesForMasjidsForToday', {
+    'getTimesForMultipleMasjids', {
         description: ["Get salaah times for today for masjids for a particular ",
                     "salaah type (optional), for certain masjids and for ",
                     "masjids near to a certain location"],
         accepts: [{
+            arg: 'date',
+            type: 'Date',
+            required: true
+        },{
             arg: 'salaahType',
             type: 'string',
             required: false
@@ -216,7 +220,7 @@ SalaahTime.remoteMethod(
             type: 'array'
         },
         http: {
-            path: '/times-for-masjids-for-today',
+            path: '/times-for-multiple-masjids',
             verb: 'get'
         }
     }
