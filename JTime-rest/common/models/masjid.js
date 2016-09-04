@@ -184,34 +184,6 @@ module.exports = function(Masjid) {
         };
     });
 
-    Masjid.getTodayTimes = function(id, cb) {
-        var today = new Date();
-        Masjid.getTimes(id, today, function(err, instances) {
-            if (err != null) {
-                console.error(err, instances, id);
-                cb(500);
-                return;
-            }
-            cb(null, instances);
-        });
-    };
-    Masjid.remoteMethod(
-        'getTodayTimes', {
-            accepts: [{
-                arg: 'id',
-                type: 'number',
-                required: true
-            }],
-            returns: {
-                arg: 'times',
-                type: 'Array'
-            },
-            http: {
-                path: '/:id/times-for-today',
-                verb: 'get'
-            }
-        }
-    );
     Masjid.getTimes = function(id, date, cb) {
         var SalaahTime = Masjid.app.models.SalaahTime;
         // Create date objs for start and end of day
