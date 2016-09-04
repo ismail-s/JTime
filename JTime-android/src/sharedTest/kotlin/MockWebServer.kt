@@ -34,7 +34,7 @@ fun createMockWebServerAndConnectToRestClient(): MockWebServer {
                   "humanReadableAddress": "some made-up address..."}]"""
                 return MockResponse().setBody(mockJsonResponse)
             }
-            if (recordedRequest.path.startsWith("/SalaahTimes/times-for-masjids-for-today", true)) {
+            if (recordedRequest.path.startsWith("/SalaahTimes/times-for-multiple-masjids", true)) {
                 val mockJsonResponse: String
                 if (recordedRequest.path.contains("salaahType=f")) {
                     mockJsonResponse = """{"res": [
