@@ -162,7 +162,8 @@ class RestClient {
         return deferred.promise
     }
 
-    fun createMasjid(name: String, latitude: Double, longitude: Double, cb: MasjidCreatedCallback) {
+    fun createMasjid(name: String, latitude: Double, longitude: Double): Promise<Unit, Throwable> {
+        val deferred = deferred<Unit, Throwable>()
         val body = JSONObject()
         val loc = JSONObject()
         loc.put("lat", latitude)
@@ -173,13 +174,14 @@ class RestClient {
         url.httpPost().body(body.toString()).responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
-                    cb.onError(result.getAs<FuelError>()!!)
+                    deferred.reject(result.getAs<FuelError>()!!)
                 }
                 is Result.Success -> {
-                    cb.onSuccess()
+                    deferred.resolve(Unit)
                 }
             }
         }
+        return deferred.promise
     }
 
     fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar, cb: CreateOrUpdateMasjidTimeCallback) {
@@ -311,8 +313,6 @@ class RestClient {
         fun onLoggedIn()
         fun onLoggedOut()
     }
-
-    interface MasjidCreatedCallback : LogoutCallback {}
 
     interface CreateOrUpdateMasjidTimeCallback : LogoutCallback {}
 

@@ -16,6 +16,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.MainActivity
+import nl.komponents.kovenant.ui.failUi
+import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.find
 import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.support.v4.toast
@@ -63,20 +65,15 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
                 return
             }
             //2. submit form
-            val cb = object: RestClient.MasjidCreatedCallback {
-                override fun onSuccess() {
-                    toast("Masjid \"$masjidName\" created")
-                    //3. switch to AllMasjidsFragment
-                    (act as? MainActivity)?.switchToAllMasjidsFragment()
-                }
-
-                override fun onError(t: Throwable) {
-                    toast("Error when trying to create masjid: ${t.toString()}")
-                    submitButton.isEnabled = true
-                }
-            }
             val location = (current_marker as Marker).position
-            RestClient(act).createMasjid(masjidName, location.latitude, location.longitude, cb)
+            RestClient(act).createMasjid(masjidName, location.latitude, location.longitude) successUi {
+                toast("Masjid \"$masjidName\" created")
+                //3. switch to AllMasjidsFragment
+                (act as? MainActivity)?.switchToAllMasjidsFragment()
+            } failUi {
+                toast("Error when trying to create masjid: ${it.toString()}")
+                submitButton.isEnabled = true
+            }
             submitButton.isEnabled = false
         }
     }
