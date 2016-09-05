@@ -184,7 +184,9 @@ class RestClient {
         return deferred.promise
     }
 
-    fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar, cb: CreateOrUpdateMasjidTimeCallback) {
+    fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar)
+            : Promise<Unit, Throwable>{
+        val deferred = deferred<Unit, Throwable>()
         val fuelInstance = FuelManager.instance
         val type = when (salaahType) {
             SalaahType.FAJR -> "f"
@@ -200,15 +202,16 @@ class RestClient {
                 .responseJson { request, response, result ->
                     when (result) {
                         is Result.Failure -> {
-                            cb.onError(result.getAs<FuelError>()!!)
+                            deferred.reject(result.getAs<FuelError>()!!)
                             fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                         }
                         is Result.Success -> {
-                            cb.onSuccess()
+                            deferred.resolve(Unit)
                             fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                         }
                     }
                 }
+        return deferred.promise
     }
 
     fun login(code: String, email: String, cb: LoginCallback) {
@@ -313,8 +316,6 @@ class RestClient {
         fun onLoggedIn()
         fun onLoggedOut()
     }
-
-    interface CreateOrUpdateMasjidTimeCallback : LogoutCallback {}
 
     companion object {
         // By having url in the companion object, we can change the url from tests

@@ -269,17 +269,12 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         val newDate = date.clone() as GregorianCalendar
         newDate.set(Calendar.HOUR_OF_DAY, time.hour)
         newDate.set(Calendar.MINUTE, time.minute)
-        val cb1 = object : RestClient.CreateOrUpdateMasjidTimeCallback {
-            override fun onSuccess() {
-                toast("DB updated with ${time.hour}:${time.minute}")
-
-            }
-            override fun onError(t: Throwable) {
-                toast(getString(R.string.salaah_time_update_failure_toast, t.message))
-            }
-        }
         if (formatCalendarAsTime(newDate) != currentSavedTime) {
-            RestClient(act).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate, cb1)
+            RestClient(act).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate) successUi {
+                toast("DB updated with ${time.hour}:${time.minute}")
+            } failUi {
+                toast(getString(R.string.salaah_time_update_failure_toast, it.message))
+            }
         }
         when (currentSalaahType) {
             SalaahType.FAJR -> {
