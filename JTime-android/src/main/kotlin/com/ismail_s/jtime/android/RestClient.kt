@@ -92,15 +92,17 @@ class RestClient {
         return deferred.promise
     }
 
-    fun getMasjidTimes(masjidId: Int, cb: MasjidTimesCallback, date: GregorianCalendar) {
+    fun getMasjidTimes(masjidId: Int, date: GregorianCalendar): Promise<MasjidPojo, Throwable> {
+        val deferred = deferred<MasjidPojo, Throwable>()
         if (!internetIsAvailable()) {
-            cb.onError(noNetworkException)
+            deferred.reject(noNetworkException)
+            return deferred.promise
         }
         "${Companion.url}/Masjids/$masjidId/times"
                 .httpGet(listOf("date" to dateFormatter.format(date.time)))
                 .responseJson { request, response, result ->
                     when (result) {
-                        is Result.Failure -> cb.onError(result.getAs<FuelError>()!!)
+                        is Result.Failure -> deferred.reject(result.getAs<FuelError>()!!)
                         is Result.Success -> {
                             val times = result.get().obj().getJSONArray("times")
                             val res = MasjidPojo()
@@ -117,10 +119,11 @@ class RestClient {
                                     "e" -> res.eshaTime = datetime
                                 }
                             }
-                            cb.onSuccess(res)
+                            deferred.resolve(res)
                         }
                     }
                 }
+        return deferred.promise
     }
 
     fun getTimesForNearbyMasjids(latitude: Double, longitude: Double, salaahType: SalaahType? = null)
@@ -294,10 +297,6 @@ class RestClient {
 
     interface Callback {
         fun onError(t: Throwable)
-    }
-
-    interface MasjidTimesCallback : Callback {
-        fun onSuccess(times: MasjidPojo)
     }
 
     interface LoginCallback : Callback {

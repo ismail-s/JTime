@@ -13,6 +13,8 @@ import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
 import com.ismail_s.jtime.android.pojo.MasjidPojo
 import com.ismail_s.jtime.android.pojo.SalaahType
+import nl.komponents.kovenant.ui.failUi
+import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.find
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.support.v4.act
@@ -66,21 +68,17 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         buttons = buttonIds.map {rootView.findViewById(it) as Button }
         setButtonOnClickListeners(rootView, buttons)
         //Get times for date
-        val cb = object : RestClient.MasjidTimesCallback {
-            override fun onSuccess(times: MasjidPojo) {
-                currentMasjidPojo = times
-                setLabels(date, currentSalaahType)
-                handleUndoButtonClick()
-            }
+        RestClient(act).getMasjidTimes(masjidId, date) successUi {
+            currentMasjidPojo = it
+            setLabels(date, currentSalaahType)
+            handleUndoButtonClick()
 
-            override fun onError(t: Throwable) {
-                longToast(getString(R.string.get_masjid_times_failure_toast, t.message))
-                // As we can't get the times (so can't edit them), we switch
-                // back to viewing the times
-                (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
-            }
+        } failUi {
+            longToast(getString(R.string.get_masjid_times_failure_toast, it.message))
+            // As we can't get the times (so can't edit them), we switch
+            // back to viewing the times
+            (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
         }
-        RestClient(act).getMasjidTimes(masjidId, cb, date)
         showKeyboard()
         return rootView
     }
@@ -165,26 +163,21 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             //Switch to next day
             val nextDate = date.clone() as GregorianCalendar
             nextDate.add(Calendar.DAY_OF_MONTH, dayOffset)
-            val cb2 = object : RestClient.MasjidTimesCallback {
-                override fun onSuccess(times: MasjidPojo) {
-                    currentMasjidPojo = times
-                    date = nextDate
-                    //enable all buttons
-                    buttons.map { it.isEnabled = true }
-                    then(newDate)
-                }
-
-                override fun onError(t: Throwable) {
-                    val s = getString(R.string.get_masjid_times_failure_toast, t.message)
-                    toast(s)
-                    //TODO-should this (next) line be here
-                    (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
-                }
-            }
             //disable all buttons here whilst we get the masjid times for the
             // new day
             buttons.map { it.isEnabled = false }
-            RestClient(act).getMasjidTimes(masjidId, cb2, nextDate)
+            RestClient(act).getMasjidTimes(masjidId, nextDate) successUi {
+                currentMasjidPojo = it
+                date = nextDate
+                //enable all buttons
+                buttons.map { it.isEnabled = true }
+                then(newDate)
+            } failUi {
+                val s = getString(R.string.get_masjid_times_failure_toast, it.message)
+                toast(s)
+                //TODO-should this (next) line be here
+                (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
+            }
             setLabels(nextDate, currentSalaahType)
         }
     }
