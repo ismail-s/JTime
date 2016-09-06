@@ -126,28 +126,27 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         setUpNavDrawer(savedInstanceState)
         setUpRightDrawer(savedInstanceState)
 
-        val cb = object: RestClient.SignedinCallback {
-            override fun onLoggedOut() {
-                loginStatus = 2
-                //Set button to be login, create drawer
-                drawer?.addItemAtPosition(loginDrawerItem, 0)
-            }
-
-            override fun onLoggedIn() {
-                loginStatus = 1
-                //Set button to be logout, create drawer
-                drawer?.addItemAtPosition(logoutDrawerItem, 0)
-                val email: String = SharedPreferencesWrapper(this@MainActivity).email
-                header.addProfile(ProfileDrawerItem().withEmail(email), 0)
-                //add addMasjidDrawerItem
-                drawer?.addItem(addMasjidDrawerItem)
-            }
+        val onLoggedOut = {
+            loginStatus = 2
+            //Set button to be login, create drawer
+            drawer?.addItemAtPosition(loginDrawerItem, 0)
+        }
+        val onLoggedIn = {
+            loginStatus = 1
+            //Set button to be logout, create drawer
+            drawer?.addItemAtPosition(logoutDrawerItem, 0)
+            val email: String = SharedPreferencesWrapper(this@MainActivity).email
+            header.addProfile(ProfileDrawerItem().withEmail(email), 0)
+            //add addMasjidDrawerItem
+            drawer?.addItem(addMasjidDrawerItem)
         }
         val loggedInStatus = savedInstanceState?.getInt(LOGIN_STATUS, 0) ?: 0
         when (loggedInStatus) {
-            1 -> cb.onLoggedIn()
-            2 -> cb.onLoggedOut()
-            else -> RestClient(this).checkIfStillSignedInOnServer(cb)
+            1 -> onLoggedIn()
+            2 -> onLoggedOut()
+            else -> RestClient(this).areWeStillSignedInOnServer()
+                .successUi {onLoggedIn()}
+                .failUi {onLoggedOut()}
         }
 
         // Check that the activity is using the layout version with

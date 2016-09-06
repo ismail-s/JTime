@@ -274,41 +274,38 @@ class RestClient {
      * to see if the login is still valid (ie the session hasn't expired).
      * If the session has expired, clear the persisted login.
      *
-     * cb.onLoggedIn is called if we are logged in atm, else cb.OnLoggedOut
-     * is called (including if there is no persisted login).
+     * We resolve the promise if we are logged in atm, else we reject the
+     * promise (including if there is no persisted login).
      */
-    fun checkIfStillSignedInOnServer(cb: SignedinCallback) {
+    fun areWeStillSignedInOnServer(): Promise<Unit, Unit> {
+        val deferred = deferred<Unit, Unit>()
         if (!sharedPrefs.persistedLoginExists()) {
-            cb.onLoggedOut()
-            return
+            deferred.reject(Unit)
+            return deferred.promise
         }
         val url = Companion.url + "/user_tables/${sharedPrefs.userId}"
         url.httpGet().responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
                     clearSavedUser()
-                    cb.onLoggedOut()
+                    deferred.reject(Unit)
                 }
                 is Result.Success -> {
                     if (response.httpStatusCode == 200) {
-                        cb.onLoggedIn()
+                        deferred.resolve(Unit)
                     } else {
                         clearSavedUser()
-                        cb.onLoggedOut()
+                        deferred.reject(Unit)
                     }
                 }
             }
         }
+        return deferred.promise
     }
 
     private fun clearSavedUser() {
         FuelManager.instance.baseHeaders = emptyMap()
         sharedPrefs.clearSavedUser()
-    }
-
-    interface SignedinCallback {
-        fun onLoggedIn()
-        fun onLoggedOut()
     }
 
     companion object {
