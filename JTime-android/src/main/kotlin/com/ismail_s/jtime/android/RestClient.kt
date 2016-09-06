@@ -4,7 +4,6 @@ import android.content.Context
 import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
@@ -18,6 +17,8 @@ import com.ismail_s.jtime.android.pojo.SalaahType
 import com.ismail_s.jtime.android.pojo.charToSalaahType
 import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.deferred
+import nl.komponents.kovenant.reject
+import nl.komponents.kovenant.resolve
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -52,22 +53,18 @@ class RestClient {
     fun internetIsAvailable(): Boolean {
         val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo
-        if (networkInfo != null && networkInfo.isConnected) {
-            return true
-        } else {
-            return false
-        }
+        return if (networkInfo != null && networkInfo.isConnected) true else false
     }
 
     fun getMasjids(): Promise<List<MasjidPojo>, Throwable> {
         val deferred = deferred<List<MasjidPojo>, Throwable>()
         if (!internetIsAvailable()) {
-            deferred.reject(noNetworkException)
+            deferred reject noNetworkException
             return deferred.promise
         }
         "${Companion.url}/Masjids".httpGet().responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> deferred.reject(result.getAs<FuelError>()!!)
+                is Result.Failure -> deferred reject result.getAs<FuelError>()!!
                 is Result.Success -> {
                     val data = result.get().array()
                     val res = mutableListOf<MasjidPojo>()
@@ -85,7 +82,7 @@ class RestClient {
                         val longitude = location["lng"].toString().toDouble()
                         res.add(MasjidPojo(name, id, address, latitude, longitude))
                     }
-                    deferred.resolve(res)
+                    deferred resolve res
                 }
             }
         }
@@ -95,14 +92,14 @@ class RestClient {
     fun getMasjidTimes(masjidId: Int, date: GregorianCalendar): Promise<MasjidPojo, Throwable> {
         val deferred = deferred<MasjidPojo, Throwable>()
         if (!internetIsAvailable()) {
-            deferred.reject(noNetworkException)
+            deferred reject noNetworkException
             return deferred.promise
         }
         "${Companion.url}/Masjids/$masjidId/times"
                 .httpGet(listOf("date" to dateFormatter.format(date.time)))
                 .responseJson { request, response, result ->
                     when (result) {
-                        is Result.Failure -> deferred.reject(result.getAs<FuelError>()!!)
+                        is Result.Failure -> deferred reject result.getAs<FuelError>()!!
                         is Result.Success -> {
                             val times = result.get().obj().getJSONArray("times")
                             val res = MasjidPojo()
@@ -119,7 +116,7 @@ class RestClient {
                                     "e" -> res.eshaTime = datetime
                                 }
                             }
-                            deferred.resolve(res)
+                            deferred resolve res
                         }
                     }
                 }
@@ -138,7 +135,7 @@ class RestClient {
                 .httpGet(params)
                 .responseJson { request, response, result ->
                     when (result) {
-                        is Result.Failure -> {deferred.reject(result.error)}
+                        is Result.Failure -> { deferred reject result.error }
                         is Result.Success -> {
                             val times = result.value.obj().getJSONArray("res")
                             val res = mutableListOf<SalaahTimePojo>()
@@ -155,7 +152,7 @@ class RestClient {
                                 datetime.time = dateFormatter.parse(datetimeStr)
                                 res += SalaahTimePojo(masjidId, masjidName, masjidLoc, type, datetime)
                             }
-                            deferred.resolve(res)
+                            deferred resolve res
                         }
                     }
                 }
@@ -173,12 +170,8 @@ class RestClient {
         val url = Companion.url + "/Masjids"
         url.httpPost().body(body.toString()).responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> {
-                    deferred.reject(result.getAs<FuelError>()!!)
-                }
-                is Result.Success -> {
-                    deferred.resolve(Unit)
-                }
+                is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
+                is Result.Success -> { deferred.resolve() }
             }
         }
         return deferred.promise
@@ -202,11 +195,11 @@ class RestClient {
                 .responseJson { request, response, result ->
                     when (result) {
                         is Result.Failure -> {
-                            deferred.reject(result.getAs<FuelError>()!!)
+                            deferred reject result.getAs<FuelError>()!!
                             fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                         }
                         is Result.Success -> {
-                            deferred.resolve(Unit)
+                            deferred.resolve()
                             fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                         }
                     }
@@ -217,16 +210,14 @@ class RestClient {
     fun login(code: String, email: String): Promise<Pair<Int, String>, Throwable> {
         val deferred = deferred<Pair<Int, String>, Throwable>()
         if (!internetIsAvailable()) {
-            deferred.reject(noNetworkException)
+            deferred reject noNetworkException
             return deferred.promise
         }
         val url = Companion.url + "/user_tables/googleid"
 
         url.httpGet(listOf("id_token" to code)).responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> {
-                    deferred.reject(result.getAs<FuelError>()!!)
-                }
+                is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
                 is Result.Success -> {
                     val data = result.get().obj()
                     val accessToken = data.getString("access_token")
@@ -236,7 +227,7 @@ class RestClient {
                     sharedPrefs.userId = id
                     sharedPrefs.email = email
 
-                    deferred.resolve(Pair(id, accessToken))
+                    deferred resolve Pair(id, accessToken)
                 }
             }
         }
@@ -246,22 +237,20 @@ class RestClient {
     fun logout(): Promise<Unit, Throwable> {
         val deferred = deferred<Unit, Throwable>()
         if (!internetIsAvailable()) {
-            deferred.reject(noNetworkException)
+            deferred reject noNetworkException
             return deferred.promise
         }
         val url = Companion.url + "/user_tables/logout"
         url.httpPost().responseString { request, response, result ->
             when (result) {
-                is Result.Failure -> {
-                    deferred.reject(result.getAs<FuelError>()!!)
-                }
+                is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
                 is Result.Success -> {
                     if (response.httpStatusCode == 204) {
                         // Clear persisted login tokens
                         clearSavedUser()
-                        deferred.resolve(Unit)
+                        deferred.resolve()
                     } else {
-                        deferred.reject(result.getAs<FuelError>()!!)
+                        deferred reject result.getAs<FuelError>()!!
                     }
                 }
             }
@@ -280,7 +269,7 @@ class RestClient {
     fun areWeStillSignedInOnServer(): Promise<Unit, Unit> {
         val deferred = deferred<Unit, Unit>()
         if (!sharedPrefs.persistedLoginExists()) {
-            deferred.reject(Unit)
+            deferred.reject()
             return deferred.promise
         }
         val url = Companion.url + "/user_tables/${sharedPrefs.userId}"
@@ -288,14 +277,14 @@ class RestClient {
             when (result) {
                 is Result.Failure -> {
                     clearSavedUser()
-                    deferred.reject(Unit)
+                    deferred.reject()
                 }
                 is Result.Success -> {
                     if (response.httpStatusCode == 200) {
-                        deferred.resolve(Unit)
+                        deferred.resolve()
                     } else {
                         clearSavedUser()
-                        deferred.reject(Unit)
+                        deferred.reject()
                     }
                 }
             }

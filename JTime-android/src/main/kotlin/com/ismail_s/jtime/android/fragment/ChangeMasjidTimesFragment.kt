@@ -302,7 +302,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
      */
     private fun getTextboxTimeIfValid(): Time? {
         val timeString = masjidTimeTextbox.text
-        if (!(timeString.length in 4..5)) {
+        if (timeString.length !in 4..5) {
             return null
         }
         val match = timeRegex.matchEntire(timeString)
@@ -312,7 +312,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             val (h, m) = match.destructured
             val hour = h.toInt()
             val minute = m.toInt()
-            if (!(hour in 0..23 && minute in 0..59)) {
+            if (hour !in 0..23 || minute !in 0..59) {
                 return null
             } else {
                 return Time(hour, minute)

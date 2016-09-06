@@ -107,9 +107,9 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
        }
        val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
        if (loc == null) {
-           locationDeferred.reject(Exception(getString(R.string.no_location_exception)))
+           locationDeferred reject Exception(getString(R.string.no_location_exception))
        } else {
-           locationDeferred.resolve(loc)
+           locationDeferred resolve loc
        }
     }
 

@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import com.ismail_s.jtime.android.*
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
-import com.ismail_s.jtime.android.pojo.MasjidPojo
+import com.ismail_s.jtime.android.Constants
+import com.ismail_s.jtime.android.R
+import com.ismail_s.jtime.android.RestClient
+import com.ismail_s.jtime.android.SharedPreferencesWrapper
 import nl.komponents.kovenant.ui.failUi
 import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.find
@@ -33,7 +35,7 @@ class MasjidFragment : BaseFragment() {
         // TODO-instead of 1, what should the default value be here?
         val masjidId = arguments.getInt(Constants.MASJID_ID)
         editButton = rootView.find<Button>(R.id.edit_button)
-        editButton.setOnClickListener {view ->
+        editButton.setOnClickListener {
             val masjidName = arguments.getString(Constants.MASJID_NAME)
             if (activity != null)
                 mainAct.switchToChangeMasjidTimesFragment(masjidId, masjidName, date)
