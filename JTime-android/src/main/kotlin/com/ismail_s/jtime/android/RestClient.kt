@@ -214,16 +214,18 @@ class RestClient {
         return deferred.promise
     }
 
-    fun login(code: String, email: String, cb: LoginCallback) {
+    fun login(code: String, email: String): Promise<Pair<Int, String>, Throwable> {
+        val deferred = deferred<Pair<Int, String>, Throwable>()
         if (!internetIsAvailable()) {
-            cb.onError(noNetworkException)
+            deferred.reject(noNetworkException)
+            return deferred.promise
         }
         val url = Companion.url + "/user_tables/googleid"
 
-        Fuel.get(url, listOf("id_token" to code)).responseJson { request, response, result ->
+        url.httpGet(listOf("id_token" to code)).responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
-                    cb.onError(result.getAs<FuelError>()!!)
+                    deferred.reject(result.getAs<FuelError>()!!)
                 }
                 is Result.Success -> {
                     val data = result.get().obj()
@@ -234,10 +236,11 @@ class RestClient {
                     sharedPrefs.userId = id
                     sharedPrefs.email = email
 
-                    cb.onSuccess(id, accessToken)
+                    deferred.resolve(Pair(id, accessToken))
                 }
             }
         }
+        return deferred.promise
     }
 
     fun logout(cb: LogoutCallback) {
@@ -302,10 +305,6 @@ class RestClient {
 
     interface Callback {
         fun onError(t: Throwable)
-    }
-
-    interface LoginCallback : Callback {
-        fun onSuccess(id: Int, accessToken: String)
     }
 
     interface LogoutCallback : Callback {

@@ -27,6 +27,8 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
 import nl.komponents.kovenant.deferred
+import nl.komponents.kovenant.ui.failUi
+import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.*
 import java.util.*
 
@@ -287,23 +289,18 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
             if (result.isSuccess) {
                 loginStatus = 1
                 val acct = result.signInAccount as GoogleSignInAccount
-                val cb = object: RestClient.LoginCallback {
-                    override fun onSuccess(id: Int, accessToken: String) {
-                        header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
-                        //Remove login button, add logout button to nav drawer
-                        drawer?.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
-                        drawer?.addItemAtPosition(logoutDrawerItem, 0)
-                        //add addMasjidDrawerItem
-                        drawer?.addItem(addMasjidDrawerItem)
-                        toast(getString(R.string.login_success_toast))
-                        currentFragment?.onLogin()
-                    }
-
-                    override fun onError(t: Throwable) {
-                        toast(getString(R.string.login_failure_toast, t.message))
-                    }
+                RestClient(this).login(acct.idToken!!, acct.email!!) successUi {
+                    header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
+                    //Remove login button, add logout button to nav drawer
+                    drawer?.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
+                    drawer?.addItemAtPosition(logoutDrawerItem, 0)
+                    //add addMasjidDrawerItem
+                    drawer?.addItem(addMasjidDrawerItem)
+                    toast(getString(R.string.login_success_toast))
+                    currentFragment?.onLogin()
+                } failUi {
+                    toast(getString(R.string.login_failure_toast, it.message))
                 }
-                RestClient(this).login(acct.idToken!!, acct.email!!, cb)
             }
         }
     }
