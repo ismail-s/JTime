@@ -243,27 +243,30 @@ class RestClient {
         return deferred.promise
     }
 
-    fun logout(cb: LogoutCallback) {
+    fun logout(): Promise<Unit, Throwable> {
+        val deferred = deferred<Unit, Throwable>()
         if (!internetIsAvailable()) {
-            cb.onError(noNetworkException)
+            deferred.reject(noNetworkException)
+            return deferred.promise
         }
         val url = Companion.url + "/user_tables/logout"
         url.httpPost().responseString { request, response, result ->
             when (result) {
                 is Result.Failure -> {
-                    cb.onError(result.getAs<FuelError>()!!)
+                    deferred.reject(result.getAs<FuelError>()!!)
                 }
                 is Result.Success -> {
                     if (response.httpStatusCode == 204) {
                         // Clear persisted login tokens
                         clearSavedUser()
-                        cb.onSuccess()
+                        deferred.resolve(Unit)
                     } else {
-                        cb.onError(result.getAs<FuelError>()!!)
+                        deferred.reject(result.getAs<FuelError>()!!)
                     }
                 }
             }
         }
+        return deferred.promise
     }
 
     /**
@@ -301,14 +304,6 @@ class RestClient {
     private fun clearSavedUser() {
         FuelManager.instance.baseHeaders = emptyMap()
         sharedPrefs.clearSavedUser()
-    }
-
-    interface Callback {
-        fun onError(t: Throwable)
-    }
-
-    interface LogoutCallback : Callback {
-        fun onSuccess()
     }
 
     interface SignedinCallback {

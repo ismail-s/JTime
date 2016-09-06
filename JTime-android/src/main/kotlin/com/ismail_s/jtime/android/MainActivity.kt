@@ -59,22 +59,19 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                 .withName(getString(R.string.drawer_item_logout))
                 .withIdentifier(LOGOUT_DRAWER_ITEM_IDENTIFIER)
                 .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                    val cb = object : RestClient.LogoutCallback {
-                        override fun onSuccess() {
-                            loginStatus = 2
-                            toast(getString(R.string.logout_success_toast))
-                            //Remove logout button, add login button to nav drawer
-                            header.removeProfile(0)
-                            drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
-                            drawer?.addItemAtPosition(loginDrawerItem, 0)
-                            //remove addMasjidDrawerItem
-                            drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
-                            currentFragment?.onLogout()
-                        }
-
-                        override fun onError(t: Throwable) = toast(getString(R.string.logout_failure_toast, t.message))
+                    RestClient(this).logout() successUi {
+                        loginStatus = 2
+                        toast(getString(R.string.logout_success_toast))
+                        //Remove logout button, add login button to nav drawer
+                        header.removeProfile(0)
+                        drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
+                        drawer?.addItemAtPosition(loginDrawerItem, 0)
+                        //remove addMasjidDrawerItem
+                        drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                        currentFragment?.onLogout()
+                    } failUi {
+                        toast(getString(R.string.logout_failure_toast, it.message))
                     }
-                    RestClient(this).logout(cb)
                     true
                 }
 
