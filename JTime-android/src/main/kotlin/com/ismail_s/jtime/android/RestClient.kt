@@ -4,7 +4,6 @@ import android.content.Context
 import android.location.Location
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
@@ -18,6 +17,8 @@ import com.ismail_s.jtime.android.pojo.SalaahType
 import com.ismail_s.jtime.android.pojo.charToSalaahType
 import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.deferred
+import nl.komponents.kovenant.reject
+import nl.komponents.kovenant.resolve
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -52,22 +53,18 @@ class RestClient {
     fun internetIsAvailable(): Boolean {
         val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo
-        if (networkInfo != null && networkInfo.isConnected) {
-            return true
-        } else {
-            return false
-        }
+        return if (networkInfo != null && networkInfo.isConnected) true else false
     }
 
     fun getMasjids(): Promise<List<MasjidPojo>, Throwable> {
         val deferred = deferred<List<MasjidPojo>, Throwable>()
         if (!internetIsAvailable()) {
-            deferred.reject(noNetworkException)
+            deferred reject noNetworkException
             return deferred.promise
         }
         "${Companion.url}/Masjids".httpGet().responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> deferred.reject(result.getAs<FuelError>()!!)
+                is Result.Failure -> deferred reject result.getAs<FuelError>()!!
                 is Result.Success -> {
                     val data = result.get().array()
                     val res = mutableListOf<MasjidPojo>()
@@ -85,22 +82,24 @@ class RestClient {
                         val longitude = location["lng"].toString().toDouble()
                         res.add(MasjidPojo(name, id, address, latitude, longitude))
                     }
-                    deferred.resolve(res)
+                    deferred resolve res
                 }
             }
         }
         return deferred.promise
     }
 
-    fun getMasjidTimes(masjidId: Int, cb: MasjidTimesCallback, date: GregorianCalendar) {
+    fun getMasjidTimes(masjidId: Int, date: GregorianCalendar): Promise<MasjidPojo, Throwable> {
+        val deferred = deferred<MasjidPojo, Throwable>()
         if (!internetIsAvailable()) {
-            cb.onError(noNetworkException)
+            deferred reject noNetworkException
+            return deferred.promise
         }
         "${Companion.url}/Masjids/$masjidId/times"
                 .httpGet(listOf("date" to dateFormatter.format(date.time)))
                 .responseJson { request, response, result ->
                     when (result) {
-                        is Result.Failure -> cb.onError(result.getAs<FuelError>()!!)
+                        is Result.Failure -> deferred reject result.getAs<FuelError>()!!
                         is Result.Success -> {
                             val times = result.get().obj().getJSONArray("times")
                             val res = MasjidPojo()
@@ -117,10 +116,11 @@ class RestClient {
                                     "e" -> res.eshaTime = datetime
                                 }
                             }
-                            cb.onSuccess(res)
+                            deferred resolve res
                         }
                     }
                 }
+        return deferred.promise
     }
 
     fun getTimesForNearbyMasjids(latitude: Double, longitude: Double, salaahType: SalaahType? = null)
@@ -135,7 +135,7 @@ class RestClient {
                 .httpGet(params)
                 .responseJson { request, response, result ->
                     when (result) {
-                        is Result.Failure -> {deferred.reject(result.error)}
+                        is Result.Failure -> { deferred reject result.error }
                         is Result.Success -> {
                             val times = result.value.obj().getJSONArray("res")
                             val res = mutableListOf<SalaahTimePojo>()
@@ -152,14 +152,15 @@ class RestClient {
                                 datetime.time = dateFormatter.parse(datetimeStr)
                                 res += SalaahTimePojo(masjidId, masjidName, masjidLoc, type, datetime)
                             }
-                            deferred.resolve(res)
+                            deferred resolve res
                         }
                     }
                 }
         return deferred.promise
     }
 
-    fun createMasjid(name: String, latitude: Double, longitude: Double, cb: MasjidCreatedCallback) {
+    fun createMasjid(name: String, latitude: Double, longitude: Double): Promise<Unit, Throwable> {
+        val deferred = deferred<Unit, Throwable>()
         val body = JSONObject()
         val loc = JSONObject()
         loc.put("lat", latitude)
@@ -169,17 +170,16 @@ class RestClient {
         val url = Companion.url + "/Masjids"
         url.httpPost().body(body.toString()).responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> {
-                    cb.onError(result.getAs<FuelError>()!!)
-                }
-                is Result.Success -> {
-                    cb.onSuccess()
-                }
+                is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
+                is Result.Success -> { deferred.resolve() }
             }
         }
+        return deferred.promise
     }
 
-    fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar, cb: CreateOrUpdateMasjidTimeCallback) {
+    fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar)
+            : Promise<Unit, Throwable>{
+        val deferred = deferred<Unit, Throwable>()
         val fuelInstance = FuelManager.instance
         val type = when (salaahType) {
             SalaahType.FAJR -> "f"
@@ -195,28 +195,29 @@ class RestClient {
                 .responseJson { request, response, result ->
                     when (result) {
                         is Result.Failure -> {
-                            cb.onError(result.getAs<FuelError>()!!)
+                            deferred reject result.getAs<FuelError>()!!
                             fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                         }
                         is Result.Success -> {
-                            cb.onSuccess()
+                            deferred.resolve()
                             fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                         }
                     }
                 }
+        return deferred.promise
     }
 
-    fun login(code: String, email: String, cb: LoginCallback) {
+    fun login(code: String, email: String): Promise<Pair<Int, String>, Throwable> {
+        val deferred = deferred<Pair<Int, String>, Throwable>()
         if (!internetIsAvailable()) {
-            cb.onError(noNetworkException)
+            deferred reject noNetworkException
+            return deferred.promise
         }
         val url = Companion.url + "/user_tables/googleid"
 
-        Fuel.get(url, listOf("id_token" to code)).responseJson { request, response, result ->
+        url.httpGet(listOf("id_token" to code)).responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> {
-                    cb.onError(result.getAs<FuelError>()!!)
-                }
+                is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
                 is Result.Success -> {
                     val data = result.get().obj()
                     val accessToken = data.getString("access_token")
@@ -226,33 +227,35 @@ class RestClient {
                     sharedPrefs.userId = id
                     sharedPrefs.email = email
 
-                    cb.onSuccess(id, accessToken)
+                    deferred resolve Pair(id, accessToken)
                 }
             }
         }
+        return deferred.promise
     }
 
-    fun logout(cb: LogoutCallback) {
+    fun logout(): Promise<Unit, Throwable> {
+        val deferred = deferred<Unit, Throwable>()
         if (!internetIsAvailable()) {
-            cb.onError(noNetworkException)
+            deferred reject noNetworkException
+            return deferred.promise
         }
         val url = Companion.url + "/user_tables/logout"
         url.httpPost().responseString { request, response, result ->
             when (result) {
-                is Result.Failure -> {
-                    cb.onError(result.getAs<FuelError>()!!)
-                }
+                is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
                 is Result.Success -> {
                     if (response.httpStatusCode == 204) {
                         // Clear persisted login tokens
                         clearSavedUser()
-                        cb.onSuccess()
+                        deferred.resolve()
                     } else {
-                        cb.onError(result.getAs<FuelError>()!!)
+                        deferred reject result.getAs<FuelError>()!!
                     }
                 }
             }
         }
+        return deferred.promise
     }
 
     /**
@@ -260,62 +263,39 @@ class RestClient {
      * to see if the login is still valid (ie the session hasn't expired).
      * If the session has expired, clear the persisted login.
      *
-     * cb.onLoggedIn is called if we are logged in atm, else cb.OnLoggedOut
-     * is called (including if there is no persisted login).
+     * We resolve the promise if we are logged in atm, else we reject the
+     * promise (including if there is no persisted login).
      */
-    fun checkIfStillSignedInOnServer(cb: SignedinCallback) {
+    fun areWeStillSignedInOnServer(): Promise<Unit, Unit> {
+        val deferred = deferred<Unit, Unit>()
         if (!sharedPrefs.persistedLoginExists()) {
-            cb.onLoggedOut()
-            return
+            deferred.reject()
+            return deferred.promise
         }
         val url = Companion.url + "/user_tables/${sharedPrefs.userId}"
         url.httpGet().responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
                     clearSavedUser()
-                    cb.onLoggedOut()
+                    deferred.reject()
                 }
                 is Result.Success -> {
                     if (response.httpStatusCode == 200) {
-                        cb.onLoggedIn()
+                        deferred.resolve()
                     } else {
                         clearSavedUser()
-                        cb.onLoggedOut()
+                        deferred.reject()
                     }
                 }
             }
         }
+        return deferred.promise
     }
 
     private fun clearSavedUser() {
         FuelManager.instance.baseHeaders = emptyMap()
         sharedPrefs.clearSavedUser()
     }
-
-    interface Callback {
-        fun onError(t: Throwable)
-    }
-
-    interface MasjidTimesCallback : Callback {
-        fun onSuccess(times: MasjidPojo)
-    }
-
-    interface LoginCallback : Callback {
-        fun onSuccess(id: Int, accessToken: String)
-    }
-
-    interface LogoutCallback : Callback {
-        fun onSuccess()
-    }
-
-    interface SignedinCallback {
-        fun onLoggedIn()
-        fun onLoggedOut()
-    }
-
-    interface MasjidCreatedCallback : LogoutCallback {}
-
-    interface CreateOrUpdateMasjidTimeCallback : LogoutCallback {}
 
     companion object {
         // By having url in the companion object, we can change the url from tests

@@ -43,7 +43,7 @@ class HomeFragment: BaseFragment() {
                 }
                 val now = GregorianCalendar()
                 val keyForTime = { x: SalaahTimePojo -> (3L * 60 * 1000) + x.datetime.timeInMillis - now.timeInMillis }
-                var sortedTimes = it.sortedBy { keyForTime(it) }
+                val sortedTimes = it.sortedBy { keyForTime(it) }
                         .dropWhile { keyForTime(it) < 0 }
                 val closest = if(sortedTimes.isEmpty()) {
                     val x = it.sortedBy { keyForTime(it) }.reversed()

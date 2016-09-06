@@ -49,7 +49,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         mockLocation.latitude = 51.507
         mockLocation.longitude = -0.1275
         val newDeferred = deferred<Location, Exception>()
-        newDeferred.resolve(mockLocation)
+        newDeferred resolve mockLocation
         act.locationDeferred = newDeferred
         act.location = newDeferred.promise
     }

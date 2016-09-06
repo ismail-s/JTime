@@ -27,6 +27,8 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
 import nl.komponents.kovenant.deferred
+import nl.komponents.kovenant.ui.failUi
+import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.*
 import java.util.*
 
@@ -57,22 +59,19 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                 .withName(getString(R.string.drawer_item_logout))
                 .withIdentifier(LOGOUT_DRAWER_ITEM_IDENTIFIER)
                 .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                    val cb = object : RestClient.LogoutCallback {
-                        override fun onSuccess() {
-                            loginStatus = 2
-                            toast(getString(R.string.logout_success_toast))
-                            //Remove logout button, add login button to nav drawer
-                            header.removeProfile(0)
-                            drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
-                            drawer?.addItemAtPosition(loginDrawerItem, 0)
-                            //remove addMasjidDrawerItem
-                            drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
-                            currentFragment?.onLogout()
-                        }
-
-                        override fun onError(t: Throwable) = toast(getString(R.string.logout_failure_toast, t.message))
+                    RestClient(this).logout() successUi {
+                        loginStatus = 2
+                        toast(getString(R.string.logout_success_toast))
+                        //Remove logout button, add login button to nav drawer
+                        header.removeProfile(0)
+                        drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
+                        drawer?.addItemAtPosition(loginDrawerItem, 0)
+                        //remove addMasjidDrawerItem
+                        drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                        currentFragment?.onLogout()
+                    } failUi {
+                        toast(getString(R.string.logout_failure_toast, it.message))
                     }
-                    RestClient(this).logout(cb)
                     true
                 }
 
@@ -108,9 +107,9 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
        }
        val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
        if (loc == null) {
-           locationDeferred.reject(Exception(getString(R.string.no_location_exception)))
+           locationDeferred reject Exception(getString(R.string.no_location_exception))
        } else {
-           locationDeferred.resolve(loc)
+           locationDeferred resolve loc
        }
     }
 
@@ -127,28 +126,27 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         setUpNavDrawer(savedInstanceState)
         setUpRightDrawer(savedInstanceState)
 
-        val cb = object: RestClient.SignedinCallback {
-            override fun onLoggedOut() {
-                loginStatus = 2
-                //Set button to be login, create drawer
-                drawer?.addItemAtPosition(loginDrawerItem, 0)
-            }
-
-            override fun onLoggedIn() {
-                loginStatus = 1
-                //Set button to be logout, create drawer
-                drawer?.addItemAtPosition(logoutDrawerItem, 0)
-                val email: String = SharedPreferencesWrapper(this@MainActivity).email
-                header.addProfile(ProfileDrawerItem().withEmail(email), 0)
-                //add addMasjidDrawerItem
-                drawer?.addItem(addMasjidDrawerItem)
-            }
+        val onLoggedOut = {
+            loginStatus = 2
+            //Set button to be login, create drawer
+            drawer?.addItemAtPosition(loginDrawerItem, 0)
+        }
+        val onLoggedIn = {
+            loginStatus = 1
+            //Set button to be logout, create drawer
+            drawer?.addItemAtPosition(logoutDrawerItem, 0)
+            val email: String = SharedPreferencesWrapper(this@MainActivity).email
+            header.addProfile(ProfileDrawerItem().withEmail(email), 0)
+            //add addMasjidDrawerItem
+            drawer?.addItem(addMasjidDrawerItem)
         }
         val loggedInStatus = savedInstanceState?.getInt(LOGIN_STATUS, 0) ?: 0
         when (loggedInStatus) {
-            1 -> cb.onLoggedIn()
-            2 -> cb.onLoggedOut()
-            else -> RestClient(this).checkIfStillSignedInOnServer(cb)
+            1 -> onLoggedIn()
+            2 -> onLoggedOut()
+            else -> RestClient(this).areWeStillSignedInOnServer()
+                .successUi {onLoggedIn()}
+                .failUi {onLoggedOut()}
         }
 
         // Check that the activity is using the layout version with
@@ -287,23 +285,18 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
             if (result.isSuccess) {
                 loginStatus = 1
                 val acct = result.signInAccount as GoogleSignInAccount
-                val cb = object: RestClient.LoginCallback {
-                    override fun onSuccess(id: Int, accessToken: String) {
-                        header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
-                        //Remove login button, add logout button to nav drawer
-                        drawer?.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
-                        drawer?.addItemAtPosition(logoutDrawerItem, 0)
-                        //add addMasjidDrawerItem
-                        drawer?.addItem(addMasjidDrawerItem)
-                        toast(getString(R.string.login_success_toast))
-                        currentFragment?.onLogin()
-                    }
-
-                    override fun onError(t: Throwable) {
-                        toast(getString(R.string.login_failure_toast, t.message))
-                    }
+                RestClient(this).login(acct.idToken!!, acct.email!!) successUi {
+                    header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
+                    //Remove login button, add logout button to nav drawer
+                    drawer?.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
+                    drawer?.addItemAtPosition(logoutDrawerItem, 0)
+                    //add addMasjidDrawerItem
+                    drawer?.addItem(addMasjidDrawerItem)
+                    toast(getString(R.string.login_success_toast))
+                    currentFragment?.onLogin()
+                } failUi {
+                    toast(getString(R.string.login_failure_toast, it.message))
                 }
-                RestClient(this).login(acct.idToken!!, acct.email!!, cb)
             }
         }
     }

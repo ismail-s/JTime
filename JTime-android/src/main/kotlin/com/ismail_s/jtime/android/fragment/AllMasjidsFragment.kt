@@ -39,8 +39,7 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
     }
 
     override fun onRefresh() {
-        RestClient(act).getMasjids() successUi {
-            val masjids = it
+        RestClient(act).getMasjids() successUi { masjids ->
             if (activity != null) {
                 mainAct.location successUi {
                     hideRefreshIcon()
