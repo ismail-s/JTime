@@ -58,6 +58,8 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
         }
     }
 
+    override fun onLocationChanged(loc: Location) = onRefresh()
+
     private fun sortMasjidsByLocation(masjids: List<MasjidPojo>, userLocation: Location): List<MasjidPojo> {
         return masjids.sortedBy {
             //For some weird reason, distanceBetween doesn't return the distance, but instead
