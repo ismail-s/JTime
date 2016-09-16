@@ -33,7 +33,7 @@ class HomeFragment: BaseFragment() {
         mainAct.location successUi {
             getTimesAndDisplayInUi(it)
         } failUi {
-            label_next_time.text = "We could not get your location. we'll keep trying. TODO-improve this..."
+            label_next_time.text = "Could not get your location. Location is needed to show salaah times for the nearest masjids."
         }
         return rootView
     }
@@ -50,8 +50,10 @@ class HomeFragment: BaseFragment() {
             * 2. Group the remaining times by salaah type and order the groups
             * 3. Show all this info
             * If the list is empty, say so and exit*/
+            //Make sure the table of salaah times is empty
+            salaah_times_summary_table.removeAllViews()
             if (it.isEmpty()) {
-                longToast(getString(R.string.no_salaah_times_nearby_masjids_toast))
+                label_next_time.text = getString(R.string.no_salaah_times_nearby_masjids_toast)
                 return@s
             }
             val now = GregorianCalendar()
