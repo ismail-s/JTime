@@ -139,6 +139,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                         LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
                             //Show dialog prompting user to change location settings
                             it.status.startResolutionForResult(this, RC_CHECK_SETTINGS)
+                            longToast("Please change your location settings in order to see nearby salaah times.")
                         }
                         LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
                             //Show a toast saying we can't get the location at all
@@ -355,10 +356,12 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                 when (resultCode) {
                     RESULT_OK -> {
                         //Location settings were successfully changed
+                        toast("Location settings changed. Trying to get your location.")
                         startLocationUpdates()
                     }
                     RESULT_CANCELED -> {
                         //Location settings were not changed
+                        toast("Location settings weren't changed. Some features in the app won't work fully.")
                     }
                 }
             }
