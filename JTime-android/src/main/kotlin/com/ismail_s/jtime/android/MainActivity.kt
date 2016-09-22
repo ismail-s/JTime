@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var rightDrawer: Drawer
-    lateinit var googleApiClient: GoogleApiClient
     lateinit var toolbar: Toolbar
     var locationDeferred = deferred<Location, Exception>()
     var location = locationDeferred.promise
@@ -204,6 +203,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     private fun setUpGoogleApiClient() {
+        if (googleApiClient != null)
+            return
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken("654477471044-i8156m316nreihgdqoicsh0gktgqjaua.apps.googleusercontent.com")
@@ -298,28 +299,30 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     override fun onStart() {
-        googleApiClient.connect()
+        googleApiClient?.connect()
         super.onStart()
     }
 
     override fun onStop() {
-        googleApiClient.disconnect()
+        googleApiClient?.disconnect()
         super.onStop()
     }
 
     override fun onPause() {
         super.onPause()
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationListener)
+        if (googleApiClient?.isConnected == true)
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationListener)
     }
 
     override fun onResume() {
         super.onResume()
-        if (googleApiClient.isConnected)
+        if (googleApiClient?.isConnected == true)
             startLocationUpdates()
     }
 
     override fun onDestroy() {
         stopKovenant()
+        googleApiClient = null
         super.onDestroy()
     }
 
@@ -406,5 +409,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     companion object {
         private val RC_SIGN_IN = 9001
         private val RC_CHECK_SETTINGS = 9002
+        var googleApiClient: GoogleApiClient? = null
     }
 }
