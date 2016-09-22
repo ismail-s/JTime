@@ -58,7 +58,10 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
         }
     }
 
-    override fun onLocationChanged(loc: Location) = onRefresh()
+    override fun onLocationChanged(loc: Location) {
+        layout.isRefreshing = true
+        onRefresh()
+    }
 
     private fun sortMasjidsByLocation(masjids: List<MasjidPojo>, userLocation: Location): List<MasjidPojo> {
         return masjids.sortedBy {
