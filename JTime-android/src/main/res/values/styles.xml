@@ -3,5 +3,9 @@
 
     <!-- Base Application theme -->
     <style name="AppTheme" parent="@style/MaterialDrawerTheme">
+        <!-- TODO-figure out a simple way of only having the below line
+             present when running unittests, as without it, the unittests
+             fail.-->
+        <item name="selectableItemBackground">@color/colorPrimaryLight</item>
     </style>
 </resources>
