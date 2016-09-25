@@ -65,10 +65,18 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     private val LOGIN_STATUS = "login_status"
 
     private val locationListener = LocationListener {
-        locationDeferred = deferred<Location, Exception>()
-        location = locationDeferred.promise
-        locationDeferred resolve it
-        currentFragment?.onLocationChanged(it)
+        /*Location should be updated unless the new location is less than
+          50 metres from the last location we had. 50 is an arbitrarily
+          chosen small-but-not-too-small number.*/
+        val weShouldUpdateTheLocation = if (location.isSuccess())
+                location.get().distanceTo(it) >= 50
+            else true
+        if (weShouldUpdateTheLocation) {
+            locationDeferred = deferred<Location, Exception>()
+            location = locationDeferred.promise
+            locationDeferred resolve it
+            currentFragment?.onLocationChanged(it)
+        }
     }
 
     private val logoutDrawerItem: PrimaryDrawerItem
