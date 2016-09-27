@@ -16,9 +16,7 @@ import android.widget.TableLayout
 import android.widget.TableRow
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
 import nl.komponents.kovenant.deferred
-import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.containsString
-import org.hamcrest.CoreMatchers.not
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
@@ -34,6 +32,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     @Before
     @Throws(Exception::class)
     public override fun setUp() {
+        MainActivity.Companion.googleApiClient = MockGoogleApiClient()
         super.setUp()
         createMockWebServerAndConnectToRestClient()
         injectInstrumentation(InstrumentationRegistry.getInstrumentation())

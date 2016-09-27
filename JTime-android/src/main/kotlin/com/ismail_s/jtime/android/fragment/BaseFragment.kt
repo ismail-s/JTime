@@ -1,5 +1,6 @@
 package com.ismail_s.jtime.android.fragment
 
+import android.location.Location
 import android.support.v4.app.Fragment
 import android.view.View
 import com.ismail_s.jtime.android.MainActivity
@@ -21,4 +22,6 @@ open class BaseFragment : Fragment(), AnkoLogger {
     open fun onLogin() {}
 
     open fun onLogout() {}
+
+    open fun onLocationChanged(loc: Location) {}
 }

@@ -13,7 +13,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.LocationListener
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.ismail_s.jtime.android.fragment.*
 import com.ismail_s.jtime.android.pojo.SalaahType
 import com.mikepenz.materialdrawer.AccountHeader
@@ -36,10 +40,16 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var rightDrawer: Drawer
-    lateinit var googleApiClient: GoogleApiClient
     lateinit var toolbar: Toolbar
     var locationDeferred = deferred<Location, Exception>()
     var location = locationDeferred.promise
+    private val locationRequest: LocationRequest by lazy {
+        val locRequest = LocationRequest()
+        locRequest.interval = 20000
+        locRequest.fastestInterval = 10000
+        locRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        locRequest
+    }
     /**
     * Login status is 0 for don't know, 1 for logged in and 2 for logged out
     */
@@ -53,6 +63,21 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
 
     private val TOOLBAR_TITLE = "toolbar_title"
     private val LOGIN_STATUS = "login_status"
+
+    private val locationListener = LocationListener {
+        /*Location should be updated unless the new location is less than
+          50 metres from the last location we had. 50 is an arbitrarily
+          chosen small-but-not-too-small number.*/
+        val weShouldUpdateTheLocation = if (location.isSuccess())
+                location.get().distanceTo(it) >= 50
+            else true
+        if (weShouldUpdateTheLocation) {
+            locationDeferred = deferred<Location, Exception>()
+            location = locationDeferred.promise
+            locationDeferred resolve it
+            currentFragment?.onLocationChanged(it)
+        }
+    }
 
     private val logoutDrawerItem: PrimaryDrawerItem
         get() = PrimaryDrawerItem()
@@ -81,7 +106,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                 .withIdentifier(LOGIN_DRAWER_ITEM_IDENTIFIER)
                 .withOnDrawerItemClickListener { view, i, iDrawerItem ->
                     val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
-                   startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
+                   startActivityForResult(signInIntent, RC_SIGN_IN)
                     true
                 }
 
@@ -102,15 +127,38 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     override fun onConnected(connectionHint: Bundle?) {
-       if (location.isDone()) {
-           return
-       }
-       val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
-       if (loc == null) {
-           locationDeferred reject Exception(getString(R.string.no_location_exception))
-       } else {
-           locationDeferred resolve loc
-       }
+        if (!location.isDone()) {
+            val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
+            if (loc == null) {
+                locationDeferred reject Exception(getString(R.string.no_location_exception))
+            } else {
+                locationDeferred resolve loc
+            }
+        }
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
+                .setResultCallback {
+                    when(it.status.statusCode) {
+                        LocationSettingsStatusCodes.SUCCESS ->{
+                            //We can request the location now
+                            startLocationUpdates()
+                        }
+                        LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+                            //Show dialog prompting user to change location settings
+                            it.status.startResolutionForResult(this, RC_CHECK_SETTINGS)
+                            longToast("Please change your location settings in order to see nearby salaah times.")
+                        }
+                        LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
+                            //Show a toast saying we can't get the location at all
+                            toast(getString(R.string.no_location_exception))
+                        }
+                    }
+                }
+    }
+
+    private fun startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest,
+            locationListener)
     }
 
     override fun onConnectionSuspended(cause: Int) {}
@@ -163,6 +211,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     private fun setUpGoogleApiClient() {
+        if (googleApiClient != null)
+            return
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken("654477471044-i8156m316nreihgdqoicsh0gktgqjaua.apps.googleusercontent.com")
@@ -257,17 +307,30 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     override fun onStart() {
-        googleApiClient.connect()
+        googleApiClient?.connect()
         super.onStart()
     }
 
     override fun onStop() {
-        googleApiClient.disconnect()
+        googleApiClient?.disconnect()
         super.onStop()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (googleApiClient?.isConnected == true)
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationListener)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (googleApiClient?.isConnected == true)
+            startLocationUpdates()
     }
 
     override fun onDestroy() {
         stopKovenant()
+        googleApiClient = null
         super.onDestroy()
     }
 
@@ -280,22 +343,37 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode == Constants.RC_SIGN_IN) {
-            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            if (result.isSuccess) {
-                loginStatus = 1
-                val acct = result.signInAccount as GoogleSignInAccount
-                RestClient(this).login(acct.idToken!!, acct.email!!) successUi {
-                    header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
-                    //Remove login button, add logout button to nav drawer
-                    drawer?.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
-                    drawer?.addItemAtPosition(logoutDrawerItem, 0)
-                    //add addMasjidDrawerItem
-                    drawer?.addItem(addMasjidDrawerItem)
-                    toast(getString(R.string.login_success_toast))
-                    currentFragment?.onLogin()
-                } failUi {
-                    toast(getString(R.string.login_failure_toast, it.message))
+        when (requestCode) {
+            RC_SIGN_IN -> {
+                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+                if (result.isSuccess) {
+                    loginStatus = 1
+                    val acct = result.signInAccount as GoogleSignInAccount
+                    RestClient(this).login(acct.idToken!!, acct.email!!) successUi {
+                        header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
+                        //Remove login button, add logout button to nav drawer
+                        drawer?.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
+                        drawer?.addItemAtPosition(logoutDrawerItem, 0)
+                        //add addMasjidDrawerItem
+                        drawer?.addItem(addMasjidDrawerItem)
+                        toast(getString(R.string.login_success_toast))
+                        currentFragment?.onLogin()
+                    } failUi {
+                        toast(getString(R.string.login_failure_toast, it.message))
+                    }
+                }
+            }
+            RC_CHECK_SETTINGS -> {
+                when (resultCode) {
+                    RESULT_OK -> {
+                        //Location settings were successfully changed
+                        toast("Location settings changed. Trying to get your location.")
+                        startLocationUpdates()
+                    }
+                    RESULT_CANCELED -> {
+                        //Location settings were not changed
+                        toast("Location settings weren't changed. Some features in the app won't work fully.")
+                    }
                 }
             }
         }
@@ -334,5 +412,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         drawer?.closeDrawer()
         rightDrawer.closeDrawer()
         toolbar.title = getString(title)
+    }
+
+    companion object {
+        private val RC_SIGN_IN = 9001
+        private val RC_CHECK_SETTINGS = 9002
+        var googleApiClient: GoogleApiClient? = null
     }
 }

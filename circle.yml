@@ -25,8 +25,10 @@ test:
         parallel: true
     - fb-adb start-server:
         background: true
-    # Try running tests twice if they fail first time
-    - (./gradlew test assembleDebug --console=plain || ./gradlew test assembleDebug --console=plain)
+    - ./gradlew assembleDebug --console=plain
+    # Robolectric and materialdrawer don't work perfectly together
+    # This is a hack to get the unittests to run.
+    - sed -i '6 i <item name="selectableItemBackground">@color/colorPrimaryLight</item>' JTime-android/src/main/res/values/styles.xml && ./gradlew test --console=plain; sed -i '6 d' JTime-android/src/main/res/values/styles.xml
     # Build the release apk if we have the secure keys required, reporting the status codes
     # correctly
     - >
@@ -42,7 +44,7 @@ test:
     - fb-adb devices
     - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
     # Note the espresso tests include code to unlock the emulator before running the tests
-    - ./gradlew connectedAndroidTest --console=plain:
+    - ./gradlew connectedAndroidTest --console=plain || ./gradlew connectedAndroidTest --console=plain:
         timeout: 900
     - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
   post:
