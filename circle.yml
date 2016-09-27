@@ -44,7 +44,7 @@ test:
     - fb-adb devices
     - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
     # Note the espresso tests include code to unlock the emulator before running the tests
-    - ./gradlew connectedAndroidTest --console=plain:
+    - ./gradlew connectedAndroidTest --console=plain || ./gradlew connectedAndroidTest --console=plain:
         timeout: 900
     - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
   post:
