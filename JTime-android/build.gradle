@@ -1,5 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.0.3'
+    ext.dokka_version = '0.9.9'
     repositories {
         jcenter()
         mavenCentral()
@@ -7,6 +8,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
         classpath 'com.google.gms:google-services:2.0.0-alpha5'
         classpath 'com.github.triplet.gradle:play-publisher:1.1.4'
     }
@@ -15,6 +17,7 @@ buildscript {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'org.jetbrains.dokka-android'
 apply plugin: 'com.github.triplet.play'
 
 android {

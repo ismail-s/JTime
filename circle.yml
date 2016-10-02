@@ -25,7 +25,7 @@ test:
         parallel: true
     - fb-adb start-server:
         background: true
-    - ./gradlew assembleDebug --console=plain
+    - ./gradlew assembleDebug dokka --console=plain
     # Robolectric and materialdrawer don't work perfectly together
     # This is a hack to get the unittests to run.
     - sed -i '6 i <item name="selectableItemBackground">@color/colorPrimaryLight</item>' JTime-android/src/main/res/values/styles.xml && ./gradlew test --console=plain; sed -i '6 d' JTime-android/src/main/res/values/styles.xml
