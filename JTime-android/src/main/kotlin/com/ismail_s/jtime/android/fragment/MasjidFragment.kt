@@ -21,7 +21,8 @@ import org.jetbrains.anko.support.v4.withArguments
 import java.util.*
 
 /**
- * A placeholder fragment containing a simple view.
+ * A fragment that displays salaah times for a particular masjid, for a particular day. Used within
+ * [MasjidsFragment].
  */
 class MasjidFragment : BaseFragment() {
     lateinit private var editButton: Button
@@ -81,16 +82,8 @@ class MasjidFragment : BaseFragment() {
     }
 
     companion object {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
         private val ARG_DATE = "date"
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
         fun newInstance(masjidId: Int, masjidName: String, date: GregorianCalendar): MasjidFragment =
                 MasjidFragment().withArguments(
                         ARG_DATE to date, Constants.MASJID_ID to masjidId,

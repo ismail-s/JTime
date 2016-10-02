@@ -3,6 +3,9 @@ package com.ismail_s.jtime.android.pojo
 import android.location.Location
 import java.util.*
 
+/**
+ * Reresents a single salaah time for a given masjid.
+ */
 class SalaahTimePojo(val masjidId: Int, val type: SalaahType, val datetime: GregorianCalendar) {
     var id: Int? = null
     var masjidName: String? = null

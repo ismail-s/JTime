@@ -23,6 +23,9 @@ import org.jetbrains.anko.support.v4.withArguments
 import org.jetbrains.anko.tableRow
 import org.jetbrains.anko.textView
 
+/**
+ * Displays nearby salaah times for today, for a given salaah type.
+ */
 class NearbyTimesFragment : BaseFragment() {
     lateinit var salaahType: SalaahType
 

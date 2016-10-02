@@ -18,6 +18,9 @@ import org.jetbrains.anko.find
 import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.support.v4.longToast
 
+/**
+* Display a list of all masjids on the rest server.
+*/
 class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var layout: SwipeRefreshLayout
     private lateinit var rView: RecyclerView

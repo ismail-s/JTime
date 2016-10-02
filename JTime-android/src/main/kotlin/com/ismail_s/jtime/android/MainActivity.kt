@@ -36,6 +36,10 @@ import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.*
 import java.util.*
 
+/**
+ * This activity holds all the fragments that make up the app, and manages the nav drawers and
+ * Google Play Services (ie login with google, location).
+ */
 class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
@@ -126,6 +130,10 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         toast(getString(R.string.login_failure_toast, connectionResult.toString()))
     }
 
+    /**
+     * Called when we connect to Google Play Services. In this method, we sort out stuff relating
+     * to getting the users location.
+     */
     override fun onConnected(connectionHint: Bundle?) {
         if (!location.isDone()) {
             val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
