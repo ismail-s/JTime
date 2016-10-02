@@ -23,6 +23,10 @@ import org.jetbrains.anko.support.v4.toast
 import org.jetbrains.anko.support.v4.withArguments
 import java.util.*
 
+/**
+ * Fragment that allows the user to add/edit the salaah times for a particular masjid. The user
+ * must be logged in to use this fragment. This fragment is reached from [MasjidFragment].
+ */
 class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
     data class Time(val hour: Int, val minute: Int)

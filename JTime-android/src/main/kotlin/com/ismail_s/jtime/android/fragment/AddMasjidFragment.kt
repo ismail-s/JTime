@@ -22,6 +22,11 @@ import org.jetbrains.anko.find
 import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.support.v4.toast
 
+/**
+* Create a new masjid.
+*
+* Create a new masjid on the rest server. Only available for logged-in users.
+*/
 class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLongClickListener, View.OnClickListener {
     private var current_marker: Marker? = null
     private var googleMap: GoogleMap? = null
@@ -96,6 +101,9 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
         addMarker(point)
     }
 
+    /**
+    * Add a marker to the map, removing a previous marker if there was one.
+    */
     fun addMarker(point: LatLng) {
         current_marker?.remove()
         val marker_options = MarkerOptions().position(point)

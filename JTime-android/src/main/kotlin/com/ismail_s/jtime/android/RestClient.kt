@@ -26,6 +26,9 @@ import java.net.NoRouteToHostException
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Helper class for talking to the rest server asynchronously.
+ */
 class RestClient {
     private var sharedPrefs: SharedPreferencesWrapper
     private var context: Context
@@ -50,12 +53,19 @@ class RestClient {
                 "Content-Type" to "application/json")
     }
 
+    /**
+     * Check if we can connect to the internet. Does not guarantee we can connect to the rest
+     * server.
+     */
     fun internetIsAvailable(): Boolean {
         val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo
         return if (networkInfo != null && networkInfo.isConnected) true else false
     }
 
+    /**
+     * Get a list of all the masjids on the rest server.
+     */
     fun getMasjids(): Promise<List<MasjidPojo>, Throwable> {
         val deferred = deferred<List<MasjidPojo>, Throwable>()
         if (!internetIsAvailable()) {
@@ -89,6 +99,9 @@ class RestClient {
         return deferred.promise
     }
 
+    /**
+     * Get the salaah times for a particular masjid, for a particular date.
+     */
     fun getMasjidTimes(masjidId: Int, date: GregorianCalendar): Promise<MasjidPojo, Throwable> {
         val deferred = deferred<MasjidPojo, Throwable>()
         if (!internetIsAvailable()) {
@@ -123,6 +136,11 @@ class RestClient {
         return deferred.promise
     }
 
+    /**
+     * Get a list of salaah times for masjids nearby to the given [latitude] and [longitude].
+     *
+     * @param salaahType the type of salaah times to be returned, or all types if not specified.
+     */
     fun getTimesForNearbyMasjids(latitude: Double, longitude: Double, salaahType: SalaahType? = null)
             : Promise<List<SalaahTimePojo>, Throwable> {
         val deferred = deferred<List<SalaahTimePojo>, Throwable>()
@@ -159,6 +177,9 @@ class RestClient {
         return deferred.promise
     }
 
+    /**
+     * Create a Masjid with the given [name], at the given [latitude] and [longitude].
+     */
     fun createMasjid(name: String, latitude: Double, longitude: Double): Promise<Unit, Throwable> {
         val deferred = deferred<Unit, Throwable>()
         val body = JSONObject()
@@ -177,6 +198,11 @@ class RestClient {
         return deferred.promise
     }
 
+    /**
+     * Add/update a salaah time on the rest server.
+     *
+     * @param masjidId the id of the masjid the salaah time is for
+     */
     fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar)
             : Promise<Unit, Throwable>{
         val deferred = deferred<Unit, Throwable>()
@@ -207,6 +233,12 @@ class RestClient {
         return deferred.promise
     }
 
+    /**
+     * Login on the rest server.
+     *
+     * @param code the secure id token returned by Google Play Services
+     * @param email the email address of the user logging in
+     */
     fun login(code: String, email: String): Promise<Pair<Int, String>, Throwable> {
         val deferred = deferred<Pair<Int, String>, Throwable>()
         if (!internetIsAvailable()) {
@@ -234,6 +266,9 @@ class RestClient {
         return deferred.promise
     }
 
+    /**
+     * Logout on the rest server.
+     */
     fun logout(): Promise<Unit, Throwable> {
         val deferred = deferred<Unit, Throwable>()
         if (!internetIsAvailable()) {
@@ -303,6 +338,9 @@ class RestClient {
     }
 }
 
+/**
+ * Helper function to make it easier to iterate over a [JSONArray].
+ */
 inline fun <reified T> JSONArray.iterator(): Iterator<T> = object : Iterator<T> {
     private var index = 0
     override fun hasNext(): Boolean {

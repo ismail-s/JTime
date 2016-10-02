@@ -16,7 +16,10 @@ import org.jetbrains.anko.find
 import org.jetbrains.anko.support.v4.withArguments
 import java.util.*
 
-
+/**
+ * Fragment that displays the salaah times for a particular masjid, for a particular day. Within
+ * this fragment, you can swipe left and right to change the day for which data is being viewed.
+ */
 class MasjidsFragment : BaseFragment() {
     /**
      * This should be a big number, so that it is as if there are an infinite number of pages.
@@ -29,8 +32,6 @@ class MasjidsFragment : BaseFragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_masjids, container, false)
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
         val mSectionsPagerAdapter = SectionsPagerAdapter(childFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
