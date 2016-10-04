@@ -148,7 +148,7 @@ SalaahTime.remoteMethod(
                     s.masjidName = masjidNameLocMap[s.masjidId][0];
                     s.masjidLocation = masjidNameLocMap[s.masjidId][1];
                     return s;
-                })
+                });
             };
 
         // Create date objs for start and end of day
@@ -164,7 +164,7 @@ SalaahTime.remoteMethod(
             var fieldsToReturn = {type: true, masjidId: true, datetime: true};
             var baseWhereQuery = {datetime: {between: [start_date, end_date]}};
             if (salaahType && inString(salaahType, "fzae")) {
-                baseWhereQuery.type = salaahType
+                baseWhereQuery.type = salaahType;
             }
             if (location) {
                 //get the nearest masjids, add them to faveMasjidIds
@@ -175,7 +175,7 @@ SalaahTime.remoteMethod(
                         baseWhereQuery.masjidId = {inq: faveMasjidIds};
                         return SalaahTime.findAsync({
                             fields: fieldsToReturn,
-                            where: baseWhereQuery})
+                            where: baseWhereQuery});
                     }).then(function(instances) {
                         var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
                         return cb(null, result);
@@ -193,35 +193,36 @@ SalaahTime.remoteMethod(
         }).catch(handleDBError);
     };
 
-SalaahTime.remoteMethod(
-    'getTimesForMultipleMasjids', {
-        description: ["Get salaah times for today for masjids for a particular ",
-                    "salaah type (optional), for certain masjids and for ",
-                    "masjids near to a certain location"],
-        accepts: [{
-            arg: 'date',
-            type: 'Date',
-            required: true
-        },{
-            arg: 'salaahType',
-            type: 'string',
-            required: false
-        }, {
-            arg: 'location',
-            type: 'GeoPoint',
-            required: false
-        }, {
-            arg: 'faveMasjidIds',
-            type: ['number'],
-            required: false
-        }],
-        returns: {
-            arg: 'res',
-            type: 'array'
-        },
-        http: {
-            path: '/times-for-multiple-masjids',
-            verb: 'get'
+    SalaahTime.remoteMethod(
+        'getTimesForMultipleMasjids', {
+            description: ["Get salaah times for today for masjids for a particular ",
+                        "salaah type (optional), for certain masjids and for ",
+                        "masjids near to a certain location"],
+            accepts: [{
+                arg: 'date',
+                type: 'Date',
+                required: true
+            },{
+                arg: 'salaahType',
+                type: 'string',
+                required: false
+            }, {
+                arg: 'location',
+                type: 'GeoPoint',
+                required: false
+            }, {
+                arg: 'faveMasjidIds',
+                type: ['number'],
+                required: false
+            }],
+            returns: {
+                arg: 'res',
+                type: 'array'
+            },
+            http: {
+                path: '/times-for-multiple-masjids',
+                verb: 'get'
+            }
         }
     );
 
