@@ -233,4 +233,36 @@ module.exports = function(Masjid) {
             }
         }
     );
+
+    Masjid.getTodayTimes = function(id, cb) {
+         var today = new Date();
+         Masjid.getTimes(id, today, function(err, instances) {
+             if (err != null) {
+                 console.error(err, instances, id);
+                 cb(500);
+                 return;
+             }
+             cb(null, instances);
+         });
+     };
+     Masjid.remoteMethod(
+         'getTodayTimes', {
+             description: ["Deprecated method, due to be removed in v2.0.0. ",
+                            "Returns salaah times for a given masjid, for ",
+                            "today, where today is determined by server time."],
+             accepts: [{
+                 arg: 'id',
+                 type: 'number',
+                 required: true
+             }],
+             returns: {
+                 arg: 'times',
+                 type: 'Array'
+             },
+             http: {
+                 path: '/:id/times-for-today',
+                 verb: 'get'
+             }
+         }
+     );
 };
