@@ -223,6 +223,40 @@ SalaahTime.remoteMethod(
             path: '/times-for-multiple-masjids',
             verb: 'get'
         }
-    }
-);
+    );
+
+    SalaahTime.getTimesForMasjidsForToday = function(salaahType, location, faveMasjidIds, cb) {
+        return SalaahTime.getTimesForMultipleMasjids(new Date(), salaahType, location, faveMasjidIds, cb);
+    };
+
+    SalaahTime.remoteMethod(
+        'getTimesForMasjidsForToday', {
+            description: ["Deprecated method, due to be removed in version 2.0.0. ",
+                        "Get salaah times for today for masjids for a particular ",
+                        "salaah type (optional), for certain masjids and for ",
+                        "masjids near to a certain location. The determination ",
+                        "of today is done by server time."],
+            accepts: [{
+                arg: 'salaahType',
+                type: 'string',
+                required: false
+            }, {
+                arg: 'location',
+                type: 'GeoPoint',
+                required: false
+            }, {
+                arg: 'faveMasjidIds',
+                type: ['number'],
+                required: false
+            }],
+            returns: {
+                arg: 'res',
+                type: 'array'
+            },
+            http: {
+                path: '/times-for-masjids-for-today',
+                verb: 'get'
+            }
+        }
+    );
 };
