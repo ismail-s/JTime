@@ -55,7 +55,7 @@
     "principalType": "ROLE",
     "principalId": "$everyone",
     "permission": "ALLOW",
-    "property": ["find", "getTimes"]
+    "property": ["find", "getTodayTimes", "getTimes"]
   }, {
     "accessType": "WRITE",
     "principalType": "ROLE",
