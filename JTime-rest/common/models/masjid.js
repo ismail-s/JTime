@@ -3,6 +3,7 @@ var async = require('async');
 var loopback = require('loopback');
 var settings = require('../../settings');
 var gmAPI = require("googlemaps");
+var getSunsetTime = require("../sunsetTimes");
 var GoogleMapsAPI = new gmAPI({
     key: settings.googleMapsKey,
     secure: true
@@ -209,7 +210,17 @@ module.exports = function(Masjid) {
                     cb(500);
                     return;
                 }
-                cb(null, instances);
+                Masjid.findOne({where: {id: id}, fields: {location: true}},
+                function(err, masjid) {
+                    if (err != null) {
+                        console.error(err, masjid);
+                        cb(500);
+                        return;
+                    }
+                    var sunset = getSunsetTime(masjid.location, date);
+                    instances.push({type: "m", datetime: sunset});
+                    cb(null, instances);
+                });
             });
     };
     Masjid.remoteMethod(
