@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.Manifest
 import android.os.Bundle
+import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -44,7 +45,7 @@ import java.util.*
  * This activity holds all the fragments that make up the app, and manages the nav drawers and
  * Google Play Services (ie login with google, location).
  */
-class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, ActivityCompat.OnRequestPermissionsResultCallback {
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var rightDrawer: Drawer
@@ -139,6 +140,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
      * to getting the users location.
      */
     override fun onConnected(connectionHint: Bundle?) {
+        //Check if location permission has been granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -179,10 +181,10 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
             locationListener)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: List<String>, grantResults: List<Int>) {
+    override fun onRequestPermissionsResult(requestCode: Int, @NonNull permissions: Array<out String>, @NonNull grantResults: IntArray) {
         if (requestCode == LOCATION_PERMISSION_RESULT_CODE) {
             // If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0
+            if (grantResults.size > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     onConnected(null)
             } else if (!location.isDone()) {
