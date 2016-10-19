@@ -17,10 +17,9 @@
     "loopback-component-explorer": "^2.1.0",
     "loopback-connector-postgresql": "^2.3.0",
     "loopback-datasource-juggler": "^2.39.0",
+    "moment": "^2.15.1",
     "request": "^2.72.0",
-    "serve-favicon": "^2.0.1",
-    "suncalc": "^1.7.0",
-    "tzwhere": "^1.0.0"
+    "serve-favicon": "^2.0.1"
   },
   "devDependencies": {
     "jshint": "^2.5.6"
