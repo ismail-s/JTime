@@ -8,6 +8,7 @@
   "dependencies": {
     "async": "^2.0.0-rc.3",
     "bluebird": "^3.4.0",
+    "cache-manager": "^2.2.0",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "express-session": "^1.12.1",
