@@ -1,7 +1,6 @@
 <template>
   <div>
-    <p>This will be a list of all masjids</p>
-    <button v-on:click="fetchMasjids">Get Masjids</button>
+    <h2>All Masjids</h2>
     <ul>
       <li v-for="masjid in masjids">
         {{ masjid.name }}
@@ -20,9 +19,11 @@ export default {
   },
   methods: {
     fetchMasjids () {
-      console.log('I am here...')
       this.$store.dispatch('getMasjids')
     }
+  },
+  created: function () {
+    this.fetchMasjids()
   }
 }
 </script>
