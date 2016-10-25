@@ -1,5 +1,6 @@
 var Promise = require("bluebird");
 var updateTimestamp = require("../updateTimestamp");
+var getSunsetTimes = require("../sunsetTimes").getSunsetTimes;
 
 function inString(char, str) {
     var list = str.split('');
@@ -177,8 +178,18 @@ SalaahTime.remoteMethod(
                             fields: fieldsToReturn,
                             where: baseWhereQuery});
                     }).then(function(instances) {
-                        var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
-                        return cb(null, result);
+                        //Get magrib times, add them to instances
+                        if (!salaahType || salaahType == "m") {
+                            //Get magrib times, add them to instances
+                            var argList = Object.keys(masjidNameLocMap).map(function(k) {return {masjidId: k, location: masjidNameLocMap[k][1]}});
+                            return getSunsetTimes(argList, date).then(function(sunsets) {
+                                var result = addMasjidNamesAndLocsToSalaahTimes(instances.concat(sunsets), masjidNameLocMap);
+                                return cb(null, result);
+                            });
+                        } else {
+                            var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
+                            return cb(null, result);
+                        }
                     }).catch(handleDBError);
             } else {
                 baseWhereQuery.masjidId = {inq: faveMasjidIds};
@@ -186,8 +197,17 @@ SalaahTime.remoteMethod(
                     fields: fieldsToReturn,
                     where: baseWhereQuery
                 }).then(function(instances) {
-                    var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
-                    return cb(null, result);
+                    if (!salaahType || salaahType == "m") {
+                        //Get magrib times, add them to instances
+                        var argList = Object.keys(masjidNameLocMap).map(function(k) {return {masjidId: k, location: masjidNameLocMap[k][1]}});
+                        return getSunsetTimes(argList, date).then(function(sunsets) {
+                            var result = addMasjidNamesAndLocsToSalaahTimes(instances.concat(sunsets), masjidNameLocMap);
+                            return cb(null, result);
+                        });
+                    } else {
+                        var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
+                        return cb(null, result);
+                    }
                 }).catch(handleDBError);
             }
         }).catch(handleDBError);

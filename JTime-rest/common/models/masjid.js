@@ -3,7 +3,7 @@ var async = require('async');
 var loopback = require('loopback');
 var settings = require('../../settings');
 var gmAPI = require("googlemaps");
-var getSunsetTime = require("../sunsetTimes");
+var getSunsetTime = require("../sunsetTimes").getSunsetTime;
 var GoogleMapsAPI = new gmAPI({
     key: settings.googleMapsKey,
     secure: true
