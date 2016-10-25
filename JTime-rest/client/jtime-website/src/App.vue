@@ -27,7 +27,18 @@
 
 <script>
 export default {
-  name: 'app'
+  name: 'app',
+  mounted: function () {
+    this.$nextTick(function () {
+      componentHandler.upgradeElement(this.$el) // eslint-disable-line no-undef
+    })
+  },
+  watch: {
+    $route: function () {
+      // Toggle drawer
+      this.$el.firstChild.firstChild.MaterialLayout.toggleDrawer()
+    }
+  }
 }
 </script>
 
