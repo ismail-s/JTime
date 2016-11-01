@@ -18,6 +18,15 @@ dependencies:
     - ./gradlew dependencies --console=plain
 test:
   override:
+    # Jtime-website tests
+    - >
+       cd JTime-rest/client/jtime-website;
+       npm install && (
+       npm run lint;
+       npm test;
+       npm run build)
+
+    # Android tests
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
     # start the emulator
     - emulator -avd custom-android21-googleapis -no-audio -no-window:
