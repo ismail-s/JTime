@@ -2,14 +2,16 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from './components/Home'
 import AllMasjids from './components/AllMasjids'
+import Masjid from './components/Masjid'
 import Help from './components/Help'
 
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/all-masjids', component: AllMasjids },
-  { path: '/help', component: Help }
+  { path: '/', name: 'home', component: Home },
+  { path: '/all-masjids', name: 'all-masjids', component: AllMasjids },
+  { path: '/help', name: 'help', component: Help },
+  { path: '/masjid/:id/:date', name: 'masjid-id-date', component: Masjid }
 ]
 
 const router = new VueRouter({

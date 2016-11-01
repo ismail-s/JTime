@@ -26,17 +26,17 @@
 </template>
 
 <script>
+import {upgradeElementMixin} from './utils'
+
 export default {
   name: 'app',
-  mounted: function () {
-    this.$nextTick(function () {
-      componentHandler.upgradeElement(this.$el) // eslint-disable-line no-undef
-    })
-  },
+  mixins: [upgradeElementMixin],
   watch: {
-    $route: function () {
-      // Toggle drawer
-      this.$el.firstChild.firstChild.MaterialLayout.toggleDrawer()
+    $route: function (to) {
+      if (to.name !== 'masjid-id-date') {
+        // Toggle drawer
+        this.$el.firstChild.firstChild.MaterialLayout.toggleDrawer()
+      }
     }
   }
 }
