@@ -1,6 +1,8 @@
 machine:
   environment:
     GRADLE_OPTS: -Dorg.gradle.daemon=true
+  node:
+    version: 6
 dependencies:
   pre:
     # Start the gradle daemon
