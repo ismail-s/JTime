@@ -18,15 +18,14 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter android-21
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
     - ./gradlew dependencies --console=plain
+    # Install deps for jtime-website
+    - (cd JTime-rest/client/jtime-website && npm install)
 test:
   override:
     # Jtime-website tests
     - >
-       cd JTime-rest/client/jtime-website;
-       npm install && (
-       npm run lint;
-       npm test;
-       npm run build)
+       cd JTime-rest/client/jtime-website &&
+       npm run lint && npm test && npm run build
 
     # Android tests
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
