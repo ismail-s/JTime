@@ -34,7 +34,9 @@ function upgradeElement (elem) {
   Vue.nextTick(() => {
     // We call upgradeElements which recursively calls upgradeElement on all the
     // children of elem (as well as elem itself)
-    window.componentHandler.upgradeElements(elem)
+    // Note that we check that window.componentHandler is defined to avoid
+    // errors whilst running unittests
+    window.componentHandler && window.componentHandler.upgradeElements(elem)
   })
 }
 
