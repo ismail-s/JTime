@@ -2,7 +2,7 @@ var Promise = require("bluebird");
 var request = require('request');
 var moment = require("moment");
 var cacheManager = require('cache-manager');
-var memoryCache = cacheManager.caching({store: 'memory', max: 10000, ttl: 2 * 24 * 3600/*seconds*/, promiseDependency: Promise});
+var memoryCache = cacheManager.caching({store: 'memory', max: 10000, ttl: 14 * 24 * 3600/*seconds*/, promiseDependency: Promise});
 var settings = require('../settings');
 
 function getSunsetTime(location, date) {
