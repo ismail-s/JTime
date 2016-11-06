@@ -279,7 +279,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     private fun setUpRightDrawer(savedInstance: Bundle?) {
-        val drawerItems = SalaahType.values().filter { it != SalaahType.MAGRIB }.map {
+        val drawerItems = SalaahType.values().map {
                 SecondaryDrawerItem()
                     .withName(it.toString(ctx))
                     .withOnDrawerItemClickListener { view, position, drawerItem ->
