@@ -25,7 +25,7 @@ function getSunsetTime(location, date) {
            request(options, function(error, response, body) {
                if (error || response.statusCode != 200 || body.status || !body.sunset) {
                    console.warn("Error in geonames response", error, response, body);
-                   reject(error || body.status);
+                   reject(new Error(error || body.status || "Error obtaining sunset time"));
                } else {
                    resolve(new Date(body.sunset));
                }
