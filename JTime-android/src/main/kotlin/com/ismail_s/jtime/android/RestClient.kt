@@ -207,13 +207,7 @@ class RestClient {
             : Promise<Unit, Throwable>{
         val deferred = deferred<Unit, Throwable>()
         val fuelInstance = FuelManager.instance
-        val type = when (salaahType) {
-            SalaahType.FAJR -> "f"
-            SalaahType.ZOHAR -> "z"
-            SalaahType.ASR -> "a"
-            SalaahType.MAGRIB -> "m"
-            SalaahType.ESHA -> "e"
-        }
+        val type = salaahType.apiRef
         val datetime = dateFormatter.format(date.time)
         val url = Companion.url + "/SalaahTimes/create-or-update"
         fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/x-www-form-urlencoded"))

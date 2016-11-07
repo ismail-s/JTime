@@ -17,7 +17,6 @@ import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.support.v4.ctx
-import org.jetbrains.anko.support.v4.longToast
 import org.jetbrains.anko.support.v4.toast
 import org.jetbrains.anko.tableRow
 import org.jetbrains.anko.textView
