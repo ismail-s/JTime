@@ -10,7 +10,7 @@ const baseUrl = 'https://jtime.ismail-s.com/api'
 
 const store = new Vuex.Store({
   state: {
-    masjids: [{name: 'Test masjid'}],
+    masjids: [],
     salaahTimes: {} // map from masjidId to list of salaahTime objects
   },
   mutations: {
