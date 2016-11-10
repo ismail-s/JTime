@@ -11,6 +11,7 @@
   <div class="mdl-layout__drawer">
     <span class="mdl-layout-title"></span>
     <nav class="mdl-navigation">
+      <sign-in-button></sign-in-button>
       <router-link to="/" class="mdl-navigation__link" >Home</router-link>
       <router-link to="/all-masjids" class="mdl-navigation__link" >All Masjids</router-link>
       <router-link to="/help" class="mdl-navigation__link" >Help</router-link>
@@ -22,20 +23,41 @@
     </div>
   </main>
 </div>
+<div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
+  <div class="mdl-snackbar__text"></div>
+  <button class="mdl-snackbar__action" type="button"></button>
+</div>
   </div>
 </template>
 
 <script>
 import {upgradeElementMixin} from './utils'
+import SignInButton from './components/SignInButton.vue'
 
 export default {
   name: 'app',
+  components: {
+    'sign-in-button': SignInButton
+  },
   mixins: [upgradeElementMixin],
+  methods: {
+    showToast (message) {
+      const snackbar = document.getElementById('snackbar')
+      snackbar.MaterialSnackbar.showSnackbar({message})
+    }
+  },
   watch: {
     $route: function (to) {
       if (to.name !== 'masjid-id-date') {
         // Toggle drawer
         this.$el.firstChild.firstChild.MaterialLayout.toggleDrawer()
+      }
+    },
+    '$store.state.toastQueue': function (queue) {
+      const msg = queue[0]
+      if (msg) {
+        this.showToast(msg)
+        this.$store.commit('removeOneToast')
       }
     }
   }
