@@ -53,7 +53,7 @@ export default {
         this.$el.firstChild.firstChild.MaterialLayout.toggleDrawer()
       }
     },
-    '$store.state.toastQueue': function (queue) {
+    '$store.state.ToastModule.toastQueue': function (queue) {
       const msg = queue[0]
       if (msg) {
         this.showToast(msg)
