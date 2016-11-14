@@ -7,7 +7,11 @@ describe('Help.vue', () => {
       el: document.createElement('div'),
       render: (h) => h(Help)
     })
-    expect(vm.$el.textContent)
-      .to.contain('help')
+    const text = vm.$el.textContent
+    expect(text).to.contain('Help')
+    expect(text).to.contain('Vuejs (MIT license)')
+    expect(text).to.contain('Vuex (MIT license)')
+    expect(text).to.contain('Vue-router (MIT license)')
+    expect(text).to.contain('Vue-resource (MIT license)')
   })
 })

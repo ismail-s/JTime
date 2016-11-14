@@ -8,6 +8,6 @@ describe('Home.vue', () => {
       render: (h) => h(Home)
     })
     expect(vm.$el.textContent)
-      .to.equal('This is the home page')
+      .to.match(/^Jamaat Times/)
   })
 })
