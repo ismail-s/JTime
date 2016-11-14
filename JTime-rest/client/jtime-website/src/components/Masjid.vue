@@ -27,7 +27,7 @@ export default {
   name: 'masjid',
   computed: {
     masjidName () {
-      const masjid = this.$store.state.masjids.find(e => e.id === this.masjidId)
+      const masjid = this.$store.state.MasjidsModule.masjids.find(e => e.id === this.masjidId)
       if (!masjid) {
         this.$store.dispatch('getMasjids')
       }
@@ -40,7 +40,7 @@ export default {
       return (new Date(this.$route.params.date))
     },
     salaahTimes () {
-      return this.$store.state.salaahTimes[this.masjidId] || []
+      return this.$store.state.SalaahTimesModule.salaahTimes[this.masjidId] || []
     }
   },
   methods: {

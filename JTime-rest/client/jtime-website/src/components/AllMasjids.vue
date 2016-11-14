@@ -19,7 +19,7 @@ export default {
   name: 'all-masjids',
   computed: {
     masjids () {
-      return this.$store.state.masjids
+      return this.$store.state.MasjidsModule.masjids
     }
   },
   methods: {
