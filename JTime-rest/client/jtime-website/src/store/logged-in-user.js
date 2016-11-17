@@ -34,6 +34,20 @@ export default {
         context.commit('toast', `Login failed: ${err.message}`)
       })
     },
+    logout (context) {
+      const loginState = context.state.loggedInUser
+      const options = {headers: {Authorization: loginState.accessToken}}
+      Vue.http.post(`${baseUrl}/user_tables/logout`, {}, options).then(response => {
+        if (response.status === 204) {
+          context.commit('clearLoggedInUser')
+          context.commit('toast', 'Logged out successfully')
+        } else {
+          context.commit('toast', 'Logout was unsuccessful')
+        }
+      }).catch(err => {
+        console.error(err)
+      })
+    },
     checkServerLoginStatus (context) {
       const loginState = context.state.loggedInUser
       if (!loginState) {

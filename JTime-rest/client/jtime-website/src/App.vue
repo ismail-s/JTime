@@ -12,9 +12,10 @@
     <span class="mdl-layout-title"></span>
     <nav class="mdl-navigation">
       <sign-in-button></sign-in-button>
-      <router-link to="/" class="mdl-navigation__link" >Home</router-link>
-      <router-link to="/all-masjids" class="mdl-navigation__link" >All Masjids</router-link>
-      <router-link to="/help" class="mdl-navigation__link" >Help</router-link>
+      <sign-out-button></sign-out-button>
+      <router-link to="/" class="mdl-navigation__link">Home</router-link>
+      <router-link to="/all-masjids" class="mdl-navigation__link">All Masjids</router-link>
+      <router-link to="/help" class="mdl-navigation__link">Help</router-link>
     </nav>
   </div>
   <main class="mdl-layout__content">
@@ -33,11 +34,13 @@
 <script>
 import {upgradeElementMixin} from './utils'
 import SignInButton from './components/SignInButton.vue'
+import SignOutButton from './components/SignOutButton.vue'
 
 export default {
   name: 'app',
   components: {
-    'sign-in-button': SignInButton
+    'sign-in-button': SignInButton,
+    'sign-out-button': SignOutButton
   },
   mixins: [upgradeElementMixin],
   methods: {
