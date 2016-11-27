@@ -67,11 +67,10 @@ class RestClient {
      * Get a list of all the masjids on the rest server.
      */
     fun getMasjids(): Promise<List<MasjidPojo>, Throwable> {
-        val deferred = deferred<List<MasjidPojo>, Throwable>()
         if (!internetIsAvailable()) {
-            deferred reject noNetworkException
-            return deferred.promise
+            return Promise.ofFail(noNetworkException)
         }
+        val deferred = deferred<List<MasjidPojo>, Throwable>()
         "${Companion.url}/Masjids".httpGet().responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> deferred reject result.getAs<FuelError>()!!
@@ -103,11 +102,10 @@ class RestClient {
      * Get the salaah times for a particular masjid, for a particular date.
      */
     fun getMasjidTimes(masjidId: Int, date: GregorianCalendar): Promise<MasjidPojo, Throwable> {
-        val deferred = deferred<MasjidPojo, Throwable>()
         if (!internetIsAvailable()) {
-            deferred reject noNetworkException
-            return deferred.promise
+            return Promise.ofFail(noNetworkException)
         }
+        val deferred = deferred<MasjidPojo, Throwable>()
         "${Companion.url}/Masjids/$masjidId/times"
                 .httpGet(listOf("date" to dateFormatter.format(date.time)))
                 .responseJson { request, response, result ->
@@ -143,6 +141,9 @@ class RestClient {
      */
     fun getTimesForNearbyMasjids(latitude: Double, longitude: Double, salaahType: SalaahType? = null)
             : Promise<List<SalaahTimePojo>, Throwable> {
+        if (!internetIsAvailable()) {
+            return Promise.ofFail(noNetworkException)
+        }
         val deferred = deferred<List<SalaahTimePojo>, Throwable>()
         val loc = JSONObject().put("lat", latitude).put("lng", longitude)
         val params: MutableList<Pair<String, Any>> = mutableListOf("location" to loc.toString(),
@@ -181,6 +182,9 @@ class RestClient {
      * Create a Masjid with the given [name], at the given [latitude] and [longitude].
      */
     fun createMasjid(name: String, latitude: Double, longitude: Double): Promise<Unit, Throwable> {
+        if (!internetIsAvailable()) {
+            return Promise.ofFail(noNetworkException)
+        }
         val deferred = deferred<Unit, Throwable>()
         val body = JSONObject()
         val loc = JSONObject()
@@ -205,6 +209,9 @@ class RestClient {
      */
     fun createOrUpdateMasjidTime(masjidId: Int, salaahType: SalaahType, date: GregorianCalendar)
             : Promise<Unit, Throwable>{
+        if (!internetIsAvailable()) {
+            return Promise.ofFail(noNetworkException)
+        }
         val deferred = deferred<Unit, Throwable>()
         val fuelInstance = FuelManager.instance
         val type = salaahType.apiRef
@@ -234,11 +241,10 @@ class RestClient {
      * @param email the email address of the user logging in
      */
     fun login(code: String, email: String): Promise<Pair<Int, String>, Throwable> {
-        val deferred = deferred<Pair<Int, String>, Throwable>()
         if (!internetIsAvailable()) {
-            deferred reject noNetworkException
-            return deferred.promise
+            return Promise.ofFail(noNetworkException)
         }
+        val deferred = deferred<Pair<Int, String>, Throwable>()
         val url = Companion.url + "/user_tables/googleid"
 
         url.httpGet(listOf("id_token" to code)).responseJson { request, response, result ->
@@ -264,11 +270,10 @@ class RestClient {
      * Logout on the rest server.
      */
     fun logout(): Promise<Unit, Throwable> {
-        val deferred = deferred<Unit, Throwable>()
         if (!internetIsAvailable()) {
-            deferred reject noNetworkException
-            return deferred.promise
+            return Promise.ofFail(noNetworkException)
         }
+        val deferred = deferred<Unit, Throwable>()
         val url = Companion.url + "/user_tables/logout"
         url.httpPost().responseString { request, response, result ->
             when (result) {
@@ -296,11 +301,10 @@ class RestClient {
      * promise (including if there is no persisted login).
      */
     fun areWeStillSignedInOnServer(): Promise<Unit, Unit> {
-        val deferred = deferred<Unit, Unit>()
-        if (!sharedPrefs.persistedLoginExists()) {
-            deferred.reject()
-            return deferred.promise
+        if (!sharedPrefs.persistedLoginExists() || !internetIsAvailable()) {
+            return Promise.ofFail(Unit)
         }
+        val deferred = deferred<Unit, Unit>()
         val url = Companion.url + "/user_tables/${sharedPrefs.userId}"
         url.httpGet().responseJson { request, response, result ->
             when (result) {
