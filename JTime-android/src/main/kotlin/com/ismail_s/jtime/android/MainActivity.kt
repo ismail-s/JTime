@@ -1,9 +1,14 @@
 package com.ismail_s.jtime.android
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
+import android.Manifest
 import android.os.Bundle
+import android.support.annotation.NonNull
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Gravity
@@ -40,7 +45,7 @@ import java.util.*
  * This activity holds all the fragments that make up the app, and manages the nav drawers and
  * Google Play Services (ie login with google, location).
  */
-class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, ActivityCompat.OnRequestPermissionsResultCallback {
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var rightDrawer: Drawer
@@ -135,6 +140,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
      * to getting the users location.
      */
     override fun onConnected(connectionHint: Bundle?) {
+        //Check if location permission has been granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_RESULT_CODE)
+            return
+        }
         if (!location.isDone()) {
             val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
             if (loc == null) {
@@ -165,8 +177,22 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     private fun startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest,
-            locationListener)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest,
+                locationListener)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, @NonNull permissions: Array<out String>, @NonNull grantResults: IntArray) {
+        if (requestCode == LOCATION_PERMISSION_RESULT_CODE) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.size > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    onConnected(null)
+            } else if (!location.isDone()) {
+                locationDeferred reject Exception(getString(R.string.no_location_exception))
+            }
+        }
     }
 
     override fun onConnectionSuspended(cause: Int) {}
@@ -425,6 +451,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     companion object {
         private val RC_SIGN_IN = 9001
         private val RC_CHECK_SETTINGS = 9002
+        private val LOCATION_PERMISSION_RESULT_CODE = 11
         var googleApiClient: GoogleApiClient? = null
     }
 }
