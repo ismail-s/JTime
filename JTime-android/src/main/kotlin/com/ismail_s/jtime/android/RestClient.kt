@@ -70,8 +70,9 @@ class RestClient {
         if (!internetIsAvailable()) {
             return Promise.ofFail(noNetworkException)
         }
-        val deferred = deferred<List<MasjidPojo>, Throwable>()
-        "${Companion.url}/Masjids".httpGet().responseJson { request, response, result ->
+        val request = "${Companion.url}/Masjids".httpGet()
+        val deferred = deferred<List<MasjidPojo>, Throwable> { request.cancel() }
+        request.responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> deferred reject result.getAs<FuelError>()!!
                 is Result.Success -> {
@@ -105,32 +106,32 @@ class RestClient {
         if (!internetIsAvailable()) {
             return Promise.ofFail(noNetworkException)
         }
-        val deferred = deferred<MasjidPojo, Throwable>()
-        "${Companion.url}/Masjids/$masjidId/times"
+        val request = "${Companion.url}/Masjids/$masjidId/times"
                 .httpGet(listOf("date" to dateFormatter.format(date.time)))
-                .responseJson { request, response, result ->
-                    when (result) {
-                        is Result.Failure -> deferred reject result.getAs<FuelError>()!!
-                        is Result.Success -> {
-                            val times = result.get().obj().getJSONArray("times")
-                            val res = MasjidPojo()
-                            for (time in times.iterator<JSONObject>()) {
-                                val type = time.getString("type")
-                                val datetimeStr = time.getString("datetime")
-                                val datetime = GregorianCalendar()
-                                datetime.time = dateFormatter.parse(datetimeStr)
-                                when (type) {
-                                    "f" -> res.fajrTime = datetime
-                                    "z" -> res.zoharTime = datetime
-                                    "a" -> res.asrTime = datetime
-                                    "m" -> res.magribTime = datetime
-                                    "e" -> res.eshaTime = datetime
-                                }
-                            }
-                            deferred resolve res
+        val deferred = deferred<MasjidPojo, Throwable> { request.cancel() }
+        request.responseJson { request, response, result ->
+            when (result) {
+                is Result.Failure -> deferred reject result.getAs<FuelError>()!!
+                is Result.Success -> {
+                    val times = result.get().obj().getJSONArray("times")
+                    val res = MasjidPojo()
+                    for (time in times.iterator<JSONObject>()) {
+                        val type = time.getString("type")
+                        val datetimeStr = time.getString("datetime")
+                        val datetime = GregorianCalendar()
+                        datetime.time = dateFormatter.parse(datetimeStr)
+                        when (type) {
+                            "f" -> res.fajrTime = datetime
+                            "z" -> res.zoharTime = datetime
+                            "a" -> res.asrTime = datetime
+                            "m" -> res.magribTime = datetime
+                            "e" -> res.eshaTime = datetime
                         }
                     }
+                    deferred resolve res
                 }
+            }
+        }
         return deferred.promise
     }
 
@@ -144,37 +145,37 @@ class RestClient {
         if (!internetIsAvailable()) {
             return Promise.ofFail(noNetworkException)
         }
-        val deferred = deferred<List<SalaahTimePojo>, Throwable>()
         val loc = JSONObject().put("lat", latitude).put("lng", longitude)
         val params: MutableList<Pair<String, Any>> = mutableListOf("location" to loc.toString(),
             "date" to dateFormatter.format(GregorianCalendar().time))
         if (salaahType != null)
             params.add("salaahType" to salaahType.apiRef)
-        "${Companion.url}/SalaahTimes/times-for-multiple-masjids"
+        val request = "${Companion.url}/SalaahTimes/times-for-multiple-masjids"
                 .httpGet(params)
-                .responseJson { request, response, result ->
-                    when (result) {
-                        is Result.Failure -> { deferred reject result.error }
-                        is Result.Success -> {
-                            val times = result.value.obj().getJSONArray("res")
-                            val res = mutableListOf<SalaahTimePojo>()
-                            for (time in times.iterator<JSONObject>()) {
-                                val type = charToSalaahType(time.getString("type")[0])
-                                val masjidId = time.getInt("masjidId")
-                                val masjidName = time.getString("masjidName")
-                                val masjidLocation = time.getJSONObject("masjidLocation")
-                                val masjidLoc = Location("")
-                                masjidLoc.latitude = masjidLocation.getDouble("lat")
-                                masjidLoc.longitude = masjidLocation.getDouble("lng")
-                                val datetimeStr = time.getString("datetime")
-                                val datetime = GregorianCalendar()
-                                datetime.time = dateFormatter.parse(datetimeStr)
-                                res += SalaahTimePojo(masjidId, masjidName, masjidLoc, type, datetime)
-                            }
-                            deferred resolve res
-                        }
+        val deferred = deferred<List<SalaahTimePojo>, Throwable> { request.cancel() }
+        request.responseJson { request, response, result ->
+            when (result) {
+                is Result.Failure -> { deferred reject result.error }
+                is Result.Success -> {
+                    val times = result.value.obj().getJSONArray("res")
+                    val res = mutableListOf<SalaahTimePojo>()
+                    for (time in times.iterator<JSONObject>()) {
+                        val type = charToSalaahType(time.getString("type")[0])
+                        val masjidId = time.getInt("masjidId")
+                        val masjidName = time.getString("masjidName")
+                        val masjidLocation = time.getJSONObject("masjidLocation")
+                        val masjidLoc = Location("")
+                        masjidLoc.latitude = masjidLocation.getDouble("lat")
+                        masjidLoc.longitude = masjidLocation.getDouble("lng")
+                        val datetimeStr = time.getString("datetime")
+                        val datetime = GregorianCalendar()
+                        datetime.time = dateFormatter.parse(datetimeStr)
+                        res += SalaahTimePojo(masjidId, masjidName, masjidLoc, type, datetime)
                     }
+                    deferred resolve res
                 }
+            }
+        }
         return deferred.promise
     }
 
@@ -185,7 +186,6 @@ class RestClient {
         if (!internetIsAvailable()) {
             return Promise.ofFail(noNetworkException)
         }
-        val deferred = deferred<Unit, Throwable>()
         val body = JSONObject()
         val loc = JSONObject()
         loc.put("lat", latitude)
@@ -193,7 +193,9 @@ class RestClient {
         body.put("name", name)
         body.put("location", loc)
         val url = Companion.url + "/Masjids"
-        url.httpPost().body(body.toString()).responseJson { request, response, result ->
+        val request = url.httpPost().body(body.toString())
+        val deferred = deferred<Unit, Throwable> { request.cancel() }
+        request.responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
                 is Result.Success -> { deferred.resolve() }
@@ -212,25 +214,25 @@ class RestClient {
         if (!internetIsAvailable()) {
             return Promise.ofFail(noNetworkException)
         }
-        val deferred = deferred<Unit, Throwable>()
         val fuelInstance = FuelManager.instance
         val type = salaahType.apiRef
         val datetime = dateFormatter.format(date.time)
         val url = Companion.url + "/SalaahTimes/create-or-update"
         fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/x-www-form-urlencoded"))
-        url.httpPost(listOf("masjidId" to "$masjidId", "type" to type, "datetime" to datetime))
-                .responseJson { request, response, result ->
-                    when (result) {
-                        is Result.Failure -> {
-                            deferred reject result.getAs<FuelError>()!!
-                            fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
-                        }
-                        is Result.Success -> {
-                            deferred.resolve()
-                            fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
-                        }
-                    }
+        val request = url.httpPost(listOf("masjidId" to "$masjidId", "type" to type, "datetime" to datetime))
+        val deferred = deferred<Unit, Throwable> { request.cancel() }
+        request.responseJson { request, response, result ->
+            when (result) {
+                is Result.Failure -> {
+                    deferred reject result.getAs<FuelError>()!!
+                    fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                 }
+                is Result.Success -> {
+                    deferred.resolve()
+                    fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
+                }
+            }
+        }
         return deferred.promise
     }
 
@@ -244,10 +246,11 @@ class RestClient {
         if (!internetIsAvailable()) {
             return Promise.ofFail(noNetworkException)
         }
-        val deferred = deferred<Pair<Int, String>, Throwable>()
-        val url = Companion.url + "/user_tables/googleid"
+        val request = "${Companion.url}/user_tables/googleid"
+                .httpGet(listOf("id_token" to code))
+        val deferred = deferred<Pair<Int, String>, Throwable> { request.cancel() }
 
-        url.httpGet(listOf("id_token" to code)).responseJson { request, response, result ->
+        request.responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
                 is Result.Success -> {
@@ -273,9 +276,9 @@ class RestClient {
         if (!internetIsAvailable()) {
             return Promise.ofFail(noNetworkException)
         }
-        val deferred = deferred<Unit, Throwable>()
-        val url = Companion.url + "/user_tables/logout"
-        url.httpPost().responseString { request, response, result ->
+        val request = "${Companion.url}/user_tables/logout".httpPost()
+        val deferred = deferred<Unit, Throwable> { request.cancel() }
+        request.responseString { request, response, result ->
             when (result) {
                 is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
                 is Result.Success -> {
@@ -304,9 +307,10 @@ class RestClient {
         if (!sharedPrefs.persistedLoginExists() || !internetIsAvailable()) {
             return Promise.ofFail(Unit)
         }
-        val deferred = deferred<Unit, Unit>()
-        val url = Companion.url + "/user_tables/${sharedPrefs.userId}"
-        url.httpGet().responseJson { request, response, result ->
+        val request = "${Companion.url}/user_tables/${sharedPrefs.userId}"
+                .httpGet()
+        val deferred = deferred<Unit, Unit> { request.cancel() }
+        request.responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
                     clearSavedUser()
