@@ -225,13 +225,12 @@ class RestClient {
             when (result) {
                 is Result.Failure -> {
                     deferred reject result.getAs<FuelError>()!!
-                    fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                 }
                 is Result.Success -> {
                     deferred.resolve()
-                    fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
                 }
             }
+            fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/json"))
         }
         return deferred.promise
     }
