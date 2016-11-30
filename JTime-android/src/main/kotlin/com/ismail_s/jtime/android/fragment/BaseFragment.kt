@@ -4,6 +4,9 @@ import android.location.Location
 import android.support.v4.app.Fragment
 import android.view.View
 import com.ismail_s.jtime.android.MainActivity
+import nl.komponents.kovenant.CancelException
+import nl.komponents.kovenant.Kovenant
+import nl.komponents.kovenant.Promise
 import org.jetbrains.anko.AnkoLogger
 
 
@@ -18,6 +21,8 @@ open class BaseFragment : Fragment(), AnkoLogger {
      */
     val mainAct: MainActivity
         get() = activity as MainActivity
+
+    private val promisesToCleanup: MutableList<Promise<*, Throwable>> = mutableListOf()
 
     /**
      * Called when either the nav drawer or the right drawer in [MainActivity] is opened. If the
@@ -46,4 +51,20 @@ open class BaseFragment : Fragment(), AnkoLogger {
      * called or _mainAct.location_ was changed.
      */
     open fun onLocationChanged(loc: Location) {}
+
+    override fun onDestroyView() {
+        promisesToCleanup.forEach { Kovenant.cancel(it, CancelException()) }
+        promisesToCleanup.clear()
+    }
+
+    /**
+     * Execute the provided block and schedule the promise returned to be cancelled
+     * when the current fragment has its view destroyed.
+     *
+     * This is useful where callbacks on the promise interact with the fragment, and
+     * would throw errors if the fragment view had been destroyed.
+     */
+    fun cancelPromiseOnFragmentDestroy(block: () -> Promise<*, Throwable>) {
+        promisesToCleanup.add(block())
+    }
 }
