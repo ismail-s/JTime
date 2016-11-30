@@ -53,6 +53,7 @@ open class BaseFragment : Fragment(), AnkoLogger {
     open fun onLocationChanged(loc: Location) {}
 
     override fun onDestroyView() {
+        super.onDestroyView()
         promisesToCleanup.forEach { Kovenant.cancel(it, CancelException()) }
         promisesToCleanup.clear()
     }
