@@ -66,8 +66,10 @@ class NearbyTimesFragment : BaseFragment() {
                             })
                         }
                     } failUi {
-                debug("Failed to get nearby times from masjid")
-                toast(getString(R.string.get_masjid_times_failure_toast, it.message))
+                        ifAttachedToAct {
+                            debug("Failed to get nearby times from masjid")
+                            toast(getString(R.string.get_masjid_times_failure_toast, it.message))
+                        }
             }
         }
     }

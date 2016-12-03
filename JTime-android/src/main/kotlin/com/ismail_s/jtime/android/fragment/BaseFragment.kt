@@ -68,4 +68,13 @@ open class BaseFragment : Fragment(), AnkoLogger {
     fun cancelPromiseOnFragmentDestroy(block: () -> Promise<*, Throwable>) {
         promisesToCleanup.add(block())
     }
+
+    /**
+    * Execute the provided block if this fragment is attached to an activity.
+    */
+    fun ifAttachedToAct(block: () -> Unit) {
+        if (isAdded() && activity != null) {
+            block()
+        }
+    }
 }

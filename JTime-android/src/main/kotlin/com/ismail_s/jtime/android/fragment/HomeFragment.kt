@@ -42,70 +42,76 @@ class HomeFragment: BaseFragment() {
     }
 
     private fun getTimesAndDisplayInUi(loc: Location) {
+        if (activity == null)
+            return
         cancelPromiseOnFragmentDestroy {
-            RestClient(ctx).getTimesForNearbyMasjids(loc.latitude, loc.longitude) successUi s@ {
-                /*We have a list of salaah times for different salaah types & masjids.
-                * We now need to:
-                * 1. Find the time closest to now, for the masjid nearest to us
-                * 2. Group the remaining times by salaah type and order the groups
-                * 3. Show all this info
-                * If the list is empty, say so and exit*/
-                //Make sure the table of salaah times is empty
-                salaah_times_summary_table.removeAllViews()
-                if (it.isEmpty()) {
-                    label_next_time.text = getString(R.string.no_salaah_times_nearby_masjids_toast)
-                    return@s
-                }
-                val now = GregorianCalendar()
-                val keyForTime = { x: SalaahTimePojo -> (3L * 60 * 1000) + x.datetime.timeInMillis - now.timeInMillis }
-                val sortedTimes = it.sortedBy { keyForTime(it) }
-                        .dropWhile { keyForTime(it) < 0 }
-                val closest = if(sortedTimes.isEmpty()) {
-                    val x = it.sortedBy { keyForTime(it) }.reversed()
-                    x.takeWhile { keyForTime(it) == keyForTime(x.first()) }
-                            .sortedBy { loc.distanceTo(it.masjidLoc) }.first()
-                } else {
-                    sortedTimes
-                            .takeWhile { keyForTime(it) == keyForTime(sortedTimes.first()) }
-                            .sortedBy { loc.distanceTo(it.masjidLoc) }.first()
-                }
-                val remaining = (it - closest).groupBy { it.type }.toSortedMap()
-
-                val params = arrayOf(closest.type.toString(ctx), closest.masjidName, formatCalendarAsTime(closest.datetime))
-                label_next_time.text = if (closest.datetime.timeInMillis >= now.timeInMillis)
-                    getString(R.string.home_fragment_next_time_future_text, *params)
-                else
-                    getString(R.string.home_fragment_next_time_past_text, *params)
-                label_other_times_today.visibility = View.VISIBLE
-
-                val addToTable = {x: AnkoContext<TableLayout>.() -> TableRow ->
-                    salaah_times_summary_table.addView(
-                            with(AnkoContext.create(act, salaah_times_summary_table), x))}
-                val tSize = 18f
-                val tSubheaderSize = 20f
-                for ((type, times) in remaining) {
-                    addToTable {
-                        tableRow {
-                            textView(type.toString(ctx)) {
-                                textSize = tSubheaderSize
-                            }
-                        }
+            RestClient(ctx).getTimesForNearbyMasjids(loc.latitude, loc.longitude) successUi {
+                ifAttachedToAct s@ {
+                    /*We have a list of salaah times for different salaah types & masjids.
+                    * We now need to:
+                    * 1. Find the time closest to now, for the masjid nearest to us
+                    * 2. Group the remaining times by salaah type and order the groups
+                    * 3. Show all this info
+                    * If the list is empty, say so and exit*/
+                    //Make sure the table of salaah times is empty
+                    salaah_times_summary_table.removeAllViews()
+                    if (it.isEmpty()) {
+                        label_next_time.text = getString(R.string.no_salaah_times_nearby_masjids_toast)
+                        return@s
                     }
-                    times.sortedBy { it.datetime.timeInMillis }.forEach {
+                    val now = GregorianCalendar()
+                    val keyForTime = { x: SalaahTimePojo -> (3L * 60 * 1000) + x.datetime.timeInMillis - now.timeInMillis }
+                    val sortedTimes = it.sortedBy { keyForTime(it) }
+                            .dropWhile { keyForTime(it) < 0 }
+                    val closest = if(sortedTimes.isEmpty()) {
+                        val x = it.sortedBy { keyForTime(it) }.reversed()
+                        x.takeWhile { keyForTime(it) == keyForTime(x.first()) }
+                                .sortedBy { loc.distanceTo(it.masjidLoc) }.first()
+                    } else {
+                        sortedTimes
+                                .takeWhile { keyForTime(it) == keyForTime(sortedTimes.first()) }
+                                .sortedBy { loc.distanceTo(it.masjidLoc) }.first()
+                    }
+                    val remaining = (it - closest).groupBy { it.type }.toSortedMap()
+
+                    val params = arrayOf(closest.type.toString(ctx), closest.masjidName, formatCalendarAsTime(closest.datetime))
+                    label_next_time.text = if (closest.datetime.timeInMillis >= now.timeInMillis)
+                        getString(R.string.home_fragment_next_time_future_text, *params)
+                    else
+                        getString(R.string.home_fragment_next_time_past_text, *params)
+                    label_other_times_today.visibility = View.VISIBLE
+
+                    val addToTable = {x: AnkoContext<TableLayout>.() -> TableRow ->
+                        salaah_times_summary_table.addView(
+                                with(AnkoContext.create(act, salaah_times_summary_table), x))}
+                    val tSize = 18f
+                    val tSubheaderSize = 20f
+                    for ((type, times) in remaining) {
                         addToTable {
                             tableRow {
-                                textView(it.masjidName) {
-                                    textSize = tSize
+                                textView(type.toString(ctx)) {
+                                    textSize = tSubheaderSize
                                 }
-                                textView(formatCalendarAsTime(it.datetime)) {
-                                    textSize = tSize
+                            }
+                        }
+                        times.sortedBy { it.datetime.timeInMillis }.forEach {
+                            addToTable {
+                                tableRow {
+                                    textView(it.masjidName) {
+                                        textSize = tSize
+                                    }
+                                    textView(formatCalendarAsTime(it.datetime)) {
+                                        textSize = tSize
+                                    }
                                 }
                             }
                         }
                     }
                 }
             } failUi {
-                toast(getString(R.string.get_masjid_times_failure_toast, it.message))
+                ifAttachedToAct {
+                    toast(getString(R.string.get_masjid_times_failure_toast, it.message))
+                }
             }
         }
     }

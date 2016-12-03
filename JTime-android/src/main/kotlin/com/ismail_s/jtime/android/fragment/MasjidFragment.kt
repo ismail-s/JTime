@@ -48,28 +48,32 @@ class MasjidFragment : BaseFragment() {
         }
         cancelPromiseOnFragmentDestroy {
             RestClient(act).getMasjidTimes(masjidId, date) successUi {
-                if (it.fajrTime != null) {
-                    val fTime = formatCalendarAsTime(it.fajrTime as GregorianCalendar)
-                    rootView.find<TextView>(R.id.fajr_date).text = fTime
-                }
-                if (it.zoharTime != null) {
-                    val zTime = formatCalendarAsTime(it.zoharTime as GregorianCalendar)
-                    rootView.find<TextView>(R.id.zohar_date).text = zTime
-                }
-                if (it.asrTime != null) {
-                    val aTime = formatCalendarAsTime(it.asrTime as GregorianCalendar)
-                    rootView.find<TextView>(R.id.asr_date).text = aTime
-                }
-                if (it.magribTime != null) {
-                    val mTime = formatCalendarAsTime(it.magribTime as GregorianCalendar)
-                    rootView.find<TextView>(R.id.magrib_date).text = mTime
-                }
-                if (it.eshaTime != null) {
-                    val eTime = formatCalendarAsTime(it.eshaTime as GregorianCalendar)
-                    rootView.find<TextView>(R.id.esha_date).text = eTime
+                ifAttachedToAct {
+                    if (it.fajrTime != null) {
+                        val fTime = formatCalendarAsTime(it.fajrTime as GregorianCalendar)
+                        rootView.find<TextView>(R.id.fajr_date).text = fTime
+                    }
+                    if (it.zoharTime != null) {
+                        val zTime = formatCalendarAsTime(it.zoharTime as GregorianCalendar)
+                        rootView.find<TextView>(R.id.zohar_date).text = zTime
+                    }
+                    if (it.asrTime != null) {
+                        val aTime = formatCalendarAsTime(it.asrTime as GregorianCalendar)
+                        rootView.find<TextView>(R.id.asr_date).text = aTime
+                    }
+                    if (it.magribTime != null) {
+                        val mTime = formatCalendarAsTime(it.magribTime as GregorianCalendar)
+                        rootView.find<TextView>(R.id.magrib_date).text = mTime
+                    }
+                    if (it.eshaTime != null) {
+                        val eTime = formatCalendarAsTime(it.eshaTime as GregorianCalendar)
+                        rootView.find<TextView>(R.id.esha_date).text = eTime
+                    }
                 }
             } failUi {
-                longToast(getString(R.string.get_masjid_times_failure_toast, it.message))
+                ifAttachedToAct {
+                    longToast(getString(R.string.get_masjid_times_failure_toast, it.message))
+                }
             }
         }
         return rootView
