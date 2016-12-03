@@ -177,7 +177,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     private fun startLocationUpdates() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                googleApiClient?.isConnected == true) {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest,
                 locationListener)
         }
