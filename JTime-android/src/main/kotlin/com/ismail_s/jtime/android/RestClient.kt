@@ -125,7 +125,10 @@ class RestClient {
                                     "f" -> res.fajrTime = datetime
                                     "z" -> res.zoharTime = datetime
                                     "a" -> res.asrTime = datetime
-                                    "m" -> res.magribTime = datetime
+                                    "m" -> {
+                                        datetime.add(Calendar.MINUTE, 5)
+                                        res.magribTime = datetime
+                                    }
                                     "e" -> res.eshaTime = datetime
                                 }
                             }
@@ -168,6 +171,8 @@ class RestClient {
                                 val datetimeStr = time.getString("datetime")
                                 val datetime = GregorianCalendar()
                                 datetime.time = dateFormatter.parse(datetimeStr)
+                                if (type == SalaahType.MAGRIB)
+                                    datetime.add(Calendar.MINUTE, 5)
                                 res += SalaahTimePojo(masjidId, masjidName, masjidLoc, type, datetime)
                             }
                             deferred resolve res
