@@ -165,8 +165,10 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     private fun startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest,
-            locationListener)
+        if (googleApiClient?.isConnected == true) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest,
+                locationListener)
+        }
     }
 
     override fun onConnectionSuspended(cause: Int) {}
