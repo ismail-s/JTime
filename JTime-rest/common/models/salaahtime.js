@@ -164,7 +164,7 @@ SalaahTime.remoteMethod(
 
             var fieldsToReturn = {type: true, masjidId: true, datetime: true};
             var baseWhereQuery = {datetime: {between: [start_date, end_date]}};
-            if (salaahType && inString(salaahType, "fzae")) {
+            if (salaahType && inString(salaahType, "fzame")) {
                 baseWhereQuery.type = salaahType;
             }
             if (location) {
