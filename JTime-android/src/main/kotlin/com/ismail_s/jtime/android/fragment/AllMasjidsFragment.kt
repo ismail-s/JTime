@@ -42,22 +42,24 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
     }
 
     override fun onRefresh() {
-        RestClient(act).getMasjids() successUi { masjids ->
-            if (activity != null) {
-                mainAct.location successUi {
-                    hideRefreshIcon()
-                    if (activity != null)
-                        rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), mainAct)
-                } failUi {
-                    hideRefreshIcon()
-                    if (activity != null)
-                        rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByName(masjids), mainAct)
+        cancelPromiseOnFragmentDestroy {
+            RestClient(act).getMasjids() successUi { masjids ->
+                if (activity != null) {
+                    mainAct.location successUi {
+                        hideRefreshIcon()
+                        if (activity != null)
+                            rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), mainAct)
+                    } failUi {
+                        hideRefreshIcon()
+                        if (activity != null)
+                            rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByName(masjids), mainAct)
+                    }
                 }
+            } failUi {
+                hideRefreshIcon()
+                if (activity != null)
+                    longToast(getString(R.string.get_masjids_failure_toast, it.message))
             }
-        } failUi {
-            hideRefreshIcon()
-            if (activity != null)
-                longToast(getString(R.string.get_masjids_failure_toast, it.message))
         }
     }
 

@@ -48,25 +48,29 @@ class NearbyTimesFragment : BaseFragment() {
 
     private fun getTimesAndDisplayInUi(loc: Location) {
         val table = salaah_times_table
-        RestClient(act).getTimesForNearbyMasjids(loc.latitude, loc.longitude, salaahType)
-                .successUi {
-                    table.removeAllViews()
-                    it.sortedBy { it.datetime.timeInMillis }.forEach {
-                        table.addView(with(AnkoContext.create(act, table)) {
-                            tableRow {
-                                val tSize = 18f
-                                textView(it.masjidName) {
-                                    textSize = tSize
+        cancelPromiseOnFragmentDestroy {
+            RestClient(act).getTimesForNearbyMasjids(loc.latitude, loc.longitude, salaahType)
+                    .successUi {
+                        table.removeAllViews()
+                        it.sortedBy { it.datetime.timeInMillis }.forEach {
+                            table.addView(with(AnkoContext.create(act, table)) {
+                                tableRow {
+                                    val tSize = 18f
+                                    textView(it.masjidName) {
+                                        textSize = tSize
+                                    }
+                                    textView(formatCalendarAsTime(it.datetime)) {
+                                        textSize = tSize
+                                    }
                                 }
-                                textView(formatCalendarAsTime(it.datetime)) {
-                                    textSize = tSize
-                                }
-                            }
-                        })
-                    }
-                } failUi {
-            debug("Failed to get nearby times from masjid")
-            toast(getString(R.string.get_masjid_times_failure_toast, it.message))
+                            })
+                        }
+                    } failUi {
+                        ifAttachedToAct {
+                            debug("Failed to get nearby times from masjid")
+                            toast(getString(R.string.get_masjid_times_failure_toast, it.message))
+                        }
+            }
         }
     }
 
