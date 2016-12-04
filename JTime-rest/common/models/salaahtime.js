@@ -169,7 +169,7 @@ SalaahTime.remoteMethod(
             }
             if (location) {
                 //get the nearest masjids, add them to faveMasjidIds
-                Masjid.findAsync({limit: 10, fields: {id: true, name: true, location: true}, where: {location: {near: location}}})
+                Masjid.findAsync({limit: 30, fields: {id: true, name: true, location: true}, where: {location: {near: location, maxDistance: 5, unit: 'miles'}}})
                     .then(function(masjids) {
                         faveMasjidIds = faveMasjidIds.concat(masjids.map(function(m){return m.id}));
                         masjids.forEach(function(m){masjidNameLocMap[m.id] = [m.name, m.location]});
