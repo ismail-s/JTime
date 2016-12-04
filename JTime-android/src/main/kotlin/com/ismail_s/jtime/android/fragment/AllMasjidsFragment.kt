@@ -18,6 +18,9 @@ import org.jetbrains.anko.find
 import org.jetbrains.anko.support.v4.act
 import org.jetbrains.anko.support.v4.longToast
 
+/**
+* Display a list of all masjids on the rest server.
+*/
 class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var layout: SwipeRefreshLayout
     private lateinit var rView: RecyclerView
@@ -39,24 +42,30 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
     }
 
     override fun onRefresh() {
-        RestClient(act).getMasjids() successUi {
-            val masjids = it
-            if (activity != null) {
-                mainAct.location successUi {
-                    hideRefreshIcon()
-                    if (activity != null)
-                        rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), mainAct)
-                } failUi {
-                    hideRefreshIcon()
-                    if (activity != null)
-                        rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByName(masjids), mainAct)
+        cancelPromiseOnFragmentDestroy {
+            RestClient(act).getMasjids() successUi { masjids ->
+                if (activity != null) {
+                    mainAct.location successUi {
+                        hideRefreshIcon()
+                        if (activity != null)
+                            rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), mainAct)
+                    } failUi {
+                        hideRefreshIcon()
+                        if (activity != null)
+                            rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByName(masjids), mainAct)
+                    }
                 }
+            } failUi {
+                hideRefreshIcon()
+                if (activity != null)
+                    longToast(getString(R.string.get_masjids_failure_toast, it.message))
             }
-        } failUi {
-            hideRefreshIcon()
-            if (activity != null)
-                longToast(getString(R.string.get_masjids_failure_toast, it.message))
         }
+    }
+
+    override fun onLocationChanged(loc: Location) {
+        layout.isRefreshing = true
+        onRefresh()
     }
 
     private fun sortMasjidsByLocation(masjids: List<MasjidPojo>, userLocation: Location): List<MasjidPojo> {

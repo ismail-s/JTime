@@ -56,7 +56,7 @@
         "principalType": "ROLE",
         "principalId": "$everyone",
         "permission": "ALLOW",
-        "property": "getTimesForMasjidsForToday"
+        "property": ["getTimesForMultipleMasjids", "getTimesForMasjidsForToday"]
     }],
     "methods": {}
 }

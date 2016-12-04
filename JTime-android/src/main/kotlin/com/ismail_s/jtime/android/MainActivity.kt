@@ -1,9 +1,14 @@
 package com.ismail_s.jtime.android
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
+import android.Manifest
 import android.os.Bundle
+import android.support.annotation.NonNull
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Gravity
@@ -13,7 +18,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.LocationListener
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.ismail_s.jtime.android.fragment.*
 import com.ismail_s.jtime.android.pojo.SalaahType
 import com.mikepenz.materialdrawer.AccountHeader
@@ -27,17 +36,29 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
 import nl.komponents.kovenant.deferred
+import nl.komponents.kovenant.ui.failUi
+import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.*
 import java.util.*
 
-class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+/**
+ * This activity holds all the fragments that make up the app, and manages the nav drawers and
+ * Google Play Services (ie login with google, location).
+ */
+class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, ActivityCompat.OnRequestPermissionsResultCallback {
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
     lateinit var rightDrawer: Drawer
-    lateinit var googleApiClient: GoogleApiClient
     lateinit var toolbar: Toolbar
     var locationDeferred = deferred<Location, Exception>()
     var location = locationDeferred.promise
+    private val locationRequest: LocationRequest by lazy {
+        val locRequest = LocationRequest()
+        locRequest.interval = 20000
+        locRequest.fastestInterval = 10000
+        locRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        locRequest
+    }
     /**
     * Login status is 0 for don't know, 1 for logged in and 2 for logged out
     */
@@ -52,27 +73,39 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     private val TOOLBAR_TITLE = "toolbar_title"
     private val LOGIN_STATUS = "login_status"
 
+    private val locationListener = LocationListener {
+        /*Location should be updated unless the new location is less than
+          50 metres from the last location we had. 50 is an arbitrarily
+          chosen small-but-not-too-small number.*/
+        val weShouldUpdateTheLocation = if (location.isSuccess())
+                location.get().distanceTo(it) >= 50
+            else true
+        if (weShouldUpdateTheLocation) {
+            locationDeferred = deferred<Location, Exception>()
+            location = locationDeferred.promise
+            locationDeferred resolve it
+            currentFragment?.onLocationChanged(it)
+        }
+    }
+
     private val logoutDrawerItem: PrimaryDrawerItem
         get() = PrimaryDrawerItem()
                 .withName(getString(R.string.drawer_item_logout))
                 .withIdentifier(LOGOUT_DRAWER_ITEM_IDENTIFIER)
                 .withOnDrawerItemClickListener { view, i, iDrawerItem ->
-                    val cb = object : RestClient.LogoutCallback {
-                        override fun onSuccess() {
-                            loginStatus = 2
-                            toast(getString(R.string.logout_success_toast))
-                            //Remove logout button, add login button to nav drawer
-                            header.removeProfile(0)
-                            drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
-                            drawer?.addItemAtPosition(loginDrawerItem, 0)
-                            //remove addMasjidDrawerItem
-                            drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
-                            currentFragment?.onLogout()
-                        }
-
-                        override fun onError(t: Throwable) = toast(getString(R.string.logout_failure_toast, t.message))
+                    RestClient(this).logout() successUi {
+                        loginStatus = 2
+                        toast(getString(R.string.logout_success_toast))
+                        //Remove logout button, add login button to nav drawer
+                        header.removeProfile(0)
+                        drawer?.removeItem(LOGOUT_DRAWER_ITEM_IDENTIFIER)
+                        drawer?.addItemAtPosition(loginDrawerItem, 0)
+                        //remove addMasjidDrawerItem
+                        drawer?.removeItem(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
+                        currentFragment?.onLogout()
+                    } failUi {
+                        toast(getString(R.string.logout_failure_toast, it.message))
                     }
-                    RestClient(this).logout(cb)
                     true
                 }
 
@@ -82,7 +115,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                 .withIdentifier(LOGIN_DRAWER_ITEM_IDENTIFIER)
                 .withOnDrawerItemClickListener { view, i, iDrawerItem ->
                     val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
-                   startActivityForResult(signInIntent, Constants.RC_SIGN_IN)
+                   startActivityForResult(signInIntent, RC_SIGN_IN)
                     true
                 }
 
@@ -102,16 +135,65 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         toast(getString(R.string.login_failure_toast, connectionResult.toString()))
     }
 
+    /**
+     * Called when we connect to Google Play Services. In this method, we sort out stuff relating
+     * to getting the users location.
+     */
     override fun onConnected(connectionHint: Bundle?) {
-       if (location.isDone()) {
-           return
-       }
-       val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
-       if (loc == null) {
-           locationDeferred.reject(Exception(getString(R.string.no_location_exception)))
-       } else {
-           locationDeferred.resolve(loc)
-       }
+        //Check if location permission has been granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_RESULT_CODE)
+            return
+        }
+        if (!location.isDone()) {
+            val loc = LocationServices.FusedLocationApi.getLastLocation(googleApiClient)
+            if (loc == null) {
+                locationDeferred reject Exception(getString(R.string.no_location_exception))
+            } else {
+                locationDeferred resolve loc
+            }
+        }
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
+                .setResultCallback {
+                    when(it.status.statusCode) {
+                        LocationSettingsStatusCodes.SUCCESS ->{
+                            //We can request the location now
+                            startLocationUpdates()
+                        }
+                        LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+                            //Show dialog prompting user to change location settings
+                            it.status.startResolutionForResult(this, RC_CHECK_SETTINGS)
+                            longToast("Please change your location settings in order to see nearby salaah times.")
+                        }
+                        LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
+                            //Show a toast saying we can't get the location at all
+                            toast(getString(R.string.no_location_exception))
+                        }
+                    }
+                }
+    }
+
+    private fun startLocationUpdates() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                googleApiClient?.isConnected == true) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest,
+                locationListener)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, @NonNull permissions: Array<out String>, @NonNull grantResults: IntArray) {
+        if (requestCode == LOCATION_PERMISSION_RESULT_CODE) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.size > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    onConnected(null)
+            } else if (!location.isDone()) {
+                locationDeferred reject Exception(getString(R.string.no_location_exception))
+            }
+        }
     }
 
     override fun onConnectionSuspended(cause: Int) {}
@@ -127,28 +209,27 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         setUpNavDrawer(savedInstanceState)
         setUpRightDrawer(savedInstanceState)
 
-        val cb = object: RestClient.SignedinCallback {
-            override fun onLoggedOut() {
-                loginStatus = 2
-                //Set button to be login, create drawer
-                drawer?.addItemAtPosition(loginDrawerItem, 0)
-            }
-
-            override fun onLoggedIn() {
-                loginStatus = 1
-                //Set button to be logout, create drawer
-                drawer?.addItemAtPosition(logoutDrawerItem, 0)
-                val email: String = SharedPreferencesWrapper(this@MainActivity).email
-                header.addProfile(ProfileDrawerItem().withEmail(email), 0)
-                //add addMasjidDrawerItem
-                drawer?.addItem(addMasjidDrawerItem)
-            }
+        val onLoggedOut = {
+            loginStatus = 2
+            //Set button to be login, create drawer
+            drawer?.addItemAtPosition(loginDrawerItem, 0)
+        }
+        val onLoggedIn = {
+            loginStatus = 1
+            //Set button to be logout, create drawer
+            drawer?.addItemAtPosition(logoutDrawerItem, 0)
+            val email: String = SharedPreferencesWrapper(this@MainActivity).email
+            header.addProfile(ProfileDrawerItem().withEmail(email), 0)
+            //add addMasjidDrawerItem
+            drawer?.addItem(addMasjidDrawerItem)
         }
         val loggedInStatus = savedInstanceState?.getInt(LOGIN_STATUS, 0) ?: 0
         when (loggedInStatus) {
-            1 -> cb.onLoggedIn()
-            2 -> cb.onLoggedOut()
-            else -> RestClient(this).checkIfStillSignedInOnServer(cb)
+            1 -> onLoggedIn()
+            2 -> onLoggedOut()
+            else -> RestClient(this).areWeStillSignedInOnServer()
+                .successUi {onLoggedIn()}
+                .failUi {onLoggedOut()}
         }
 
         // Check that the activity is using the layout version with
@@ -165,6 +246,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     private fun setUpGoogleApiClient() {
+        if (googleApiClient != null)
+            return
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken("654477471044-i8156m316nreihgdqoicsh0gktgqjaua.apps.googleusercontent.com")
@@ -223,7 +306,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     private fun setUpRightDrawer(savedInstance: Bundle?) {
-        val drawerItems = SalaahType.values().filter { it != SalaahType.MAGRIB }.map {
+        val drawerItems = SalaahType.values().map {
                 SecondaryDrawerItem()
                     .withName(it.toString(ctx))
                     .withOnDrawerItemClickListener { view, position, drawerItem ->
@@ -259,17 +342,30 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     override fun onStart() {
-        googleApiClient.connect()
+        googleApiClient?.connect()
         super.onStart()
     }
 
     override fun onStop() {
-        googleApiClient.disconnect()
+        googleApiClient?.disconnect()
         super.onStop()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (googleApiClient?.isConnected == true)
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationListener)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (googleApiClient?.isConnected == true)
+            startLocationUpdates()
     }
 
     override fun onDestroy() {
         stopKovenant()
+        googleApiClient = null
         super.onDestroy()
     }
 
@@ -282,13 +378,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode == Constants.RC_SIGN_IN) {
-            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            if (result.isSuccess) {
-                loginStatus = 1
-                val acct = result.signInAccount as GoogleSignInAccount
-                val cb = object: RestClient.LoginCallback {
-                    override fun onSuccess(id: Int, accessToken: String) {
+        when (requestCode) {
+            RC_SIGN_IN -> {
+                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+                if (result.isSuccess) {
+                    loginStatus = 1
+                    val acct = result.signInAccount as GoogleSignInAccount
+                    RestClient(this).login(acct.idToken!!, acct.email!!) successUi {
                         header.addProfile(ProfileDrawerItem().withEmail(acct.email), 0)
                         //Remove login button, add logout button to nav drawer
                         drawer?.removeItem(LOGIN_DRAWER_ITEM_IDENTIFIER)
@@ -297,13 +393,23 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                         drawer?.addItem(addMasjidDrawerItem)
                         toast(getString(R.string.login_success_toast))
                         currentFragment?.onLogin()
-                    }
-
-                    override fun onError(t: Throwable) {
-                        toast(getString(R.string.login_failure_toast, t.message))
+                    } failUi {
+                        toast(getString(R.string.login_failure_toast, it.message))
                     }
                 }
-                RestClient(this).login(acct.idToken!!, acct.email!!, cb)
+            }
+            RC_CHECK_SETTINGS -> {
+                when (resultCode) {
+                    RESULT_OK -> {
+                        //Location settings were successfully changed
+                        toast("Location settings changed. Trying to get your location.")
+                        startLocationUpdates()
+                    }
+                    RESULT_CANCELED -> {
+                        //Location settings were not changed
+                        toast("Location settings weren't changed. Some features in the app won't work fully.")
+                    }
+                }
             }
         }
     }
@@ -341,5 +447,12 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         drawer?.closeDrawer()
         rightDrawer.closeDrawer()
         toolbar.title = getString(title)
+    }
+
+    companion object {
+        private val RC_SIGN_IN = 9001
+        private val RC_CHECK_SETTINGS = 9002
+        private val LOCATION_PERMISSION_RESULT_CODE = 11
+        var googleApiClient: GoogleApiClient? = null
     }
 }

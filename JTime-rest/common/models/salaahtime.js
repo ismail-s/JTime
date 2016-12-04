@@ -1,5 +1,6 @@
 var Promise = require("bluebird");
 var updateTimestamp = require("../updateTimestamp");
+var getSunsetTimes = require("../sunsetTimes").getSunsetTimes;
 
 function inString(char, str) {
     var list = str.split('');
@@ -129,7 +130,7 @@ SalaahTime.remoteMethod(
     }
 );
 
-    SalaahTime.getTimesForMasjidsForToday = function(salaahType, location, faveMasjidIds, cb) {
+    SalaahTime.getTimesForMultipleMasjids = function(date, salaahType, location, faveMasjidIds, cb) {
         SalaahTime.findAsync = Promise.promisify(SalaahTime.find, {context: SalaahTime});
         if ((faveMasjidIds === null || faveMasjidIds === undefined) && (location === null || location === undefined)) {
             return cb(null, []);
@@ -148,11 +149,11 @@ SalaahTime.remoteMethod(
                     s.masjidName = masjidNameLocMap[s.masjidId][0];
                     s.masjidLocation = masjidNameLocMap[s.masjidId][1];
                     return s;
-                })
+                });
             };
 
         // Create date objs for start and end of day
-        var today = new Date();
+        var today = date;
         var end_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 23, 59, 59, 999));
         var start_date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0, 0));
 
@@ -163,22 +164,32 @@ SalaahTime.remoteMethod(
 
             var fieldsToReturn = {type: true, masjidId: true, datetime: true};
             var baseWhereQuery = {datetime: {between: [start_date, end_date]}};
-            if (salaahType && inString(salaahType, "fzae")) {
-                baseWhereQuery.type = salaahType
+            if (salaahType && inString(salaahType, "fzame")) {
+                baseWhereQuery.type = salaahType;
             }
             if (location) {
                 //get the nearest masjids, add them to faveMasjidIds
-                Masjid.findAsync({limit: 10, fields: {id: true, name: true, location: true}, where: {location: {near: location}}})
+                Masjid.findAsync({limit: 30, fields: {id: true, name: true, location: true}, where: {location: {near: location, maxDistance: 5, unit: 'miles'}}})
                     .then(function(masjids) {
                         faveMasjidIds = faveMasjidIds.concat(masjids.map(function(m){return m.id}));
                         masjids.forEach(function(m){masjidNameLocMap[m.id] = [m.name, m.location]});
                         baseWhereQuery.masjidId = {inq: faveMasjidIds};
                         return SalaahTime.findAsync({
                             fields: fieldsToReturn,
-                            where: baseWhereQuery})
+                            where: baseWhereQuery});
                     }).then(function(instances) {
-                        var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
-                        return cb(null, result);
+                        //Get magrib times, add them to instances
+                        if (!salaahType || salaahType == "m") {
+                            //Get magrib times, add them to instances
+                            var argList = Object.keys(masjidNameLocMap).map(function(k) {return {masjidId: k, location: masjidNameLocMap[k][1]}});
+                            return getSunsetTimes(argList, date).then(function(sunsets) {
+                                var result = addMasjidNamesAndLocsToSalaahTimes(instances.concat(sunsets), masjidNameLocMap);
+                                return cb(null, result);
+                            });
+                        } else {
+                            var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
+                            return cb(null, result);
+                        }
                     }).catch(handleDBError);
             } else {
                 baseWhereQuery.masjidId = {inq: faveMasjidIds};
@@ -186,39 +197,87 @@ SalaahTime.remoteMethod(
                     fields: fieldsToReturn,
                     where: baseWhereQuery
                 }).then(function(instances) {
-                    var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
-                    return cb(null, result);
+                    if (!salaahType || salaahType == "m") {
+                        //Get magrib times, add them to instances
+                        var argList = Object.keys(masjidNameLocMap).map(function(k) {return {masjidId: k, location: masjidNameLocMap[k][1]}});
+                        return getSunsetTimes(argList, date).then(function(sunsets) {
+                            var result = addMasjidNamesAndLocsToSalaahTimes(instances.concat(sunsets), masjidNameLocMap);
+                            return cb(null, result);
+                        });
+                    } else {
+                        var result = addMasjidNamesAndLocsToSalaahTimes(instances, masjidNameLocMap);
+                        return cb(null, result);
+                    }
                 }).catch(handleDBError);
             }
         }).catch(handleDBError);
     };
 
-SalaahTime.remoteMethod(
-    'getTimesForMasjidsForToday', {
-        description: ["Get salaah times for today for masjids for a particular ",
-                    "salaah type (optional), for certain masjids and for ",
-                    "masjids near to a certain location"],
-        accepts: [{
-            arg: 'salaahType',
-            type: 'string',
-            required: false
-        }, {
-            arg: 'location',
-            type: 'GeoPoint',
-            required: false
-        }, {
-            arg: 'faveMasjidIds',
-            type: ['number'],
-            required: false
-        }],
-        returns: {
-            arg: 'res',
-            type: 'array'
-        },
-        http: {
-            path: '/times-for-masjids-for-today',
-            verb: 'get'
+    SalaahTime.remoteMethod(
+        'getTimesForMultipleMasjids', {
+            description: ["Get salaah times for today for masjids for a particular ",
+                        "salaah type (optional), for certain masjids and for ",
+                        "masjids near to a certain location"],
+            accepts: [{
+                arg: 'date',
+                type: 'Date',
+                required: true
+            },{
+                arg: 'salaahType',
+                type: 'string',
+                required: false
+            }, {
+                arg: 'location',
+                type: 'GeoPoint',
+                required: false
+            }, {
+                arg: 'faveMasjidIds',
+                type: ['number'],
+                required: false
+            }],
+            returns: {
+                arg: 'res',
+                type: 'array'
+            },
+            http: {
+                path: '/times-for-multiple-masjids',
+                verb: 'get'
+            }
         }
-    }
-);
+    );
+
+    SalaahTime.getTimesForMasjidsForToday = function(salaahType, location, faveMasjidIds, cb) {
+        return SalaahTime.getTimesForMultipleMasjids(new Date(), salaahType, location, faveMasjidIds, cb);
+    };
+
+    SalaahTime.remoteMethod(
+        'getTimesForMasjidsForToday', {
+            description: ["Deprecated method, due to be removed in version 2.0.0. ",
+                        "Get salaah times for today for masjids for a particular ",
+                        "salaah type (optional), for certain masjids and for ",
+                        "masjids near to a certain location. The determination ",
+                        "of today is done by server time."],
+            accepts: [{
+                arg: 'salaahType',
+                type: 'string',
+                required: false
+            }, {
+                arg: 'location',
+                type: 'GeoPoint',
+                required: false
+            }, {
+                arg: 'faveMasjidIds',
+                type: ['number'],
+                required: false
+            }],
+            returns: {
+                arg: 'res',
+                type: 'array'
+            },
+            http: {
+                path: '/times-for-masjids-for-today',
+                verb: 'get'
+            }
+        }
+    );
 };

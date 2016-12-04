@@ -11,7 +11,7 @@ module.exports = function(User) {
             json: true
         };
         request(options, function(error, response, body) {
-            if (!error && response.statusCode == 200 && body.aud == settings.clientId) {
+            if (!error && response.statusCode == 200 && body.aud == settings.clientId && !body.email.endsWith("cloudtestlabaccounts.com")) {
                 var username = "google." + body.sub;
                 var query = {
                     where: {

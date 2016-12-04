@@ -10,6 +10,9 @@ import com.ismail_s.jtime.android.R
 import org.jetbrains.anko.debug
 import org.jetbrains.anko.find
 
+/**
+* Display help text that can be scrolled and has clickable links.
+*/
 class HelpFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {

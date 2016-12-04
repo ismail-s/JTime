@@ -13,6 +13,8 @@ import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsDate
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
 import com.ismail_s.jtime.android.pojo.MasjidPojo
 import com.ismail_s.jtime.android.pojo.SalaahType
+import nl.komponents.kovenant.ui.failUi
+import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.find
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.support.v4.act
@@ -21,6 +23,10 @@ import org.jetbrains.anko.support.v4.toast
 import org.jetbrains.anko.support.v4.withArguments
 import java.util.*
 
+/**
+ * Fragment that allows the user to add/edit the salaah times for a particular masjid. The user
+ * must be logged in to use this fragment. This fragment is reached from [MasjidFragment].
+ */
 class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
 
     data class Time(val hour: Int, val minute: Int)
@@ -66,21 +72,17 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         buttons = buttonIds.map {rootView.findViewById(it) as Button }
         setButtonOnClickListeners(rootView, buttons)
         //Get times for date
-        val cb = object : RestClient.MasjidTimesCallback {
-            override fun onSuccess(times: MasjidPojo) {
-                currentMasjidPojo = times
-                setLabels(date, currentSalaahType)
-                handleUndoButtonClick()
-            }
+        RestClient(act).getMasjidTimes(masjidId, date) successUi {
+            currentMasjidPojo = it
+            setLabels(date, currentSalaahType)
+            handleUndoButtonClick()
 
-            override fun onError(t: Throwable) {
-                longToast(getString(R.string.get_masjid_times_failure_toast, t.message))
-                // As we can't get the times (so can't edit them), we switch
-                // back to viewing the times
-                (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
-            }
+        } failUi {
+            longToast(getString(R.string.get_masjid_times_failure_toast, it.message))
+            // As we can't get the times (so can't edit them), we switch
+            // back to viewing the times
+            (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
         }
-        RestClient(act).getMasjidTimes(masjidId, cb, date)
         showKeyboard()
         return rootView
     }
@@ -165,26 +167,21 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             //Switch to next day
             val nextDate = date.clone() as GregorianCalendar
             nextDate.add(Calendar.DAY_OF_MONTH, dayOffset)
-            val cb2 = object : RestClient.MasjidTimesCallback {
-                override fun onSuccess(times: MasjidPojo) {
-                    currentMasjidPojo = times
-                    date = nextDate
-                    //enable all buttons
-                    buttons.map { it.isEnabled = true }
-                    then(newDate)
-                }
-
-                override fun onError(t: Throwable) {
-                    val s = getString(R.string.get_masjid_times_failure_toast, t.message)
-                    toast(s)
-                    //TODO-should this (next) line be here
-                    (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
-                }
-            }
             //disable all buttons here whilst we get the masjid times for the
             // new day
             buttons.map { it.isEnabled = false }
-            RestClient(act).getMasjidTimes(masjidId, cb2, nextDate)
+            RestClient(act).getMasjidTimes(masjidId, nextDate) successUi {
+                currentMasjidPojo = it
+                date = nextDate
+                //enable all buttons
+                buttons.map { it.isEnabled = true }
+                then(newDate)
+            } failUi {
+                val s = getString(R.string.get_masjid_times_failure_toast, it.message)
+                toast(s)
+                //TODO-should this (next) line be here
+                (act as? MainActivity)?.switchToMasjidsFragment(masjidId, masjidName)
+            }
             setLabels(nextDate, currentSalaahType)
         }
     }
@@ -276,17 +273,12 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
         val newDate = date.clone() as GregorianCalendar
         newDate.set(Calendar.HOUR_OF_DAY, time.hour)
         newDate.set(Calendar.MINUTE, time.minute)
-        val cb1 = object : RestClient.CreateOrUpdateMasjidTimeCallback {
-            override fun onSuccess() {
-                toast("DB updated with ${time.hour}:${time.minute}")
-
-            }
-            override fun onError(t: Throwable) {
-                toast(getString(R.string.salaah_time_update_failure_toast, t.message))
-            }
-        }
         if (formatCalendarAsTime(newDate) != currentSavedTime) {
-            RestClient(act).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate, cb1)
+            RestClient(act).createOrUpdateMasjidTime(masjidId, currentSalaahType, newDate) successUi {
+                toast("DB updated with ${time.hour}:${time.minute}")
+            } failUi {
+                toast(getString(R.string.salaah_time_update_failure_toast, it.message))
+            }
         }
         when (currentSalaahType) {
             SalaahType.FAJR -> {
@@ -314,7 +306,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
      */
     private fun getTextboxTimeIfValid(): Time? {
         val timeString = masjidTimeTextbox.text
-        if (!(timeString.length in 4..5)) {
+        if (timeString.length !in 4..5) {
             return null
         }
         val match = timeRegex.matchEntire(timeString)
@@ -324,7 +316,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
             val (h, m) = match.destructured
             val hour = h.toInt()
             val minute = m.toInt()
-            if (!(hour in 0..23 && minute in 0..59)) {
+            if (hour !in 0..23 || minute !in 0..59) {
                 return null
             } else {
                 return Time(hour, minute)

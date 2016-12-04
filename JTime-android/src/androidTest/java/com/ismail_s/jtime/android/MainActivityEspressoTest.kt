@@ -16,9 +16,7 @@ import android.widget.TableLayout
 import android.widget.TableRow
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
 import nl.komponents.kovenant.deferred
-import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.containsString
-import org.hamcrest.CoreMatchers.not
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
@@ -34,6 +32,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
     @Before
     @Throws(Exception::class)
     public override fun setUp() {
+        MainActivity.Companion.googleApiClient = MockGoogleApiClient()
         super.setUp()
         createMockWebServerAndConnectToRestClient()
         injectInstrumentation(InstrumentationRegistry.getInstrumentation())
@@ -49,7 +48,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         mockLocation.latitude = 51.507
         mockLocation.longitude = -0.1275
         val newDeferred = deferred<Location, Exception>()
-        newDeferred.resolve(mockLocation)
+        newDeferred resolve mockLocation
         act.locationDeferred = newDeferred
         act.location = newDeferred.promise
     }
@@ -112,7 +111,7 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
         onView(allOf(withId(R.id.fajr_date), isCompletelyDisplayed())).check(matches(withText("05:30")))
         onView(allOf(withId(R.id.zohar_date), isCompletelyDisplayed())).check(matches(withText("12:00")))
         onView(allOf(withId(R.id.asr_date), isCompletelyDisplayed())).check(matches(withText("15:00")))
-        onView(allOf(withId(R.id.magrib_date), isCompletelyDisplayed())).check(matches(withText("15:12")))
+        onView(allOf(withId(R.id.magrib_date), isCompletelyDisplayed())).check(matches(withText("15:17")))
         onView(allOf(withId(R.id.esha_date), isCompletelyDisplayed())).check(matches(withText("19:45")))
     }
 

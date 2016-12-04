@@ -3,6 +3,7 @@ var async = require('async');
 var loopback = require('loopback');
 var settings = require('../../settings');
 var gmAPI = require("googlemaps");
+var getSunsetTime = require("../sunsetTimes").getSunsetTime;
 var GoogleMapsAPI = new gmAPI({
     key: settings.googleMapsKey,
     secure: true
@@ -184,34 +185,6 @@ module.exports = function(Masjid) {
         };
     });
 
-    Masjid.getTodayTimes = function(id, cb) {
-        var today = new Date();
-        Masjid.getTimes(id, today, function(err, instances) {
-            if (err != null) {
-                console.error(err, instances, id);
-                cb(500);
-                return;
-            }
-            cb(null, instances);
-        });
-    };
-    Masjid.remoteMethod(
-        'getTodayTimes', {
-            accepts: [{
-                arg: 'id',
-                type: 'number',
-                required: true
-            }],
-            returns: {
-                arg: 'times',
-                type: 'Array'
-            },
-            http: {
-                path: '/:id/times-for-today',
-                verb: 'get'
-            }
-        }
-    );
     Masjid.getTimes = function(id, date, cb) {
         var SalaahTime = Masjid.app.models.SalaahTime;
         // Create date objs for start and end of day
@@ -237,7 +210,25 @@ module.exports = function(Masjid) {
                     cb(500);
                     return;
                 }
-                cb(null, instances);
+                Masjid.findOne({where: {id: id}, fields: {location: true}},
+                function(err, masjid) {
+                    if (err != null || !masjid) {
+                        console.error(err, masjid);
+                        if(masjid == null && !err) {
+                            cb(new Error("masjid id not found"));
+                        } else {
+                            cb(500);
+                        }
+                        return;
+                    }
+                    getSunsetTime(masjid.location, date).then(function(sunset) {
+                        instances.push({type: "m", datetime: sunset});
+                        cb(null, instances);
+                    }).catch(function() {
+                        //If we can't get magrib time, just return the other times.
+                        cb(null, instances);
+                    });
+                });
             });
     };
     Masjid.remoteMethod(
@@ -261,4 +252,36 @@ module.exports = function(Masjid) {
             }
         }
     );
+
+    Masjid.getTodayTimes = function(id, cb) {
+         var today = new Date();
+         Masjid.getTimes(id, today, function(err, instances) {
+             if (err != null) {
+                 console.error(err, instances, id);
+                 cb(err);
+                 return;
+             }
+             cb(null, instances);
+         });
+     };
+     Masjid.remoteMethod(
+         'getTodayTimes', {
+             description: ["Deprecated method, due to be removed in v2.0.0. ",
+                            "Returns salaah times for a given masjid, for ",
+                            "today, where today is determined by server time."],
+             accepts: [{
+                 arg: 'id',
+                 type: 'number',
+                 required: true
+             }],
+             returns: {
+                 arg: 'times',
+                 type: 'Array'
+             },
+             http: {
+                 path: '/:id/times-for-today',
+                 verb: 'get'
+             }
+         }
+     );
 };
