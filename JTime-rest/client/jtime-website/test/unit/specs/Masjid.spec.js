@@ -34,7 +34,7 @@ if (!Array.prototype.find) {
 describe('Masjid.vue', () => {
   function setUpComponent (masjids = []) {
     router.push({name: 'masjid-id-date', params: {id: 1, date: '2016-01-01'}})
-    const mockStore = {actions: {getMasjids: sinon.spy(), getSalaahTimes: sinon.spy()}, state: {masjids, salaahTimes: {}}}
+    const mockStore = {actions: {getMasjids: sinon.spy(), getSalaahTimes: sinon.spy()}, state: {MasjidsModule: {masjids}, SalaahTimesModule: {salaahTimes: {}}}}
     const vm = new Vue({
       el: document.createElement('div'),
       render: (h) => h(Masjid),
@@ -74,7 +74,7 @@ describe('Masjid.vue', () => {
 
   it('displays salaahTimes when they are added to the store', (done) => {
     const [vm, mockStore] = setUpComponent()
-    mockStore.state.salaahTimes = {'1': [{'type': 'f', 'datetime': '2016-11-07T06:40:17.354Z'}, {'type': 'z', 'datetime': '2016-11-07T13:00:58.374Z'}, {'type': 'a', 'datetime': '2016-11-07T15:00:58.374Z'}, {'type': 'e', 'datetime': '2016-11-07T18:30:58.374Z'}]}
+    mockStore.state.SalaahTimesModule.salaahTimes = {'1': [{'type': 'f', 'datetime': '2016-11-07T06:40:17.354Z'}, {'type': 'z', 'datetime': '2016-11-07T13:00:58.374Z'}, {'type': 'a', 'datetime': '2016-11-07T15:00:58.374Z'}, {'type': 'e', 'datetime': '2016-11-07T18:30:58.374Z'}]}
     Vue.nextTick(() => {
       const text = vm.$el.textContent
       expect(text).to.contain('Fajr')

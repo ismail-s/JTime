@@ -5,7 +5,7 @@ import AllMasjids from 'src/components/AllMasjids'
 
 describe('AllMasjids.vue', () => {
   function setUpComponent () {
-    const mockStore = {actions: {getMasjids: sinon.spy()}, state: {masjids: []}}
+    const mockStore = {actions: {getMasjids: sinon.spy()}, state: {MasjidsModule: {masjids: []}}}
     const vm = new Vue({
       el: document.createElement('div'),
       render: (h) => h(AllMasjids),
@@ -28,7 +28,7 @@ describe('AllMasjids.vue', () => {
 
   it('should display any masjids added to the state', done => {
     const [vm, mockStore] = setUpComponent()
-    mockStore.state.masjids = [{id: 5, name: 'test', humanReadableAddress: 'sdfa'}]
+    mockStore.state.MasjidsModule.masjids = [{id: 5, name: 'test', humanReadableAddress: 'sdfa'}]
     Vue.nextTick(() => {
       expect(vm.$el.textContent).to.contain('test')
       expect(vm.$el.textContent).to.contain('sdfa')
