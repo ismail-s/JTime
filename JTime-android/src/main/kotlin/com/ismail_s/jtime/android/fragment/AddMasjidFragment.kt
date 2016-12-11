@@ -16,6 +16,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.MainActivity
+import kotlinx.android.synthetic.main.fragment_add_masjid.*
 import nl.komponents.kovenant.ui.failUi
 import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.find
@@ -31,9 +32,6 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
     private var current_marker: Marker? = null
     private var googleMap: GoogleMap? = null
     private var savedInstanceState: Bundle? = null
-    lateinit private var masjidNameTextbox: EditText
-    lateinit private var submitButton: Button
-    lateinit private var mapHelpLabel: TextView
     private val LATITUDE = "latitude"
     private val LONGITUDE = "longitude"
 
@@ -45,10 +43,6 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
         mapFragment.getMapAsync(this)
         childFragmentManager.beginTransaction()
             .add(R.id.map_container, mapFragment).commit()
-        masjidNameTextbox = rootView.find<EditText>(R.id.masjid_name_textbox)
-        mapHelpLabel = rootView.find<TextView>(R.id.map_help_label)
-        submitButton = rootView.find<Button>(R.id.add_masjid_submit_button)
-        submitButton.setOnClickListener(this)
         return rootView
     }
 
@@ -60,11 +54,14 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
             savedInstanceState.putDouble(LONGITUDE, lng)
             savedInstanceState.putDouble(LATITUDE, lat)
         }
+	override fun onStart() {
+		super.onStart()
+		add_masjid_submit_button.setOnClickListener(this)
     }
 
     override fun onClick(view: View) {
         if (view.id == R.id.add_masjid_submit_button) {
-            val masjidName = masjidNameTextbox.text.toString()
+            val masjidName = masjid_name_textbox.text.toString()
             //1. Validate fields
             if (current_marker == null || masjidName == "") {
                 return
@@ -77,16 +74,16 @@ class AddMasjidFragment : BaseFragment(), OnMapReadyCallback, GoogleMap.OnMapLon
                 (act as? MainActivity)?.switchToAllMasjidsFragment()
             } failUi {
                 toast("Error when trying to create masjid: ${it.toString()}")
-                submitButton.isEnabled = true
+                add_masjid_submit_button.isEnabled = true
             }
-            submitButton.isEnabled = false
+            add_masjid_submit_button.isEnabled = false
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         googleMap.setOnMapLongClickListener(this)
-        val submitButtonHeight = submitButton.height
-        val mapHelpLabelHeight = mapHelpLabel.height
+        val submitButtonHeight = add_masjid_submit_button.height
+        val mapHelpLabelHeight = map_help_label.height
         googleMap.setPadding(0, mapHelpLabelHeight, 0, submitButtonHeight)
         this.googleMap = googleMap
         if (savedInstanceState != null) {
