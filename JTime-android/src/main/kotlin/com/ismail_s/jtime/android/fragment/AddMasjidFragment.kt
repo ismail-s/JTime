@@ -47,7 +47,7 @@ class AddMasjidFragment : BaseFragment(), View.OnClickListener {
 		super.onStart()
 		add_masjid_submit_button.setOnClickListener(this)
 		get_masjid_location_button.setOnClickListener(this)
-		masjidLocation?.let { get_masjid_location_button.text = "Change masjid location" }
+		masjidLocation?.let { setMasjidLocationButtonToHaveBeenSelected() }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,11 +80,11 @@ class AddMasjidFragment : BaseFragment(), View.OnClickListener {
 				}
 				//2. submit form
 				RestClient(act).createMasjid(masjidName, masjidLoc.latitude, masjidLoc.longitude) successUi {
-					toast("Masjid \"$masjidName\" created")
+					toast(getString(R.string.masjid_created_toast, masjidName))
 					//3. switch to AllMasjidsFragment
 					(act as? MainActivity)?.switchToAllMasjidsFragment()
 				} failUi {
-					toast("Error when trying to create masjid: ${it.toString()}")
+					toast(getString(R.string.masjid_not_created_toast, it.toString()))
 					add_masjid_submit_button.isEnabled = true
 				}
 				add_masjid_submit_button.isEnabled = false
@@ -100,11 +100,15 @@ class AddMasjidFragment : BaseFragment(), View.OnClickListener {
 		if (requestCode == ADD_MASJID_LOCATION_REQUEST) {
 			val place = data?.let { PlacePicker.getPlace(ctx, it) }
 			if (resultCode != Activity.RESULT_OK || place == null) {
-				toast("No masjid was selected")
+				toast(getString(R.string.no_masjid_selected_toast))
 			} else {
 				masjidLocation = place.latLng
-				get_masjid_location_button.text = "Change masjid location"
+				setMasjidLocationButtonToHaveBeenSelected()
             }
 		}
     }
+
+	fun setMasjidLocationButtonToHaveBeenSelected() {
+	    get_masjid_location_button.text = getString(R.string.get_masjid_location_button_masjid_selected_text)
+	}
 }
