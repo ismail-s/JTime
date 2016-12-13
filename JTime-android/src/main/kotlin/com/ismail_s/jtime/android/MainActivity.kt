@@ -377,7 +377,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         savedInstanceState.putInt(LOGIN_STATUS, loginStatus)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             RC_SIGN_IN -> {
                 val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
@@ -411,6 +411,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                     }
                 }
             }
+			else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
