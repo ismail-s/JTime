@@ -70,4 +70,5 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
 
     <string name="add_masjid_marker_title">Masjid location</string>
     <string name="label_other_times_today">Other times today:</string>
+    <string name="powered_by_google_logo_content_description">Powered by Google Logo</string>
 </resources>

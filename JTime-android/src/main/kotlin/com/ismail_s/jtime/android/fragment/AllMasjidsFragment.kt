@@ -12,6 +12,7 @@ import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.MasjidRecyclerViewAdapter
 import com.ismail_s.jtime.android.pojo.MasjidPojo
+import kotlinx.android.synthetic.main.fragment_item_list.*
 import nl.komponents.kovenant.ui.failUi
 import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.find
@@ -22,23 +23,22 @@ import org.jetbrains.anko.support.v4.longToast
 * Display a list of all masjids on the rest server.
 */
 class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
-    private lateinit var layout: SwipeRefreshLayout
-    private lateinit var rView: RecyclerView
 
     private fun hideRefreshIcon() {
-        layout.isRefreshing = false
+        pull_to_refresh_container.isRefreshing = false
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        layout = inflater!!.inflate(R.layout.fragment_item_list, container, false) as SwipeRefreshLayout
-        layout.setOnRefreshListener(this)
-        rView = layout.find<RecyclerView>(R.id.list)
-        rView.setHasFixedSize(true)
+            savedInstanceState: Bundle?): View? =
+        inflater?.inflate(R.layout.fragment_item_list, container, false)
 
-        layout.post { layout.isRefreshing = true }
+    override fun onStart() {
+        super.onStart()
+        pull_to_refresh_container.setOnRefreshListener(this)
+        masjid_list.setHasFixedSize(true)
+
+        pull_to_refresh_container.post { pull_to_refresh_container.isRefreshing = true }
         onRefresh()
-        return layout
     }
 
     override fun onRefresh() {
@@ -48,11 +48,11 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
                     mainAct.location successUi {
                         hideRefreshIcon()
                         if (activity != null)
-                            rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), mainAct)
+                            masjid_list.adapter = MasjidRecyclerViewAdapter(sortMasjidsByLocation(masjids, it), mainAct)
                     } failUi {
                         hideRefreshIcon()
                         if (activity != null)
-                            rView.adapter = MasjidRecyclerViewAdapter(sortMasjidsByName(masjids), mainAct)
+                            masjid_list.adapter = MasjidRecyclerViewAdapter(sortMasjidsByName(masjids), mainAct)
                     }
                 }
             } failUi {
@@ -64,7 +64,7 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
     }
 
     override fun onLocationChanged(loc: Location) {
-        layout.isRefreshing = true
+        pull_to_refresh_container.isRefreshing = true
         onRefresh()
     }
 
