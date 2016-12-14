@@ -20,12 +20,18 @@ dependencies:
     - ./gradlew dependencies --console=plain
     # Install deps for jtime-website
     - (cd JTime-rest/client/jtime-website && npm install)
+    # Install deps for jtime-rest
+    - (cd JTime-rest && npm install)
 test:
   override:
-    # Jtime-website tests
+    # JTime-website tests
     - >
        cd JTime-rest/client/jtime-website &&
        npm run lint && npm test && npm run build
+
+    JTime-rest tests
+    - >
+       cd JTime-rest && npm test
 
     # Android tests
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
