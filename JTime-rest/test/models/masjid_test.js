@@ -13,6 +13,7 @@ describe('/Masjid', function () {
         mockery.enable({useCleanCache: true, warnOnUnregistered: false})
         mockery.registerMock("googlemaps", require("../mocks/googleMapsMock"))
         mockery.registerMock("../sunsetTimes", require("../mocks/sunsetTimesMock"))
+        mockery.registerMock("request", require("../mocks/requestMock"))
         var server = require('../../server/server')
         request = require('supertest')(server)
         Masjid = server.models.Masjid
@@ -32,16 +33,21 @@ describe('/Masjid', function () {
 
     it('can create new masjids', function(done) {
         this.timeout(3000)
-        request.post('/api/Masjids')
-            .send({name: 'test', location: {lat: 0, lng: 0}})
-            .expect(200)
-            .expect(checkBodyOfResponse)
-            .end(function(err, res) {
-                if (err) return done(err)
-                request.get('/api/Masjids').expect(200).expect(function(res) {
-                    checkBodyOfResponse({body: res.body[0]})
-                }).end(done)
+        Masjid.app.models.UserTable.googleId('fakeGoogleId', function(err, access_token, userId) {
+            if (err) return done(err)
+            expect(access_token).to.exist
+            expect(userId).to.exist
+            request.post('/api/Masjids')
+                .send({name: 'test', location: {lat: 0, lng: 0}})
+                .expect(200)
+                .expect(checkBodyOfResponse)
+                .end(function(err, res) {
+                    if (err) return done(err)
+                    request.get('/api/Masjids').expect(200).expect(function(res) {
+                        checkBodyOfResponse({body: res.body[0]})
+                    }).end(done)
             })
+        })
         function checkBodyOfResponse(res) {
             expect(res.body.name).to.equal('test')
             expect(res.body.location).to.eql({lat: 0, lng: 0})
