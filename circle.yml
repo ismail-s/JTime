@@ -29,7 +29,7 @@ test:
        cd JTime-rest/client/jtime-website &&
        npm run lint && npm test && npm run build
 
-    JTime-rest tests
+    # JTime-rest tests
     - >
        cd JTime-rest && npm test
 
