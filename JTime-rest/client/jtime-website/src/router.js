@@ -11,7 +11,7 @@ const routes = [
   { path: '/', name: 'home', component: Home },
   { path: '/all-masjids', name: 'all-masjids', component: AllMasjids },
   { path: '/help', name: 'help', component: Help },
-  { path: '/masjid/:id/:date', name: 'masjid-id-date', component: Masjid }
+  { path: '/masjid/:id/:year/:month', name: 'masjid-times-for-month', component: Masjid }
 ]
 
 const router = new VueRouter({
