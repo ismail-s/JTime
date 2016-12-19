@@ -38,6 +38,7 @@ describe('/Masjid', function () {
             expect(access_token).to.exist
             expect(userId).to.exist
             request.post('/api/Masjids')
+                .set('Authorization', access_token)
                 .send({name: 'test', location: {lat: 0, lng: 0}})
                 .expect(200)
                 .expect(checkBodyOfResponse)
