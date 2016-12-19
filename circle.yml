@@ -29,16 +29,12 @@ test:
        cd JTime-rest/client/jtime-website &&
        npm run lint && npm test && npm run build
 
-    # JTime-rest tests
-    - |
-       # Add test database and user to postgres
-       psql <<EOF
-       CREATE USER jtimetest WITH PASSWORD 'jtimetest';
-       CREATE DATABASE jtime OWNER jtimetest;
-       EOF
-
-       # Run tests
-       cd JTime-rest && npm test
+    # JTime-rest tests (using loopback memory db)
+    - >
+       cd JTime-rest &&
+       jq '.postgres = {name: "postgres", connector: "memory"}' server/datasources.json > /tmp/temp.json &&
+       mv /tmp/temp.json server/datasources.json &&
+       npm test
 
     # Android tests
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
