@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import {dateToDateString, upgradeElementMixin} from '../utils'
+import {upgradeElementMixin} from '../utils'
 
 export default {
   name: 'all-masjids',
@@ -28,7 +28,7 @@ export default {
     },
     linkToMasjid (id) {
       const today = new Date()
-      return `/masjid/${id}/${dateToDateString(today)}`
+      return `/masjid/${id}/${today.getFullYear()}/${today.getMonth()}`
     }
   },
   created () {

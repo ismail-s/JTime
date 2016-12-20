@@ -1,9 +1,11 @@
 var updateTimestamp = require("../updateTimestamp");
+var Promise = require("bluebird");
 var async = require('async');
 var loopback = require('loopback');
 var settings = require('../../settings');
 var gmAPI = require("googlemaps");
 var getSunsetTime = require("../sunsetTimes").getSunsetTime;
+var getStartAndEndDatesForMonth = require("../utils").getStartAndEndDatesForMonth;
 var GoogleMapsAPI = new gmAPI({
     key: settings.googleMapsKey,
     secure: true
@@ -41,7 +43,6 @@ function doReverseGeocode(data, cb) {
             return cb(data);
         });
 }
-
 
 module.exports = function(Masjid) {
     Masjid.observe('before save', updateTimestamp);
@@ -280,6 +281,85 @@ module.exports = function(Masjid) {
              },
              http: {
                  path: '/:id/times-for-today',
+                 verb: 'get'
+             }
+         }
+     );
+
+    Masjid.getTimesForAMonth = function(id, date, cb) {
+        var SalaahTime = Masjid.app.models.SalaahTime;
+        // Create date objs for start and end of month
+        var start_and_end_date = getStartAndEndDatesForMonth(date);
+        var start_date = start_and_end_date.start_date;
+        var end_date = start_and_end_date.end_date;
+        // Find salaah times for the specified masjid for the specified month
+        SalaahTime.find({
+                where: {
+                    masjidId: id,
+                    datetime: {
+                        between: [start_date, end_date]
+                    }
+                },
+                fields: {
+                    type: true,
+                    datetime: true
+                }
+            },
+            function(err, instances) {
+                if (err != null) {
+                    console.error(err, instances, id, date);
+                    cb(500);
+                    return;
+                }
+                Masjid.findOne({where: {id: id}, fields: {location: true}},
+                function(err, masjid) {
+                    if (err != null || !masjid) {
+                        console.error(err, masjid);
+                        if(masjid == null && !err) {
+                            cb(new Error("masjid id not found"));
+                        } else {
+                            cb(500);
+                        }
+                        return;
+                    }
+                    // Get sunset times for a month
+                    var numOfDaysInMonth = new Date(date.getUTCFullYear(), date.getUTCMonth() + 1, 0).getDate();
+                    var dates = [];
+                    for (var i = 1; i <= numOfDaysInMonth; i++) {
+                        dates.push(new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), i)));
+                    }
+                    Promise.all(dates.map(function(elem) {
+                        return getSunsetTime(masjid.location, elem).then(function(sunset) {
+                            return {datetime: sunset, type: "m"};
+                        }).reflect();
+                    }))
+                        .filter(function(maybeSunset) { return maybeSunset.isFulfilled(); })
+                        .map(function(sunset) { return sunset.value(); })
+                        .then(function(sunsets) { cb(null, instances.concat(sunsets)); });
+                });
+            });
+     };
+     Masjid.remoteMethod(
+         'getTimesForAMonth', {
+             description: ["Return salaah times for a given masjid, for a given",
+                 " month. All salaah times in that month for that masjid will",
+                 " be returned."
+             ],
+             accepts: [{
+                 arg: 'id',
+                 type: 'number',
+                 required: true
+             }, {
+                arg: 'date',
+                type: 'Date',
+                required: true
+            }],
+             returns: {
+                 arg: 'times',
+                 type: 'Array'
+             },
+             http: {
+                 path: '/:id/times-for-a-month',
                  verb: 'get'
              }
          }

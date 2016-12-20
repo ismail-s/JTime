@@ -32,7 +32,10 @@ describe('AllMasjids.vue', () => {
     Vue.nextTick(() => {
       expect(vm.$el.textContent).to.contain('test')
       expect(vm.$el.textContent).to.contain('sdfa')
-      expect(vm.$el.innerHTML).to.contain('/masjid/5/')
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = now.getMonth()
+      expect(vm.$el.innerHTML).to.contain(`/masjid/5/${year}/${month}`)
       done()
     }, 0)
   })

@@ -28,7 +28,10 @@ module.exports = function(SalaahTime) {
         //Check if there is a salaah time with matching masjidId & type
         //  If yes, then update this instance with the new datetime
         //  If no, then create a new instance
-        console.log("creating/updating", masjidId, type, datetime);
+
+        // normalise the datetime
+        datetime.setSeconds(0);
+        datetime.setMilliseconds(0);
 
         var badTypeError = new Error("type should be one of f, z, a, e or j");
         if (type.length !== 1) {

@@ -4,15 +4,6 @@ export function dateToDateString (date) {
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
 }
 
-function padNumToTwoDigits (n) {
-  return ('0' + n).slice(-2)
-}
-
-export function dateTimeStringToTimeString (dateStr) {
-  const date = new Date(dateStr)
-  return `${padNumToTwoDigits(date.getHours())}-${padNumToTwoDigits(date.getMinutes())}`
-}
-
 export function salaahTypeCodeToString (c) {
   switch (c) {
     case 'f':
@@ -27,6 +18,22 @@ export function salaahTypeCodeToString (c) {
       return 'Esha'
     default:
       return ''
+  }
+}
+
+export function compareSalaahTypes (a, b) {
+  const salaahTypes = ['f', 'z', 'a', 'm', 'e']
+  const aIndex = salaahTypes.indexOf(a)
+  const bIndex = salaahTypes.indexOf(b)
+  if (aIndex === -1 || bIndex === -1) {
+    return -2
+  }
+  if (aIndex < bIndex) {
+    return -1
+  } else if (aIndex > bIndex) {
+    return 1
+  } else {
+    return 0
   }
 }
 
