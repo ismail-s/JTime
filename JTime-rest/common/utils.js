@@ -4,12 +4,12 @@
  *
  * @param {Date} date - Used to figure out which date to return date objs for
  */
-function getStartAndEndDatesForMonth(date) {
-    var start_date = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1, 0, 0, 0, 0));
-    var end_date = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0, 23, 59, 59, 999));
-    return {start_date: start_date, end_date: end_date};
+function getStartAndEndDatesForMonth (date) {
+  var startDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1, 0, 0, 0, 0))
+  var endDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0, 23, 59, 59, 999))
+  return {startDate: startDate, endDate: endDate}
 }
 
 module.exports = {
-    getStartAndEndDatesForMonth: getStartAndEndDatesForMonth
-};
+  getStartAndEndDatesForMonth: getStartAndEndDatesForMonth
+}
