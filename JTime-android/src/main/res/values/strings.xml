@@ -67,6 +67,7 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
 
     <string name="no_network_exception">Network is not available</string>
     <string name="no_location_exception">Location could not be obtained</string>
+    <string name="generic_server_exception">Server error</string>
 
     <string name="add_masjid_marker_title">Masjid location</string>
     <string name="label_other_times_today">Other times today:</string>

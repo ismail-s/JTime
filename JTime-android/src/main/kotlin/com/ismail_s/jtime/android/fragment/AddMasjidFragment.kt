@@ -75,7 +75,7 @@ class AddMasjidFragment : BaseFragment(), View.OnClickListener {
 					//3. switch to AllMasjidsFragment
 					(act as? MainActivity)?.switchToAllMasjidsFragment()
 				} failUi {
-					toast(getString(R.string.masjid_not_created_toast, it.toString()))
+					toast(getString(R.string.masjid_not_created_toast, it.message))
 					add_masjid_submit_button.isEnabled = true
 				}
 				add_masjid_submit_button.isEnabled = false
