@@ -31,23 +31,11 @@ import java.util.*
 /**
  * Helper class for talking to the rest server asynchronously.
  */
-class RestClient {
+class RestClient(private var context: Context) {
     private var sharedPrefs: SharedPreferencesWrapper
-    private var context: Context
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
     private val noNetworkException: NoRouteToHostException
         get() = NoRouteToHostException(context.getString(R.string.no_network_exception))
-
-    constructor(context: Context) {
-        this.context = context
-        this.sharedPrefs = SharedPreferencesWrapper(context)
-
-        if ((FuelManager.instance.baseHeaders == emptyMap<String, String>()
-                || FuelManager.instance.baseHeaders == null)
-                && sharedPrefs.accessToken != "") {
-            setHttpHeaders(sharedPrefs.accessToken)
-        }
-    }
 
     private fun setHttpHeaders(accessToken: String) {
         FuelManager.instance.baseHeaders = mapOf("Authorization" to accessToken,
@@ -62,7 +50,7 @@ class RestClient {
     fun internetIsAvailable(): Boolean {
         val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo: NetworkInfo? = connMgr.activeNetworkInfo
-        return if (networkInfo != null && networkInfo.isConnected) true else false
+        return networkInfo != null && networkInfo.isConnected
     }
 
     /**
@@ -92,11 +80,10 @@ class RestClient {
                     val res = mutableListOf<MasjidPojo>()
                     for (m in data.iterator<JSONObject>()) {
                         val name = m.getString("name")
-                        val address: String
-                        try {
-                            address = m.getString("humanReadableAddress")
+                        val address = try {
+                            m.getString("humanReadableAddress")
                         } catch (e: JSONException) {
-                            address = ""
+                            ""
                         }
                         val id = m.getInt("id")
                         val location = m.getJSONObject("location")
@@ -353,6 +340,15 @@ class RestClient {
     companion object {
         // By having url in the companion object, we can change the url from tests
         var url = "https://jtime.ismail-s.com/api"
+    }
+
+    init {
+        this.sharedPrefs = SharedPreferencesWrapper(context)
+        if ((FuelManager.instance.baseHeaders == emptyMap<String, String>()
+                || FuelManager.instance.baseHeaders == null)
+                && sharedPrefs.accessToken != "") {
+            setHttpHeaders(sharedPrefs.accessToken)
+        }
     }
 }
 

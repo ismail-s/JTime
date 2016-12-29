@@ -187,7 +187,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     override fun onRequestPermissionsResult(requestCode: Int, @NonNull permissions: Array<out String>, @NonNull grantResults: IntArray) {
         if (requestCode == LOCATION_PERMISSION_RESULT_CODE) {
             // If request is cancelled, the result arrays are empty.
-            if (grantResults.size > 0
+            if (grantResults.isNotEmpty()
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     onConnected(null)
             } else if (!location.isDone()) {

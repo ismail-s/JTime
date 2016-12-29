@@ -53,7 +53,7 @@ class NearbyTimesFragment : BaseFragment() {
                     .successUi s@ {
                         table.removeAllViews()
                         val tSize = 18f
-                        if (it.size == 0) {
+                        if (it.isEmpty()) {
                             table.addView(with(AnkoContext.create(act, table)) {
                                 tableRow {
                                     textView(getString(R.string.no_salaah_times_nearby_masjids_toast)) {
