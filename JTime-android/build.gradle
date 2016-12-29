@@ -1,12 +1,12 @@
 buildscript {
-    ext.kotlin_version = '1.0.3'
-    ext.dokka_version = '0.9.9'
+    ext.kotlin_version = '1.0.6'
+    ext.dokka_version = '0.9.11'
     repositories {
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0'
+        classpath 'com.android.tools.build:gradle:2.2.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
         classpath 'com.google.gms:google-services:2.0.0-alpha5'
@@ -56,8 +56,7 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt')
-            FileCollection proGuardFileCollection = files {file('./proguard-config').listFiles()}
-            proguardFiles(proGuardFileCollection)
+            proguardFiles fileTree(dir: './proguard-config', include: ['*.pro']).asList().toArray()
         }
     }
 }
