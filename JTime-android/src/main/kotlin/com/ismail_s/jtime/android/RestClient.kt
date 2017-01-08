@@ -132,6 +132,9 @@ class RestClient {
                         val datetimeStr = time.getString("datetime")
                         val datetime = GregorianCalendar()
                         datetime.time = dateFormatter.parse(datetimeStr)
+                        // Make sure datetime from rest api is for correct day
+                        if (intArrayOf(Calendar.YEAR, Calendar.DAY_OF_YEAR).fold(false) { b, i -> b || datetime.get(i) != date.get(i) })
+                            continue
                         when (type) {
                             "f" -> res.fajrTime = datetime
                             "z" -> res.zoharTime = datetime
@@ -161,8 +164,9 @@ class RestClient {
             return Promise.ofFail(noNetworkException)
         }
         val loc = JSONObject().put("lat", latitude).put("lng", longitude)
+        val today = GregorianCalendar()
         val params: MutableList<Pair<String, Any>> = mutableListOf("location" to loc.toString(),
-            "date" to dateFormatter.format(GregorianCalendar().time))
+            "date" to dateFormatter.format(today.time))
         if (salaahType != null)
             params.add("salaahType" to salaahType.apiRef)
         val request = "${Companion.url}/SalaahTimes/times-for-multiple-masjids"
@@ -185,6 +189,9 @@ class RestClient {
                         val datetimeStr = time.getString("datetime")
                         val datetime = GregorianCalendar()
                         datetime.time = dateFormatter.parse(datetimeStr)
+                        // Make sure datetime from rest api is for today
+                        if (intArrayOf(Calendar.YEAR, Calendar.DAY_OF_YEAR).fold(false) { b, i -> b || datetime.get(i) != today.get(i) })
+                            continue
                         if (type == SalaahType.MAGRIB)
                             datetime.add(Calendar.MINUTE, 5)
                         res += SalaahTimePojo(masjidId, masjidName, masjidLoc, type, datetime)
