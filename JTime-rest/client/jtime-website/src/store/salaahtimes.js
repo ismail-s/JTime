@@ -11,12 +11,6 @@ export default {
   },
   mutations: {
     addSalaahTimes (state, {masjidId, times}) {
-      times.map(time => {
-        if (typeof time.datetime === 'string') {
-          time.datetime = new Date(time.datetime)
-        }
-        return time
-      })
       Vue.set(state.salaahTimes, masjidId, times)
     }
   },
@@ -29,7 +23,14 @@ export default {
       Vue.http.get(`${baseUrl}/Masjids/${masjidId}/times-for-a-month`, options).then(response => {
         return response.json()
       }).then(({times}) => {
-        context.commit('addSalaahTimes', {masjidId, times})
+        const newTimes = times.map(time => {
+          if (typeof time.datetime === 'string') {
+            time.datetime = new Date(time.datetime)
+          }
+          return time
+        // Make sure times returned by rest api are for the correct month/year
+        }).filter(time => time.datetime.getFullYear() === year && time.datetime.getMonth() === month)
+        context.commit('addSalaahTimes', {masjidId, times: newTimes})
       })
     }
   }
