@@ -87,7 +87,7 @@ export default {
               obj.asrTime = datetime
               break
             case 'm':
-              obj.magribTime = datetime
+              obj.magribTime = moment(time.datetime).add(5, 'minutes').format('HH-mm')
               break
             case 'e':
               obj.eshaTime = datetime
