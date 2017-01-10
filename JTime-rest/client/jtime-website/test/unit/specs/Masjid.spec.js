@@ -68,7 +68,7 @@ describe('Masjid.vue', () => {
       expect(text).to.contain('06-40')
       expect(text).to.contain('13-00')
       expect(text).to.contain('15-00')
-      expect(text).to.contain('16-05')
+      expect(text).to.contain('16-10') // 5 mins should be added to magrib time
       expect(text).to.contain('18-30')
       done()
     })
