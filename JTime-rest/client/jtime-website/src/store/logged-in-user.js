@@ -8,6 +8,12 @@ export default {
   state: {
     loggedInUser: null // dict of userId, email, accessToken, verified
   },
+  getters: {
+    loggedIn (state) {
+      const loggedInUser = state.loggedInUser
+      return loggedInUser && loggedInUser.verified === true
+    }
+  },
   mutations: {
     loginUser (state, {userId, email, accessToken, verified}) {
       state.loggedInUser = {userId, email, accessToken, verified}

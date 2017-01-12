@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
 import {upgradeElementMixin} from '../utils'
 
 export default {
@@ -24,10 +25,7 @@ export default {
     }
   },
   computed: {
-    loggedIn () {
-      const loggedInUser = this.$store.state.LoggedInUserModule.loggedInUser
-      return loggedInUser && loggedInUser.verified === true
-    }
+    ...mapGetters(['loggedIn'])
   }
 }
 </script>
