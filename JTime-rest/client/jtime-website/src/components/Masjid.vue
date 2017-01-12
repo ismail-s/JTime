@@ -136,6 +136,6 @@ export default {
 }
 
 .highlight-row {
-  background-color: #e3f2fd; /*material design blue 50*/
+  background-color: #f48fb1; /*material design pink 200*/
 }
 </style>
