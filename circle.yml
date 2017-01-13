@@ -1,6 +1,8 @@
 machine:
   environment:
     GRADLE_OPTS: -Dorg.gradle.daemon=true
+  node:
+    version: 6
 dependencies:
   pre:
     # Start the gradle daemon
@@ -16,8 +18,26 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter android-21
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
     - ./gradlew dependencies --console=plain
+    # Install deps for jtime-website
+    - (cd JTime-rest/client/jtime-website && npm install)
+    # Install deps for jtime-rest
+    - (cd JTime-rest && npm install)
 test:
   override:
+    # JTime-website tests
+    - >
+       cd JTime-rest/client/jtime-website &&
+       npm run lint && npm test && npm run build
+
+    # JTime-rest tests (using loopback memory db)
+    - >
+       cd JTime-rest &&
+       jq '.postgres = {name: "postgres", connector: "memory"}' server/datasources.json > /tmp/temp.json &&
+       mv /tmp/temp.json server/datasources.json &&
+       npm test &&
+       npm run lint
+
+    # Android tests
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
     # start the emulator
     - emulator -avd custom-android21-googleapis -no-audio -no-window:
@@ -58,7 +78,7 @@ deployment:
         commands:
             - >
                if [[ $(git diff HEAD^..HEAD JTime-rest) ]];
-               then (sudo apt-get install -y fabric && fab -H $PRODUCTION_HOST -u $PRODUCTION_USER deploy | sed -n -e 's/^\(\[[a-zA-Z0-9.]\+]\)\?//p' | sed '$ d');
+               then (sudo apt-get install -y fabric && echo "$PRODUCTION_HOST production" | sudo tee -a /etc/hosts > /dev/null && fab -H production -u "$PRODUCTION_USER" deploy | sed -n -e 's/^\(\[[a-zA-Z0-9.]\+]\)\?//p' | sed '$ d');
                else echo "No changes to JTime-rest folder, so not redeploying rest api"; fi
             - >
                if [[ $(git diff HEAD^..HEAD JTime-android) ]];

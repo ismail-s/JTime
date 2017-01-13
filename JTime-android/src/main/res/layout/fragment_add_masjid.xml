@@ -14,27 +14,15 @@
         android:layout_height="wrap_content"
         android:hint="@string/add_masjid_masjid_name_hint"
         android:textSize="25sp"
-        android:layout_alignParentTop="true"
-        android:layout_alignEnd="@+id/map_container"
-        android:layout_alignRight="@+id/map_container"/>
+        android:layout_alignParentTop="true"/>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/masjid_name_textbox"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/map_container"/>
-
-    <TextView
-        android:id="@+id/map_help_label"
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/map_help_text"
-        android:textColor="#000000"
-        android:textSize="20sp"
-        android:layout_alignTop="@+id/map_container"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"/>
+        android:text="@string/get_masjid_location_button"
+        android:layout_below="@+id/masjid_name_textbox"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/get_masjid_location_button"/>
 
     <Button
         android:layout_width="wrap_content"

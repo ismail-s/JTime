@@ -7,6 +7,7 @@ import android.net.NetworkInfo
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
@@ -23,6 +24,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.NoRouteToHostException
+import java.nio.charset.StandardCharsets.UTF_8
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -64,6 +66,16 @@ class RestClient {
     }
 
     /**
+     * Create a string with info about a rest api error. A generic error string is returned
+     * if this is not possible.
+     */
+    private fun getServerException(response: Response) = ServerException(try {
+            JSONObject(String(response.data, UTF_8)).getJSONObject("error").getString("message")
+        } catch (e: JSONException) {
+            context.getString(R.string.generic_server_exception)
+        })
+
+    /**
      * Get a list of all the masjids on the rest server.
      */
     fun getMasjids(): Promise<List<MasjidPojo>, Throwable> {
@@ -74,7 +86,7 @@ class RestClient {
         val deferred = deferred<List<MasjidPojo>, Throwable> { request.cancel() }
         request.responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> deferred reject result.getAs<FuelError>()!!
+                is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
                     val data = result.get().array()
                     val res = mutableListOf<MasjidPojo>()
@@ -111,7 +123,7 @@ class RestClient {
         val deferred = deferred<MasjidPojo, Throwable> { request.cancel() }
         request.responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> deferred reject result.getAs<FuelError>()!!
+                is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
                     val times = result.get().obj().getJSONArray("times")
                     val res = MasjidPojo()
@@ -120,6 +132,9 @@ class RestClient {
                         val datetimeStr = time.getString("datetime")
                         val datetime = GregorianCalendar()
                         datetime.time = dateFormatter.parse(datetimeStr)
+                        // Make sure datetime from rest api is for correct day
+                        if (intArrayOf(Calendar.YEAR, Calendar.DAY_OF_YEAR).fold(false) { b, i -> b || datetime.get(i) != date.get(i) })
+                            continue
                         when (type) {
                             "f" -> res.fajrTime = datetime
                             "z" -> res.zoharTime = datetime
@@ -149,8 +164,9 @@ class RestClient {
             return Promise.ofFail(noNetworkException)
         }
         val loc = JSONObject().put("lat", latitude).put("lng", longitude)
+        val today = GregorianCalendar()
         val params: MutableList<Pair<String, Any>> = mutableListOf("location" to loc.toString(),
-            "date" to dateFormatter.format(GregorianCalendar().time))
+            "date" to dateFormatter.format(today.time))
         if (salaahType != null)
             params.add("salaahType" to salaahType.apiRef)
         val request = "${Companion.url}/SalaahTimes/times-for-multiple-masjids"
@@ -158,7 +174,7 @@ class RestClient {
         val deferred = deferred<List<SalaahTimePojo>, Throwable> { request.cancel() }
         request.responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> { deferred reject result.error }
+                is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
                     val times = result.value.obj().getJSONArray("res")
                     val res = mutableListOf<SalaahTimePojo>()
@@ -173,6 +189,9 @@ class RestClient {
                         val datetimeStr = time.getString("datetime")
                         val datetime = GregorianCalendar()
                         datetime.time = dateFormatter.parse(datetimeStr)
+                        // Make sure datetime from rest api is for today
+                        if (intArrayOf(Calendar.YEAR, Calendar.DAY_OF_YEAR).fold(false) { b, i -> b || datetime.get(i) != today.get(i) })
+                            continue
                         if (type == SalaahType.MAGRIB)
                             datetime.add(Calendar.MINUTE, 5)
                         res += SalaahTimePojo(masjidId, masjidName, masjidLoc, type, datetime)
@@ -202,8 +221,8 @@ class RestClient {
         val deferred = deferred<Unit, Throwable> { request.cancel() }
         request.responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
-                is Result.Success -> { deferred.resolve() }
+                is Result.Failure -> deferred reject getServerException(response)
+                is Result.Success -> deferred.resolve()
             }
         }
         return deferred.promise
@@ -229,7 +248,7 @@ class RestClient {
         request.responseJson { request, response, result ->
             when (result) {
                 is Result.Failure -> {
-                    deferred reject result.getAs<FuelError>()!!
+                    deferred reject getServerException(response)
                 }
                 is Result.Success -> {
                     deferred.resolve()
@@ -256,7 +275,7 @@ class RestClient {
 
         request.responseJson { request, response, result ->
             when (result) {
-                is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
+                is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
                     val data = result.get().obj()
                     val accessToken = data.getString("access_token")
@@ -284,7 +303,7 @@ class RestClient {
         val deferred = deferred<Unit, Throwable> { request.cancel() }
         request.responseString { request, response, result ->
             when (result) {
-                is Result.Failure -> { deferred reject result.getAs<FuelError>()!! }
+                is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
                     if (response.httpStatusCode == 204) {
                         // Clear persisted login tokens
@@ -343,6 +362,8 @@ class RestClient {
         var url = "https://jtime.ismail-s.com/api"
     }
 }
+
+open class ServerException(message: String): Throwable(message)
 
 /**
  * Helper function to make it easier to iterate over a [JSONArray].

@@ -8,6 +8,8 @@
     <string name="app_name">Jamaat Times</string>
     <string name="add_masjid_masjid_name_hint">Name of masjid</string>
     <string name="add_masjid_masjid_submit_button">Create Masjid</string>
+	<string name="get_masjid_location_button">Select the location of the Masjid</string>
+	<string name="get_masjid_location_button_masjid_selected_text">Change Masjid location</string>
     <string name="help_text"><b>Help</b>\n
 This app allows you to view masjid jamaat times, as well as add/change the times. If anyone makes any changes, then everyone sees the new version. It\'s a bit like editing wikipedia in that way.\n\n
 <i>Editing times</i>\n
@@ -20,7 +22,6 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
 <a href="https://github.com/kittinunf/Fuel">Fuel</a> (MIT license)\n
 <a href="https://mikepenz.github.io/MaterialDrawer">MaterialDrawer</a> (Apache license)
 </string>
-    <string name="map_help_text">Long click on map to select location</string>
     <string name="nearby_times_title_text">Nearby times for %1$s</string>
     <string name="home_fragment_next_time_future_text">%1$s at %2$s is at %3$s</string>
     <string name="home_fragment_next_time_past_text">%1$s at %2$s started at %3$s</string>
@@ -44,6 +45,9 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
     <string name="salaah_time_update_failure_toast">Failed to update db with new time: %1$s</string>
     <string name="get_location_for_nearby_masjids_failure_toast">Could not get your current location, so don\'t know which masjids are nearby</string>
     <string name="no_salaah_times_nearby_masjids_toast">No salaah times for nearby masjids found</string>
+	<string name="no_masjid_selected_toast">No masjid was selected</string>
+	<string name="masjid_created_toast">Masjid "%1$s" created</string>
+	<string name="masjid_not_created_toast">Error when creating masjid: %1$s</string>
 
     <string name="drawer_item_logout">Logout</string>
     <string name="drawer_item_login">Login</string>
@@ -63,7 +67,9 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
 
     <string name="no_network_exception">Network is not available</string>
     <string name="no_location_exception">Location could not be obtained</string>
+    <string name="generic_server_exception">Server error</string>
 
     <string name="add_masjid_marker_title">Masjid location</string>
     <string name="label_other_times_today">Other times today:</string>
+    <string name="powered_by_google_logo_content_description">Powered by Google Logo</string>
 </resources>
