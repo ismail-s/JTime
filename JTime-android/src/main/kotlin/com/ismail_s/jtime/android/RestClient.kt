@@ -142,14 +142,14 @@ class RestClient(private var context: Context) {
      *
      * @param salaahType the type of salaah times to be returned, or all types if not specified.
      */
-    fun getTimesForNearbyMasjids(latitude: Double, longitude: Double, salaahType: SalaahType? = null)
+    fun getTimesForNearbyMasjids(latitude: Double, longitude: Double, date: Calendar = GregorianCalendar(), salaahType: SalaahType? = null)
             : Promise<List<SalaahTimePojo>, Throwable> {
         if (!internetIsAvailable()) {
             return Promise.ofFail(noNetworkException)
         }
         val loc = JSONObject().put("lat", latitude).put("lng", longitude)
         val params: MutableList<Pair<String, Any>> = mutableListOf("location" to loc.toString(),
-            "date" to dateFormatter.format(GregorianCalendar().time))
+            "date" to dateFormatter.format(date.time))
         if (salaahType != null)
             params.add("salaahType" to salaahType.apiRef)
         val request = "${Companion.url}/SalaahTimes/times-for-multiple-masjids"

@@ -1,20 +1,26 @@
 package com.ismail_s.jtime.android.fragment
 
+import android.app.Activity
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment
 import com.google.android.flexbox.FlexboxLayout
+import com.google.android.gms.location.places.ui.PlacePicker
 import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTime
+import com.ismail_s.jtime.android.CalendarFormatter.formatCalendarAsTodayOrDate
 import com.ismail_s.jtime.android.MainActivity
 import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.RestClient
 import com.ismail_s.jtime.android.pojo.SalaahTimePojo
 import com.ismail_s.jtime.android.pojo.SalaahType
-import kotlinx.android.synthetic.main.fragment_home.label_title_or_error_message
-import kotlinx.android.synthetic.main.fragment_home.scroll_view
+import kotlinx.android.synthetic.main.fragment_home.*
+import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.ui.failUi
 import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.*
@@ -31,27 +37,92 @@ import kotlin.comparisons.thenBy
  */
 class HomeFragment : BaseFragment() {
     private lateinit var card_view_container: FlexboxLayout
+    private var date: GregorianCalendar = GregorianCalendar()
+    private var location: Location? = null
+    private var locationName: String? = null
+    private val SELECT_LOCATION_REQUEST = 46
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            location = savedInstanceState.getParcelable<Location>(LOCATION)
+            locationName = savedInstanceState.getString(LOCATION_NAME)
+            date = savedInstanceState.getSerializable(DATE) as GregorianCalendar? ?: GregorianCalendar()
+        }
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        savedInstanceState.putSerializable(DATE, date)
+        savedInstanceState.putString(LOCATION_NAME, locationName)
+        savedInstanceState.putParcelable(LOCATION, location)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_home, container, false)
         card_view_container = rootView.find<FlexboxLayout>(R.id.card_view_container)
-        mainAct.location successUi {
-            getTimesAndDisplayInUi(it)
-        } failUi {
-            label_title_or_error_message.text = "Could not get your location. Location is needed to show salaah times for the nearest masjids."
-        }
+        getTimesAndLocAndDisplayInUi()
         return rootView
     }
 
     override fun onLocationChanged(loc: Location) {
-        getTimesAndDisplayInUi(loc)
+        if (location == null) getTimesAndDisplayInUi(loc)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu) {
+        menu.add("Change date").setOnMenuItemClickListener {
+            val cdp = CalendarDatePickerDialogFragment()
+                    .setThemeDark()
+                    .setPreselectedDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
+                    .setOnDateSetListener { unused, y, m, d ->
+                        this.toast("$y $m $d")
+                        date = GregorianCalendar()
+                        date.set(Calendar.YEAR, y)
+                        date.set(Calendar.MONTH, m)
+                        date.set(Calendar.DAY_OF_MONTH, d)
+                        getTimesAndLocAndDisplayInUi()
+                    }
+            cdp.show(childFragmentManager, "datePickerDialog")
+            true
+        }
+        menu.add("Change location").setOnMenuItemClickListener {
+            val intent = PlacePicker.IntentBuilder().build(mainAct)
+			startActivityForResult(intent, SELECT_LOCATION_REQUEST)
+            true
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		if (requestCode == SELECT_LOCATION_REQUEST) {
+			val place = data?.let { PlacePicker.getPlace(ctx, it) }
+			if (resultCode != Activity.RESULT_OK || place == null) {
+				toast("No location selected")
+			} else {
+                val loc = Location("")
+                loc.latitude = place.latLng.latitude
+                loc.longitude = place.latLng.longitude
+				location = loc
+                locationName = place.name.toString()
+				getTimesAndLocAndDisplayInUi()
+            }
+		}
+    }
+
+    private fun getTimesAndLocAndDisplayInUi() {
+        val promise = location?.let { Promise.of(it) } ?: mainAct.location
+        promise successUi {
+            getTimesAndDisplayInUi(it)
+        } failUi {
+            label_title_or_error_message.text = getString(R.string.home_fragment_could_not_get_loc_text)
+        }
     }
 
     private fun getTimesAndDisplayInUi(loc: Location) {
         if (activity == null)
             return
         cancelPromiseOnFragmentDestroy {
-            RestClient(ctx).getTimesForNearbyMasjids(loc.latitude, loc.longitude) successUi {
+            RestClient(ctx).getTimesForNearbyMasjids(loc.latitude, loc.longitude, date) successUi {
                 ifAttachedToAct s@ {
                     /*We have a list of salaah times for different salaah types & masjids.
                     * We now need to:
@@ -65,6 +136,8 @@ class HomeFragment : BaseFragment() {
                         label_title_or_error_message.text = getString(R.string.no_salaah_times_nearby_masjids_toast)
                         return@s
                     }
+                    val locStr = locationName?.let { " for $it" } ?: ""
+                    label_title_or_error_message.text = getString(R.string.label_home_fragment_title, formatCalendarAsTodayOrDate(date), locStr)
                     val now = GregorianCalendar()
                     // TODO-use the updateTime variable
                     val (closest, sortedSalaahTimesMap, updateTime) = calcHomeFragmentLayoutParams(it, now, loc)
@@ -115,6 +188,12 @@ class HomeFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    companion object {
+        private val LOCATION = "HomeFragment.LOCATION"
+        private val LOCATION_NAME = "HomeFragment.LOCATION_NAME"
+        private val DATE = "HomeFragment.DATE"
     }
 }
 

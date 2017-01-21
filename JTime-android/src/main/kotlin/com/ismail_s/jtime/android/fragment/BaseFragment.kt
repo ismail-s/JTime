@@ -2,6 +2,7 @@ package com.ismail_s.jtime.android.fragment
 
 import android.location.Location
 import android.support.v4.app.Fragment
+import android.view.Menu
 import android.view.View
 import com.ismail_s.jtime.android.MainActivity
 import nl.komponents.kovenant.CancelException
@@ -51,6 +52,11 @@ open class BaseFragment : Fragment(), AnkoLogger {
      * called or _mainAct.location_ was changed.
      */
     open fun onLocationChanged(loc: Location) {}
+
+    /**
+    * Implement this method to create an options menu.
+    */
+    open fun onCreateOptionsMenu(menu: Menu) {}
 
     override fun onDestroyView() {
         super.onDestroyView()

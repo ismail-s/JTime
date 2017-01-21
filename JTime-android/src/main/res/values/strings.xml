@@ -25,6 +25,9 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
     <string name="nearby_times_title_text">Nearby times for %1$s</string>
     <string name="home_fragment_next_time_future_text">%1$s at %2$s is at %3$s</string>
     <string name="home_fragment_next_time_past_text">%1$s at %2$s started at %3$s</string>
+    <string name="home_fragment_could_not_get_loc_text">
+        Could not get your location. Location is needed to show salaah times for the nearest masjids.
+    </string>
     <string name="edit_salaah_times">Edit</string>
     <string name="change_times__undo_button">undo</string>
     <string name="change_times__up_button">up</string>
@@ -70,6 +73,6 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
     <string name="generic_server_exception">Server error</string>
 
     <string name="add_masjid_marker_title">Masjid location</string>
-    <string name="label_other_times_today">Other times today:</string>
+    <string name="label_home_fragment_title">Nearby times for %1$s%2$s</string>
     <string name="powered_by_google_logo_content_description">Powered by Google Logo</string>
 </resources>
