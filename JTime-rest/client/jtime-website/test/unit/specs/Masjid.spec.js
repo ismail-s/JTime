@@ -3,7 +3,6 @@ import Vuex from 'vuex'
 import moment from 'moment'
 import router from '../../../src/router'
 import Masjid from 'src/components/Masjid'
-import 'babel-polyfill'
 
 describe('Masjid.vue', () => {
   function setUpComponent (masjids = []) {
