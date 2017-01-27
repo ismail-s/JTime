@@ -17,6 +17,7 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter android-23
     - echo y | android update sdk --no-ui --all --filter android-21
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
+    - echo y | android update sdk --no-ui --all --filter sys-img-x86-google_apis-23
     - ./gradlew dependencies --console=plain
     # Install deps for jtime-website
     - (cd JTime-rest/client/jtime-website && yarn install)
@@ -41,9 +42,9 @@ test:
        yarn run lint
 
     # Android tests
-    - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
+    - echo | android create avd -n test -t android-23 --abi google_apis/x86 --force
     # start the emulator
-    - emulator -avd custom-android21-googleapis -no-audio -no-window:
+    - emulator64-x86 -avd test -no-audio -no-window:
         background: true
         parallel: true
     - fb-adb start-server:
