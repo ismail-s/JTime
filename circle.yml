@@ -47,7 +47,7 @@ test:
     - emulator -avd custom-android21-googleapis -no-audio -no-window:
         background: true
         parallel: true
-    - fb-adb start-server:
+    - adb start-server:
         background: true
     - ./gradlew assembleDebug dokka --console=plain
     # Robolectric and materialdrawer don't work perfectly together
@@ -65,12 +65,12 @@ test:
     - circle-android wait-for-boot
     # Sleeping isn't a brilliant fix...
     - sleep 30
-    - fb-adb devices
-    - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
+    - adb devices
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
     # Note the espresso tests include code to unlock the emulator before running the tests
     - ./gradlew connectedAndroidTest --console=plain || ./gradlew connectedAndroidTest --console=plain:
         timeout: 900
-    - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
   post:
     - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
