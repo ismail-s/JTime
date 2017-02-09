@@ -51,7 +51,7 @@
         "principalType": "ROLE",
         "principalId": "$authenticated",
         "permission": "ALLOW",
-        "property": "createOrUpdate"
+        "property": ["createOrUpdate", "createOrUpdateMultiple"]
     }, {
         "principalType": "ROLE",
         "principalId": "$everyone",
