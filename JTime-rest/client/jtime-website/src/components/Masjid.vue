@@ -41,9 +41,8 @@
 </template>
 
 <script>
-import router from '../router'
 import {upgradeElementMixin} from '../utils'
-import {commonComputedProperties, sortSalaahTimes} from '../masjid-utils'
+import {commonComputedProperties, commonMethods, sortSalaahTimes} from '../masjid-utils'
 import moment from 'moment'
 import {mapGetters} from 'vuex'
 
@@ -71,47 +70,10 @@ export default {
     ...mapGetters(['loggedIn'])
   },
   methods: {
-    getSalaahTimesForMonth () {
-      if (this.masjidId && this.year && this.month + 1) {
-        this.$store.dispatch({
-          type: 'getSalaahTimesForMonth',
-          masjidId: this.masjidId,
-          year: this.year,
-          month: this.month
-        })
-      }
-    },
     isToday (dayOfMonth) {
       return new Date().getDate() === dayOfMonth
     },
-    goToNextMonth () {
-      let [newYear, newMonth] = [this.year, this.month]
-      if (this.month < 0 || this.month > 11) {
-        // Invalid month, return early
-        return
-      } else if (this.month === 11) {
-        newMonth = 0
-        newYear = this.year + 1
-      } else {
-        newMonth = this.month + 1
-      }
-      router.push({name: 'masjid-times-for-month',
-        params: {id: this.masjidId, year: newYear, month: newMonth}})
-    },
-    goToPrevMonth () {
-      let [newYear, newMonth] = [this.year, this.month]
-      if (this.month < 0 || this.month > 11) {
-        // Invalid month, return early
-        return
-      } else if (this.month === 0) {
-        newMonth = 11
-        newYear = this.year - 1
-      } else {
-        newMonth = this.month - 1
-      }
-      router.push({name: 'masjid-times-for-month',
-        params: {id: this.masjidId, year: newYear, month: newMonth}})
-    }
+    ...commonMethods
   },
   created () {
     this.getSalaahTimesForMonth()

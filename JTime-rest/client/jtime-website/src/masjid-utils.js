@@ -1,4 +1,5 @@
 import {compareSalaahTypes} from './utils'
+import router from './router'
 import moment from 'moment'
 
 export function sortSalaahTimes (salaahTimes, year, month) {
@@ -53,5 +54,46 @@ export const commonComputedProperties = {
   },
   month () {
     return parseInt(this.$route.params.month)
+  }
+}
+
+export const commonMethods = {
+  goToNextMonth () {
+    let [newYear, newMonth] = [this.year, this.month]
+    if (this.month < 0 || this.month > 11) {
+      // Invalid month, return early
+      return
+    } else if (this.month === 11) {
+      newMonth = 0
+      newYear = this.year + 1
+    } else {
+      newMonth = this.month + 1
+    }
+    router.push({name: this.name,
+      params: {id: this.masjidId, year: newYear, month: newMonth}})
+  },
+  goToPrevMonth () {
+    let [newYear, newMonth] = [this.year, this.month]
+    if (this.month < 0 || this.month > 11) {
+      // Invalid month, return early
+      return
+    } else if (this.month === 0) {
+      newMonth = 11
+      newYear = this.year - 1
+    } else {
+      newMonth = this.month - 1
+    }
+    router.push({name: this.name,
+      params: {id: this.masjidId, year: newYear, month: newMonth}})
+  },
+  getSalaahTimesForMonth () {
+    if (this.masjidId && this.year && this.month + 1) {
+      this.$store.dispatch({
+        type: 'getSalaahTimesForMonth',
+        masjidId: this.masjidId,
+        year: this.year,
+        month: this.month
+      })
+    }
   }
 }

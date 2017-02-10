@@ -20,9 +20,8 @@
 </template>
 
 <script>
-import {commonComputedProperties, sortSalaahTimes} from '../masjid-utils'
+import {commonComputedProperties, commonMethods, sortSalaahTimes} from '../masjid-utils'
 import {baseUrl} from '../store/utils'
-import router from '../router'
 import Handsontable from 'handsontable/dist/handsontable.full'
 import moment from 'moment'
 import Vue from 'vue'
@@ -88,14 +87,7 @@ export default {
           elem.querySelector('.wtHolder').style.height = '100%'
         }.bind(this)
       })
-      if (this.masjidId && this.year && this.month + 1) {
-        this.$store.dispatch({
-          type: 'getSalaahTimesForMonth',
-          masjidId: this.masjidId,
-          year: this.year,
-          month: this.month
-        })
-      }
+      this.getSalaahTimesForMonth()
     },
     saveChanges () {
       this.saveButtonIsDisabled = true
@@ -153,34 +145,7 @@ export default {
           throw Error(`Invalid num parameter passed to salaahTypeNumToCode: ${num}`)
       }
     },
-    goToNextMonth () {
-      let [newYear, newMonth] = [this.year, this.month]
-      if (this.month < 0 || this.month > 11) {
-        // Invalid month, return early
-        return
-      } else if (this.month === 11) {
-        newMonth = 0
-        newYear = this.year + 1
-      } else {
-        newMonth = this.month + 1
-      }
-      router.push({name: 'edit-salaah-times',
-        params: {id: this.masjidId, year: newYear, month: newMonth}})
-    },
-    goToPrevMonth () {
-      let [newYear, newMonth] = [this.year, this.month]
-      if (this.month < 0 || this.month > 11) {
-        // Invalid month, return early
-        return
-      } else if (this.month === 0) {
-        newMonth = 11
-        newYear = this.year - 1
-      } else {
-        newMonth = this.month - 1
-      }
-      router.push({name: 'edit-salaah-times',
-        params: {id: this.masjidId, year: newYear, month: newMonth}})
-    }
+    ...commonMethods
   },
   mounted () { this.setUpComponent() },
   watch: {
