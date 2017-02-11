@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.Menu
@@ -40,6 +41,8 @@ class HomeFragment : BaseFragment() {
     private var date: GregorianCalendar = GregorianCalendar()
     private var location: Location? = null
     private var locationName: String? = null
+    private var nextUpdateTime: Calendar? = null
+    private val getAndDisplayTimesCallback = Runnable { getTimesAndLocAndDisplayInUi() }
     private val SELECT_LOCATION_REQUEST = 46
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,6 +112,17 @@ class HomeFragment : BaseFragment() {
 		}
     }
 
+    override fun onStop() {
+        super.onStop()
+        Handler().removeCallbacks(getAndDisplayTimesCallback)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val delay = nextUpdateTime?.timeInMillis?.let { it - GregorianCalendar().timeInMillis }
+        if (delay != null) Handler().postDelayed(getAndDisplayTimesCallback, delay)
+    }
+
     private fun getTimesAndLocAndDisplayInUi() {
         val promise = location?.let { Promise.of(it) } ?: mainAct.location
         promise successUi {
@@ -139,7 +153,6 @@ class HomeFragment : BaseFragment() {
                     val locStr = locationName?.let { " for $it" } ?: ""
                     label_title_or_error_message.text = getString(R.string.label_home_fragment_title, formatCalendarAsTodayOrDate(date), locStr)
                     val now = GregorianCalendar()
-                    // TODO-use the updateTime variable
                     val (closest, sortedSalaahTimesMap, updateTime) = calcHomeFragmentLayoutParams(it, now, loc)
 
                     val addToGrid = { x: AnkoContext<FlexboxLayout>.() -> View ->
@@ -181,6 +194,11 @@ class HomeFragment : BaseFragment() {
                             }
                         }
                     }
+                    // Delete any callbacks, add a callback to trigger at updateTime
+                    Handler().removeCallbacks(getAndDisplayTimesCallback)
+                    nextUpdateTime = updateTime
+                    Handler().postDelayed(getAndDisplayTimesCallback,
+                            updateTime.timeInMillis - GregorianCalendar().timeInMillis)
                 }
             } failUi {
                 ifAttachedToAct {
