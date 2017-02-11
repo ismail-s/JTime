@@ -14,6 +14,7 @@ import android.view.View
 import android.view.WindowManager.LayoutParams
 import android.widget.TableLayout
 import android.widget.TableRow
+import com.ismail_s.jtime.android.R
 import com.ismail_s.jtime.android.MockWebServer.createMockWebServerAndConnectToRestClient
 import nl.komponents.kovenant.deferred
 import org.hamcrest.CoreMatchers.*
@@ -148,8 +149,10 @@ class MainActivityEspressoTest : ActivityInstrumentationTestCase2<MainActivity>(
             checkTextIsDisplayedAtPosition(x, y, text)
 
         // Make sure clicking on the remaining drawer items doesn't crash the app
-        for (i in listOf("Asr", "Esha"))
+        for (i in listOf("Asr", "Magrib", "Esha")) {
             clickOnDrawerItem(i)
+            checkTextIsDisplayedAtPosition(0, 0, activity.getString(R.string.no_salaah_times_nearby_masjids_toast))
+        }
     }
 
     private fun atTablePosition(x: Int, y: Int): Matcher<View> {

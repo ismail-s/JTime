@@ -17,25 +17,29 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter android-23
     - echo y | android update sdk --no-ui --all --filter android-21
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
+    - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-google_apis-21
     - ./gradlew dependencies --console=plain
     # Install deps for jtime-website
-    - (cd JTime-rest/client/jtime-website && npm install)
+    - (cd JTime-rest/client/jtime-website && yarn install)
     # Install deps for jtime-rest
-    - (cd JTime-rest && npm install)
+    - (cd JTime-rest && yarn install)
+  cache_directories:
+    - ~/.cache/yarn
+
 test:
   override:
     # JTime-website tests
     - >
        cd JTime-rest/client/jtime-website &&
-       npm run lint && npm test && npm run build
+       yarn run lint && yarn test && yarn run build
 
     # JTime-rest tests (using loopback memory db)
     - >
        cd JTime-rest &&
        jq '.postgres = {name: "postgres", connector: "memory"}' server/datasources.json > /tmp/temp.json &&
        mv /tmp/temp.json server/datasources.json &&
-       npm test &&
-       npm run lint
+       yarn test &&
+       yarn run lint
 
     # Android tests
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
@@ -43,7 +47,7 @@ test:
     - emulator -avd custom-android21-googleapis -no-audio -no-window:
         background: true
         parallel: true
-    - fb-adb start-server:
+    - adb start-server:
         background: true
     - ./gradlew assembleDebug dokka --console=plain
     # Robolectric and materialdrawer don't work perfectly together
@@ -61,12 +65,12 @@ test:
     - circle-android wait-for-boot
     # Sleeping isn't a brilliant fix...
     - sleep 30
-    - fb-adb devices
-    - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
+    - adb devices
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
     # Note the espresso tests include code to unlock the emulator before running the tests
     - ./gradlew connectedAndroidTest --console=plain || ./gradlew connectedAndroidTest --console=plain:
         timeout: 900
-    - fb-adb rcmd screencap -p > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
+    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
   post:
     - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
@@ -78,7 +82,7 @@ deployment:
         commands:
             - >
                if [[ $(git diff HEAD^..HEAD JTime-rest) ]];
-               then (sudo apt-get install -y fabric && fab -H $PRODUCTION_HOST -u $PRODUCTION_USER deploy | sed -n -e 's/^\(\[[a-zA-Z0-9.]\+]\)\?//p' | sed '$ d');
+               then (sudo apt-get install -y fabric && echo "$PRODUCTION_HOST production" | sudo tee -a /etc/hosts > /dev/null && fab -H production -u "$PRODUCTION_USER" deploy | sed -n -e 's/^\(\[[a-zA-Z0-9.]\+]\)\?//p' | sed '$ d');
                else echo "No changes to JTime-rest folder, so not redeploying rest api"; fi
             - >
                if [[ $(git diff HEAD^..HEAD JTime-android) ]];

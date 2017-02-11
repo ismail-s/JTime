@@ -2,6 +2,10 @@
   <div class="padBottom">
     <h2 v-if="masjidName">Salaah times for {{ masjidName }} for {{ monthAndYear }}</h2>
     <h2 v-else>Loading...</h2>
+    <div class="pad-5px">
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
+    </div>
     <table class="mdl-data-table mdl-js-data-table center">
       <thead>
         <tr>
@@ -26,11 +30,16 @@
         </tr>
       </tbody>
     </table>
+    <div class="pad-5px">
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
+    </div>
   </div>
 </template>
 
 <script>
 import {compareSalaahTypes, upgradeElementMixin} from '../utils'
+import router from '../router'
 import moment from 'moment'
 
 export default {
@@ -87,7 +96,7 @@ export default {
               obj.asrTime = datetime
               break
             case 'm':
-              obj.magribTime = datetime
+              obj.magribTime = moment(time.datetime).add(5, 'minutes').format('HH-mm')
               break
             case 'e':
               obj.eshaTime = datetime
@@ -112,6 +121,34 @@ export default {
     },
     isToday (dayOfMonth) {
       return new Date().getDate() === dayOfMonth
+    },
+    goToNextMonth () {
+      let [newYear, newMonth] = [this.year, this.month]
+      if (this.month < 0 || this.month > 11) {
+        // Invalid month, return early
+        return
+      } else if (this.month === 11) {
+        newMonth = 0
+        newYear = this.year + 1
+      } else {
+        newMonth = this.month + 1
+      }
+      router.push({name: 'masjid-times-for-month',
+        params: {id: this.masjidId, year: newYear, month: newMonth}})
+    },
+    goToPrevMonth () {
+      let [newYear, newMonth] = [this.year, this.month]
+      if (this.month < 0 || this.month > 11) {
+        // Invalid month, return early
+        return
+      } else if (this.month === 0) {
+        newMonth = 11
+        newYear = this.year - 1
+      } else {
+        newMonth = this.month - 1
+      }
+      router.push({name: 'masjid-times-for-month',
+        params: {id: this.masjidId, year: newYear, month: newMonth}})
     }
   },
   created () {
@@ -135,7 +172,11 @@ export default {
   padding-bottom: 10px;
 }
 
+.pad-5px {
+  padding: 5px;
+}
+
 .highlight-row {
-  background-color: #e3f2fd; /*material design blue 50*/
+  background-color: #f48fb1; /*material design pink 200*/
 }
 </style>

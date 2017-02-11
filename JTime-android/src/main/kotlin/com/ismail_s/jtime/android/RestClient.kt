@@ -119,6 +119,9 @@ class RestClient(private var context: Context) {
                         val datetimeStr = time.getString("datetime")
                         val datetime = GregorianCalendar()
                         datetime.time = dateFormatter.parse(datetimeStr)
+                        // Make sure datetime from rest api is for correct day
+                        if (intArrayOf(Calendar.YEAR, Calendar.DAY_OF_YEAR).fold(false) { b, i -> b || datetime.get(i) != date.get(i) })
+                            continue
                         when (type) {
                             "f" -> res.fajrTime = datetime
                             "z" -> res.zoharTime = datetime
@@ -172,6 +175,9 @@ class RestClient(private var context: Context) {
                         val datetimeStr = time.getString("datetime")
                         val datetime = GregorianCalendar()
                         datetime.time = dateFormatter.parse(datetimeStr)
+                        // Make sure datetime from rest api is for correct date
+                        if (intArrayOf(Calendar.YEAR, Calendar.DAY_OF_YEAR).fold(false) { b, i -> b || datetime.get(i) != date.get(i) })
+                            continue
                         if (type == SalaahType.MAGRIB)
                             datetime.add(Calendar.MINUTE, 5)
                         res += SalaahTimePojo(masjidId, masjidName, masjidLoc, type, datetime)
