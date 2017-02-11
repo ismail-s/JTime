@@ -199,12 +199,45 @@ class HomeFragment : BaseFragment() {
                     nextUpdateTime = updateTime
                     Handler().postDelayed(getAndDisplayTimesCallback,
                             updateTime.timeInMillis - GregorianCalendar().timeInMillis)
+                    scrollToHighlightedRow(closestId)
                 }
             } failUi {
                 ifAttachedToAct {
                     toast(getString(R.string.get_masjid_times_failure_toast, it.message))
                 }
             }
+        }
+    }
+
+    /**
+     * Scroll the the view with id [closestId].
+     *
+     * The view with id [closestId] must be a child or sub-child of the
+     * scroll view of this fragment.
+     */
+    private fun scrollToHighlightedRow(closestId: Int) {
+        // To prevent NullPointerExceptions, keep a reference to the
+        // scroll view, as we'll be doing stuff in callbacks on the
+        // ui thread rather than in one go
+        val scrollView = scroll_view
+        // This post is done to make sure that the layout all exists
+        // before we start doing calculations based on it
+        scrollView.post s@ {
+            val row = scrollView.findOptional<View>(closestId) ?: return@s
+            // Find y location of view relative to top of scroll view
+            var yDistanceToRow = 0
+            var parentView: View = row.parent as? View ?: return@s
+            // iterate through parent views, adding up their y positions
+            while (true) {
+                if (parentView == scrollView) break
+                yDistanceToRow += parentView.top
+                parentView = parentView.parent as? View ?: break
+            }
+            val topInScrollView = yDistanceToRow + row.top
+            val bottomInScrollView = yDistanceToRow + row.bottom
+            // Scroll target view to almost the top of the screen (or as
+            // close to there as possible)
+            scrollView.smoothScrollTo(0, ((topInScrollView + bottomInScrollView) / 2) - row.height)
         }
     }
 
