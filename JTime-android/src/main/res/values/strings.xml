@@ -68,6 +68,9 @@ This app is a work in progress. Any ideas/improvements/issues, please either lea
     <string name="fragment_title_change_salaah_times">Change salaah times</string>
     <string name="fragment_title_nearby_times">Nearby times</string>
 
+    <string name="menu_item_home_fragment_change_date">Change date</string>
+    <string name="menu_item_home_fragment_change_location">Change location</string>
+
     <string name="no_network_exception">Network is not available</string>
     <string name="no_location_exception">Location could not be obtained</string>
     <string name="generic_server_exception">Server error</string>

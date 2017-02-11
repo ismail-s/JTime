@@ -74,12 +74,11 @@ class HomeFragment : BaseFragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu) {
-        menu.add("Change date").setOnMenuItemClickListener {
+        menu.add(getString(R.string.menu_item_home_fragment_change_date)).setOnMenuItemClickListener {
             val cdp = CalendarDatePickerDialogFragment()
                     .setThemeDark()
                     .setPreselectedDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
                     .setOnDateSetListener { unused, y, m, d ->
-                        this.toast("$y $m $d")
                         date = GregorianCalendar()
                         date.set(Calendar.YEAR, y)
                         date.set(Calendar.MONTH, m)
@@ -89,7 +88,7 @@ class HomeFragment : BaseFragment() {
             cdp.show(childFragmentManager, "datePickerDialog")
             true
         }
-        menu.add("Change location").setOnMenuItemClickListener {
+        menu.add(getString(R.string.menu_item_home_fragment_change_location)).setOnMenuItemClickListener {
             val intent = PlacePicker.IntentBuilder().build(mainAct)
 			startActivityForResult(intent, SELECT_LOCATION_REQUEST)
             true
@@ -124,11 +123,13 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun getTimesAndLocAndDisplayInUi() {
-        val promise = location?.let { Promise.of(it) } ?: mainAct.location
-        promise successUi {
-            getTimesAndDisplayInUi(it)
-        } failUi {
-            label_title_or_error_message.text = getString(R.string.home_fragment_could_not_get_loc_text)
+        ifAttachedToAct {
+            val promise = location?.let { Promise.of(it) } ?: mainAct.location
+            promise successUi {
+                getTimesAndDisplayInUi(it)
+            } failUi {
+                label_title_or_error_message.text = getString(R.string.home_fragment_could_not_get_loc_text)
+            }
         }
     }
 
