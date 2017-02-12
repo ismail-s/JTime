@@ -49,7 +49,10 @@ test:
         parallel: true
     - adb start-server:
         background: true
-    - ./gradlew assembleDebug dokka --console=plain
+    - ./gradlew assembleDebug --console=plain
+    # Atm dokka crashes the build. I think this is a bug in dokka,
+    # so until this is fixed, dokka won't be run.
+    # - ./gradlew dokka --console=plain
     # Robolectric and materialdrawer don't work perfectly together
     # This is a hack to get the unittests to run.
     - sed -i '6 i <item name="selectableItemBackground">@color/colorPrimaryLight</item>' JTime-android/src/main/res/values/styles.xml && ./gradlew test --console=plain; sed -i '6 d' JTime-android/src/main/res/values/styles.xml
