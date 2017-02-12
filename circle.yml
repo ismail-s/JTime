@@ -43,12 +43,6 @@ test:
 
     # Android tests
     - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
-    # start the emulator
-    - emulator -avd custom-android21-googleapis -no-audio -no-window:
-        background: true
-        parallel: true
-    - adb start-server:
-        background: true
     - ./gradlew assembleDebug --console=plain
     # Atm dokka crashes the build. I think this is a bug in dokka,
     # so until this is fixed, dokka won't be run.
@@ -64,6 +58,12 @@ test:
        else true; fi
     # Build the tests first so the command to run them executes faster
     - ./gradlew assembleDebugAndroidTest --console=plain
+    # start the emulator
+    - emulator -avd custom-android21-googleapis -no-audio -no-window:
+        background: true
+        parallel: true
+    - adb start-server:
+        background: true
     # wait for emulator to have booted
     - circle-android wait-for-boot
     # Sleeping isn't a brilliant fix...
