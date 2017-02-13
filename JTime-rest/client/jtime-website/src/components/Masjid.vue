@@ -6,8 +6,8 @@
     </template>
     <h2 v-else>Loading...</h2>
     <div class="pad-5px">
-      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
-      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
     </div>
     <table class="mdl-data-table mdl-js-data-table center">
       <thead>
@@ -34,8 +34,8 @@
       </tbody>
     </table>
     <div class="pad-5px">
-      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
-      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
     </div>
   </div>
 </template>
