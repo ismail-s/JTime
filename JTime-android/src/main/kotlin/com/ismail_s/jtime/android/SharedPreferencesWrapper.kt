@@ -6,8 +6,7 @@ import android.content.SharedPreferences
 /**
  * Wrapper class providing a simpler way of getting/setting persisted preferences/settings
  */
-class SharedPreferencesWrapper {
-    private var context: Context
+class SharedPreferencesWrapper(private var context: Context) {
     private var SHARED_PREFERENCES_NAME = "com.ismail_s.jtime.android.SharedPreferencesWrapper"
     private var PROPERTY_ACCESS_TOKEN = "ACCESS_TOKEN"
     private var PROPERTY_CURRENT_USER_ID = "CURRENT_USER_ID"
@@ -46,10 +45,6 @@ class SharedPreferencesWrapper {
      */
     val sharedPrefs: SharedPreferences?
         get() = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
-
-    constructor(context: Context) {
-        this.context = context
-    }
 
     /**
      * Short for setting [accessToken] to "" and [userId] to -1.

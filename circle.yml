@@ -17,7 +17,6 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter android-23
     - echo y | android update sdk --no-ui --all --filter android-21
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2
-    - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-google_apis-21
     - ./gradlew dependencies --console=plain
     # Install deps for jtime-website
     - (cd JTime-rest/client/jtime-website && yarn install)
@@ -41,15 +40,10 @@ test:
        yarn test &&
        yarn run lint
 
-    # Android tests
-    - echo | android create avd -n custom-android21-googleapis -t "android-21" --abi google_apis/armeabi-v7a
-    # start the emulator
-    - emulator -avd custom-android21-googleapis -no-audio -no-window:
-        background: true
-        parallel: true
-    - adb start-server:
-        background: true
-    - ./gradlew assembleDebug dokka --console=plain
+    - ./gradlew assembleDebug --console=plain
+    # Atm dokka crashes the build. I think this is a bug in dokka,
+    # so until this is fixed, dokka won't be run.
+    # - ./gradlew dokka --console=plain
     # Robolectric and materialdrawer don't work perfectly together
     # This is a hack to get the unittests to run.
     - sed -i '6 i <item name="selectableItemBackground">@color/colorPrimaryLight</item>' JTime-android/src/main/res/values/styles.xml && ./gradlew test --console=plain; sed -i '6 d' JTime-android/src/main/res/values/styles.xml
@@ -59,23 +53,10 @@ test:
        (cd JTime-android && gpg -d -o android.jks --passphrase $ANDROID_RELEASE_ENCRYPTION_PASSWORD android.jks.gpg);
        if test $? == 0; then (./gradlew assembleRelease --console=plain && rm JTime-android/android.jks);
        else true; fi
-    # Build the tests first so the command to run them executes faster
-    - ./gradlew assembleDebugAndroidTest --console=plain
-    # wait for emulator to have booted
-    - circle-android wait-for-boot
-    # Sleeping isn't a brilliant fix...
-    - sleep 30
-    - adb devices
-    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
-    # Note the espresso tests include code to unlock the emulator before running the tests
-    - ./gradlew connectedAndroidTest --console=plain || ./gradlew connectedAndroidTest --console=plain:
-        timeout: 900
-    - adb shell screencap -p | perl -pe 's/\x0D\x0A/\x0A/g' > $CIRCLE_ARTIFACTS/screen-$(date +"%T").png
   post:
     - cp -r JTime-android/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
     - find JTime-android/build/test-results -name "*.xml" -exec cp {} $CIRCLE_TEST_REPORTS/ \;
-    - cp -r JTime-android/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
 deployment:
     production:
         branch: production

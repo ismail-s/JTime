@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.Manifest
 import android.os.Bundle
+import android.os.Handler
 import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
@@ -12,6 +13,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Gravity
+import android.view.Menu
 import android.view.View
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -187,7 +189,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
     override fun onRequestPermissionsResult(requestCode: Int, @NonNull permissions: Array<out String>, @NonNull grantResults: IntArray) {
         if (requestCode == LOCATION_PERMISSION_RESULT_CODE) {
             // If request is cancelled, the result arrays are empty.
-            if (grantResults.size > 0
+            if (grantResults.isNotEmpty()
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     onConnected(null)
             } else if (!location.isDone()) {
@@ -341,6 +343,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                 .build()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        currentFragment?.onCreateOptionsMenu(menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onStart() {
         googleApiClient?.connect()
         super.onStart()
@@ -448,6 +455,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         drawer?.closeDrawer()
         rightDrawer.closeDrawer()
         toolbar.title = getString(title)
+        Handler().post { supportInvalidateOptionsMenu() }
     }
 
     companion object {

@@ -2,6 +2,7 @@ package com.ismail_s.jtime.android.fragment
 
 import android.location.Location
 import android.support.v4.app.Fragment
+import android.view.Menu
 import android.view.View
 import com.ismail_s.jtime.android.MainActivity
 import nl.komponents.kovenant.CancelException
@@ -52,6 +53,11 @@ open class BaseFragment : Fragment(), AnkoLogger {
      */
     open fun onLocationChanged(loc: Location) {}
 
+    /**
+    * Implement this method to create an options menu.
+    */
+    open fun onCreateOptionsMenu(menu: Menu) {}
+
     override fun onDestroyView() {
         super.onDestroyView()
         promisesToCleanup.forEach { Kovenant.cancel(it, CancelException()) }
@@ -73,7 +79,7 @@ open class BaseFragment : Fragment(), AnkoLogger {
     * Execute the provided block if this fragment is attached to an activity.
     */
     fun ifAttachedToAct(block: () -> Unit) {
-        if (isAdded() && activity != null) {
+        if (isAdded && activity != null) {
             block()
         }
     }

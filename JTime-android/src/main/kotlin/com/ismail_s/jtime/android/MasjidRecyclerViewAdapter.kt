@@ -33,14 +33,9 @@ class MasjidRecyclerViewAdapter(private val mValues: List<MasjidPojo>, private v
     }
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        val mNameView: TextView
-        val mAddressView: TextView
+        val mNameView: TextView = mView.find<TextView>(R.id.content)
+        val mAddressView: TextView = mView.find<TextView>(R.id.address)
         var mItem: MasjidPojo = MasjidPojo()
-
-        init {
-            mNameView = mView.find<TextView>(R.id.content)
-            mAddressView = mView.find<TextView>(R.id.address)
-        }
 
         override fun toString(): String {
             return "${super.toString()} '${mNameView.text}' ${mAddressView.text}'"
