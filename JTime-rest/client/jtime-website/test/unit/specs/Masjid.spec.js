@@ -64,7 +64,7 @@ describe('Masjid.vue', () => {
   it('dispatchs a getSalaahTimes action on component creation', () => {
     const [, mockStore] = setUpComponent()
     expect(mockStore.modules.MasjidsModule.actions.getSalaahTimesForMonth)
-      .to.have.been.calledWith(sinon.match.any, sinon.match((val) => {
+      .to.have.been.calledWith(sinon.match.any, sinon.match(val => {
         return val.type === 'getSalaahTimesForMonth' &&
           val.masjidId === 1 &&
           val.year === 2016 &&
