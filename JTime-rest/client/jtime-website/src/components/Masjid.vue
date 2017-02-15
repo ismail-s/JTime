@@ -6,30 +6,32 @@
       <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
       <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
     </div>
-    <table class="mdl-data-table mdl-js-data-table center">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th class="mdl-data-table__cell--non-numeric">Day</th>
-          <th>Fajr</th>
-          <th>Zohar</th>
-          <th>Asr</th>
-          <th>Magrib</th>
-          <th>Esha</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="day in salaahTimes" v-bind:class="isToday(day.date) ? 'highlight-row' : ''">
-          <td>{{ day.date }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ day.dayOfWeek }}</td>
-          <td>{{ day.fajrTime }}</td>
-          <td>{{ day.zoharTime }}</td>
-          <td>{{ day.asrTime }}</td>
-          <td>{{ day.magribTime }}</td>
-          <td>{{ day.eshaTime }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="horizontal-scroll">
+      <table class="mdl-data-table mdl-js-data-table center">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th class="mdl-data-table__cell--non-numeric">Day</th>
+            <th>Fajr</th>
+            <th>Zohar</th>
+            <th>Asr</th>
+            <th>Magrib</th>
+            <th>Esha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="day in salaahTimes" v-bind:class="isToday(day.date) ? 'highlight-row' : ''">
+            <td>{{ day.date }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ day.dayOfWeek }}</td>
+            <td>{{ day.fajrTime }}</td>
+            <td>{{ day.zoharTime }}</td>
+            <td>{{ day.asrTime }}</td>
+            <td>{{ day.magribTime }}</td>
+            <td>{{ day.eshaTime }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div class="pad-5px">
       <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
       <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
@@ -178,5 +180,9 @@ export default {
 
 .highlight-row {
   background-color: #f48fb1; /*material design pink 200*/
+}
+
+.horizontal-scroll {
+  overflow-x: auto;
 }
 </style>
