@@ -148,8 +148,8 @@ module.exports = function (SalaahTime) {
     })
     Promise.all(promises)
       // Filter out any updates that didn't succeed
-      .filter(function (maybe) {return maybe.isFulfilled()})
-      .map(function (p) {return p.value()})
+      .filter(function (maybe) { return maybe.isFulfilled() })
+      .map(function (p) { return p.value() })
       .then(function (arr) {
         cb(null, arr)
       })
