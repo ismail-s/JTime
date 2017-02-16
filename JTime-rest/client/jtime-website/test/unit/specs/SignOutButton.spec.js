@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import LoggedInUserModule from 'src/store/logged-in-user'
 import SignOutButton from 'src/components/SignOutButton'
 
 describe('SignOutButton.vue', () => {
   const testLoggedInUser = {userId: 1, email: 'test@example.com', accessToken: 'test'}
   function setUpComponent () {
-    const mockStore = {actions: {logout: sinon.spy()}, state: {LoggedInUserModule: {loggedInUser: null}}}
+    const mockStore = {modules: {LoggedInUserModule: {actions: {logout: sinon.spy()}, state: {loggedInUser: null}, getters: LoggedInUserModule.getters}}}
     const vm = new Vue({
       el: document.createElement('div'),
       render: (h) => h(SignOutButton),
@@ -23,7 +24,7 @@ describe('SignOutButton.vue', () => {
     const [vm, mockStore] = setUpComponent()
     var mockLoggedInUser = {verified: false}
     Object.assign(mockLoggedInUser, testLoggedInUser)
-    mockStore.state.LoggedInUserModule.loggedInUser = mockLoggedInUser
+    mockStore.modules.LoggedInUserModule.state.loggedInUser = mockLoggedInUser
     Vue.nextTick(() => {
       expect(vm.$el.innerHTML).to.be.empty
       done()
@@ -34,7 +35,7 @@ describe('SignOutButton.vue', () => {
     const [vm, mockStore] = setUpComponent()
     var mockLoggedInUser = {verified: true}
     Object.assign(mockLoggedInUser, testLoggedInUser)
-    mockStore.state.LoggedInUserModule.loggedInUser = mockLoggedInUser
+    mockStore.modules.LoggedInUserModule.state.loggedInUser = mockLoggedInUser
     Vue.nextTick(() => {
       expect(vm.$el.textContent).to.equal('Sign Out')
       done()
@@ -45,7 +46,7 @@ describe('SignOutButton.vue', () => {
     const [vm, mockStore] = setUpComponent()
     var mockLoggedInUser = {verified: true}
     Object.assign(mockLoggedInUser, testLoggedInUser)
-    mockStore.state.LoggedInUserModule.loggedInUser = mockLoggedInUser
+    mockStore.modules.LoggedInUserModule.state.loggedInUser = mockLoggedInUser
     Vue.nextTick(() => {
       const thenSpy = sinon.spy()
       var signOutStub = sinon.stub().returns({then: thenSpy})
@@ -55,10 +56,10 @@ describe('SignOutButton.vue', () => {
       expect(signOutStub).to.have.been.calledWithExactly()
       expect(thenSpy).to.have.been.calledOnce
 
-      expect(mockStore.actions.logout).to.not.have.been.calledOnce
+      expect(mockStore.modules.LoggedInUserModule.actions.logout).to.not.have.been.calledOnce
       // Invoke the func that is to be called when google signOut completes
       thenSpy.getCall(0).args[0]()
-      expect(mockStore.actions.logout).to.have.been.calledOnce
+      expect(mockStore.modules.LoggedInUserModule.actions.logout).to.have.been.calledOnce
       done()
     })
   })

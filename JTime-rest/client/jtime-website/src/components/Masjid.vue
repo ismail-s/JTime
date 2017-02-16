@@ -1,10 +1,13 @@
 <template>
   <div class="padBottom">
-    <h2 v-if="masjidName">Salaah times for {{ masjidName }} for {{ monthAndYear }}</h2>
+    <template v-if="masjidName">
+      <h2>Salaah times for {{ masjidName }} for {{ monthAndYear }}</h2>
+      <router-link :to="editSalaahTimesLink" v-if="loggedIn">Edit Salaah times</router-link>
+    </template>
     <h2 v-else>Loading...</h2>
     <div class="pad-5px">
-      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
-      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
     </div>
     <div class="horizontal-scroll">
       <table class="mdl-data-table mdl-js-data-table center">
@@ -33,16 +36,17 @@
       </table>
     </div>
     <div class="pad-5px">
-      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
-      <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" v-on:click="goToPrevMonth">Previous month</button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" v-on:click="goToNextMonth">Next month</button>
     </div>
   </div>
 </template>
 
 <script>
-import {compareSalaahTypes, upgradeElementMixin} from '../utils'
-import router from '../router'
+import {upgradeElementMixin} from '../utils'
+import {commonComputedProperties, commonMethods, sortSalaahTimes} from '../masjid-utils'
 import moment from 'moment'
+import {mapGetters} from 'vuex'
 
 export default {
   name: 'masjid',
@@ -54,104 +58,24 @@ export default {
       }
       return (masjid && masjid.name) || ''
     },
-    masjidId () {
-      return parseInt(this.$route.params.id)
-    },
-    year () {
-      return parseInt(this.$route.params.year)
-    },
-    month () {
-      return parseInt(this.$route.params.month)
-    },
+    ...commonComputedProperties,
     monthAndYear () {
       return moment().year(this.year).month(this.month).format('MMMM YYYY')
     },
     salaahTimes () {
       var times = this.$store.state.SalaahTimesModule.salaahTimes[this.masjidId] || []
-      times = times.filter(t => t.datetime.getFullYear() === this.year && t.datetime.getMonth() === this.month)
-      times.sort((a, b) => {
-        const aDate = a.datetime.getDate()
-        const bDate = b.datetime.getDate()
-        if (aDate < bDate) {
-          return -1
-        } else if (aDate > bDate) {
-          return 1
-        } else {
-          return compareSalaahTypes(a.type, b.type)
-        }
-      })
-      const daysInMonth = moment().year(this.year).month(this.month).daysInMonth()
-      var finalResult = []
-      for (var i = 1; i <= daysInMonth; i++) {
-        var obj = {date: i, dayOfWeek: moment().year(this.year).month(this.month).date(i).format('ddd')}
-        while (times[0] && times[0].datetime.getDate() === i) {
-          const time = times.shift()
-          const datetime = moment(time.datetime).format('HH-mm')
-          switch (time.type) {
-            case 'f':
-              obj.fajrTime = datetime
-              break
-            case 'z':
-              obj.zoharTime = datetime
-              break
-            case 'a':
-              obj.asrTime = datetime
-              break
-            case 'm':
-              obj.magribTime = moment(time.datetime).add(5, 'minutes').format('HH-mm')
-              break
-            case 'e':
-              obj.eshaTime = datetime
-              break
-          }
-        }
-        finalResult.push(obj)
-      }
-      return finalResult
-    }
+      return sortSalaahTimes(times, this.year, this.month)
+    },
+    editSalaahTimesLink () {
+      return `/masjid/${this.masjidId}/${this.year}/${this.month}/edit`
+    },
+    ...mapGetters(['loggedIn'])
   },
   methods: {
-    getSalaahTimesForMonth () {
-      if (this.masjidId && this.year && this.month + 1) {
-        this.$store.dispatch({
-          type: 'getSalaahTimesForMonth',
-          masjidId: this.masjidId,
-          year: this.year,
-          month: this.month
-        })
-      }
-    },
     isToday (dayOfMonth) {
       return new Date().getDate() === dayOfMonth
     },
-    goToNextMonth () {
-      let [newYear, newMonth] = [this.year, this.month]
-      if (this.month < 0 || this.month > 11) {
-        // Invalid month, return early
-        return
-      } else if (this.month === 11) {
-        newMonth = 0
-        newYear = this.year + 1
-      } else {
-        newMonth = this.month + 1
-      }
-      router.push({name: 'masjid-times-for-month',
-        params: {id: this.masjidId, year: newYear, month: newMonth}})
-    },
-    goToPrevMonth () {
-      let [newYear, newMonth] = [this.year, this.month]
-      if (this.month < 0 || this.month > 11) {
-        // Invalid month, return early
-        return
-      } else if (this.month === 0) {
-        newMonth = 11
-        newYear = this.year - 1
-      } else {
-        newMonth = this.month - 1
-      }
-      router.push({name: 'masjid-times-for-month',
-        params: {id: this.masjidId, year: newYear, month: newMonth}})
-    }
+    ...commonMethods
   },
   created () {
     this.getSalaahTimesForMonth()

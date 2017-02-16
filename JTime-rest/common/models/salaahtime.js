@@ -105,6 +105,7 @@ module.exports = function (SalaahTime) {
       })
     })
   }
+
   SalaahTime.remoteMethod(
     'createOrUpdate', {
       description: ['Check if a salaah time for the same salaah, ',
@@ -131,8 +132,52 @@ module.exports = function (SalaahTime) {
         path: '/create-or-update',
         verb: 'post'
       }
-    }
-)
+    })
+
+  SalaahTime.createOrUpdateAsync = Promise.promisify(SalaahTime.createOrUpdate, {context: SalaahTime})
+
+  SalaahTime.createOrUpdateMultiple = function (masjidId, newOrUpdatedTimes, cb) {
+    // Filter out all malformed inputs
+    var promises = newOrUpdatedTimes.filter(function (elem) {
+      return elem.type && elem.date
+    }).map(function (e) {
+      e.date = new Date(e.date)
+      return e
+    }).map(function (e) {
+      return SalaahTime.createOrUpdateAsync(masjidId, e.type, e.date).reflect()
+    })
+    Promise.all(promises)
+      // Filter out any updates that didn't succeed
+      .filter(function (maybe) { return maybe.isFulfilled() })
+      .map(function (p) { return p.value() })
+      .then(function (arr) {
+        cb(null, arr)
+      })
+  }
+
+  SalaahTime.remoteMethod(
+    'createOrUpdateMultiple', {
+      description: ['Same as the createOrUpdate endpoint, but accepts ',
+        'multiple updates for one masjid. Returns an array of any ',
+        'successfully updated times'],
+      accepts: [{
+        arg: 'masjidId',
+        type: 'number',
+        required: true
+      }, {
+        arg: 'newOrUpdatedTimes',
+        type: ['Object'],
+        required: true
+      }],
+      returns: {
+        arg: 'res',
+        type: ['Object']
+      },
+      http: {
+        path: '/create-or-update-multiple',
+        verb: 'post'
+      }
+    })
 
   SalaahTime.getTimesForMultipleMasjids = function (date, salaahType, location, faveMasjidIds, cb) {
     SalaahTime.findAsync = Promise.promisify(SalaahTime.find, {context: SalaahTime})
