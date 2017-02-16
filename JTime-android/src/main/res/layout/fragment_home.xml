@@ -1,9 +1,11 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
-    android:scrollbars="vertical"
-    android:fillViewport="true">
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,33 +17,19 @@
         tools:context=".fragment.HomeFragment">
 
         <TextView
+            android:id="@+id/label_title_or_error_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/label_next_time"
-            android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:textSize="30sp" />
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/label_other_times_today"
-            android:id="@+id/label_other_times_today"
-            android:layout_below="@+id/label_next_time"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:visibility="invisible"/>
-
-        <TableLayout
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/card_view_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/label_other_times_today"
-            android:id="@+id/salaah_times_summary_table"/>
+            android:layout_height="wrap_content"
+            android:layout_below="@id/label_title_or_error_message"
+            app:flexWrap="wrap"/>
 
     </RelativeLayout>
 </ScrollView>
