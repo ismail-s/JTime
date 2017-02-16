@@ -9,7 +9,7 @@
     <div class="mdl-grid" v-else>
         <div class="mdl-cell mdl-card mdl-shadow--2dp mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--6-col-phone" v-for="salaahTimes in sortedSalaahTimes">
           <div class="mdl-card__title">{{ salaahTypeCodeToString(salaahTimes[0]) }}</div>
-          <div class="mdl-card__supporting-text">
+          <div class="mdl-card__supporting-text horizontal-scroll">
             <table class="mdl-data-table mdl-js-data-table center">
               <tbody>
                 <tr v-for="time in salaahTimes[1]" v-bind:class="time === closestTime ? 'highlight-row' : ''">
@@ -182,5 +182,9 @@ h1 {
 
 .highlight-row {
   background-color: #f48fb1; /*material design pink 200*/
+}
+
+.horizontal-scroll {
+  overflow-x: auto;
 }
 </style>
