@@ -51,7 +51,7 @@ export default {
   },
   watch: {
     $route: function (to) {
-      if (to.name !== 'masjid-times-for-month') {
+      if (!(['masjid-times-for-month', 'edit-salaah-times'].includes(to.name))) {
         // Toggle drawer
         this.$el.firstChild.firstChild.MaterialLayout.toggleDrawer()
       }

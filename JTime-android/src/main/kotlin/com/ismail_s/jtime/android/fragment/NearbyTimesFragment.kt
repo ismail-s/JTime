@@ -49,11 +49,11 @@ class NearbyTimesFragment : BaseFragment() {
     private fun getTimesAndDisplayInUi(loc: Location) {
         val table = salaah_times_table
         cancelPromiseOnFragmentDestroy {
-            RestClient(act).getTimesForNearbyMasjids(loc.latitude, loc.longitude, salaahType)
+            RestClient(act).getTimesForNearbyMasjids(loc.latitude, loc.longitude, salaahType = salaahType)
                     .successUi s@ {
                         table.removeAllViews()
                         val tSize = 18f
-                        if (it.size == 0) {
+                        if (it.isEmpty()) {
                             table.addView(with(AnkoContext.create(act, table)) {
                                 tableRow {
                                     textView(getString(R.string.no_salaah_times_nearby_masjids_toast)) {
