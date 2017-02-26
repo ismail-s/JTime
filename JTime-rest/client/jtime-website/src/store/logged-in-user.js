@@ -28,17 +28,38 @@ export default {
     }
   },
   actions: {
-    login (context, {idToken, email}) {
-      const options = {params: {id_token: idToken}}
-      Vue.http.get(`${baseUrl}/user_tables/googleid`, options).then(response => {
-        return response.json()
-      }).then(({userId, access_token}) => {
-        context.commit('loginUser', {userId, email, accessToken: access_token, verified: true})
-        context.commit('toast', `Logged in as ${email}`)
-      }).catch((err) => {
-        context.commit('clearLoggedInUser')
-        context.commit('toast', `Login failed: ${err.message}`)
-      })
+    login ({commit, dispatch, state}, {idToken, email}) {
+      // First, check to see if we have a saved login with the same email
+      if (state.loggedInUser && state.loggedInUser.email === email) {
+        // Check if we have verified the login is still valid
+        if (!state.loggedInUser.verified || state.loggedInUser.verified !== true) {
+          // Check if login is still valid
+          return dispatch('checkServerLoginStatus').then(() => {
+            commit('toast', `Logged in as ${email}`)
+            return Promise.resolve()
+          }).catch(() => {
+            /* checkServerLoginStatus clears the saved login user if it isn't,
+               valid, so this line essentially is like doing a goto to the else
+               block. */
+            return dispatch('login', {idToken, email})
+          })
+        }
+        return Promise.resolve()
+      } else {
+        // Login user
+        const options = {params: {id_token: idToken}}
+        return Vue.http.get(`${baseUrl}/user_tables/googleid`, options).then(response => {
+          return response.json()
+        }).then(({userId, access_token}) => {
+          commit('loginUser', {userId, email, accessToken: access_token, verified: true})
+          commit('toast', `Logged in as ${email}`)
+          return Promise.resolve()
+        }).catch((err) => {
+          commit('clearLoggedInUser')
+          commit('toast', `Login failed: ${err.message}`)
+          return Promise.reject(err)
+        })
+      }
     },
     logout (context) {
       const loginState = context.state.loggedInUser
@@ -58,17 +79,19 @@ export default {
       const loginState = context.state.loggedInUser
       if (!loginState) {
         // No persisted login, so we are logged out & don't need to do anything
-        return
+        return Promise.reject(new Error())
       }
       const options = {headers: {Authorization: loginState.accessToken}}
-      Vue.http.get(`${baseUrl}/user_tables/${loginState.userId}`, options).then(response => {
+      return Vue.http.get(`${baseUrl}/user_tables/${loginState.userId}`, options).then(response => {
         if (response.status === 200) {
           context.commit('verifyLoggedInUser')
-          context.commit('toast', `Logged in as ${context.state.loggedInUser.email}`)
         } else {
           context.commit('clearLoggedInUser')
-          context.commit('toast', 'Logged out on server')
+          throw new Error()
         }
+      }).catch(err => {
+        context.commit('clearLoggedInUser')
+        throw err
       })
     }
   }
