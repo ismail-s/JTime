@@ -28,7 +28,12 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.blue-pink.min.css" />
   <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
-  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://apis.google.com/js/platform.js?onload=gapicallback" async defer></script>
+  <script>
+    window.gapicallback = function () {
+      window.gapi_is_available = true
+    }
+  </script>
 </head>
 
 <body>
