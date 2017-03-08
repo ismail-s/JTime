@@ -17,7 +17,20 @@ describe('Home.vue', () => {
 
   function mockGeoLocation () {
     const mockGetCurrentPosition = sinon.spy()
-    window.navigator.geolocation = {getCurrentPosition: mockGetCurrentPosition}
+    const object = {getCurrentPosition: mockGetCurrentPosition}
+    // The following code is taken from
+    // https://github.com/2gis/mock-geolocation/blob/57d29b159cb85585333dfda4a76bc72efd13d4c4/src/geolocate.js#L22-L37
+    // MIT license Copyright (c) 2016 2GIS
+    if (Object.defineProperty) {
+      Object.defineProperty(navigator, 'geolocation', {
+        get () { return object },
+        configurable: true
+      })
+    } else if (navigator.__defineGetter__) {
+      navigator.__defineGetter__('geolocation', () => object)
+    } else {
+      throw new Error('Cannot change navigator.geolocation method')
+    }
     return mockGetCurrentPosition
   }
 
