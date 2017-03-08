@@ -2,9 +2,12 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from './components/Home'
 import AllMasjids from './components/AllMasjids'
-import EditSalaahTimes from './components/EditSalaahTimes'
 import Masjid from './components/Masjid'
 import Help from './components/Help'
+
+// Split EditSalaahTimes.vue code and deps into separate module to be
+// lazy-loaded
+const EditSalaahTimes = () => import('./components/EditSalaahTimes')
 
 Vue.use(VueRouter)
 
