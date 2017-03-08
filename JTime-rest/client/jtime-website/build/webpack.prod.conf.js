@@ -94,7 +94,10 @@ var webpackConfig = merge(baseWebpackConfig, {
         from: path.resolve(__dirname, '../staticRoot'),
         ignore: ['.*']
       }
-    ])
+    ]),
+    // https://github.com/moment/moment/issues/1435#issuecomment-33106268
+    // Used to avoid including unused momentjs locales
+    new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/en$/)
   ]
 })
 
