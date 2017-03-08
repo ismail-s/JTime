@@ -5,7 +5,6 @@ import EditSalaahTimes from 'src/components/EditSalaahTimes'
 
 describe('EditSalaahTimes.vue', () => {
   function setUpComponent (masjids = [], routerParams = {id: 1, year: 2016, month: 0}) {
-    router.push({name: 'edit-salaah-times', params: routerParams})
     const mockStore = {modules: {
       MasjidsModule: {
         actions: {getSalaahTimesForMonth: sinon.spy()}
@@ -22,39 +21,50 @@ describe('EditSalaahTimes.vue', () => {
       store: new Vuex.Store(mockStore),
       router
     })
-    return [vm, mockStore]
+    return new Promise((resolve, reject) => {
+      // We need to explicitly wait for the router.push to complete as
+      // EditSalaahTimes route is lazy-loaded ie asynchronously loaded.
+      router.push({name: 'edit-salaah-times', params: routerParams}, () => {
+        resolve([vm, mockStore])
+      }, () => {
+        resolve([vm, mockStore])
+      })
+    })
   }
 
-  it('should initially display a title, help text and some buttons', () => {
-    const [vm] = setUpComponent()
-    const strings = ['Edit Salaah times', 'Help',
-      'Previous month', 'Next month', 'Save changes']
-    strings.forEach(text => {
-      expect(vm.$el.textContent).to.contain(text)
+  it('should initially display a title, help text and some buttons', done => {
+    setUpComponent().then(([vm]) => {
+      const strings = ['Edit Salaah times', 'Help',
+        'Previous month', 'Next month', 'Save changes']
+      strings.forEach(text => {
+        expect(vm.$el.textContent).to.contain(text)
+      })
+      done()
     })
   })
 
   it('dispatches a request to get salaah times when mounted or when the route changes', done => {
-    const [, mockStore] = setUpComponent()
-    const getSalaahTimesForMonth = mockStore.modules.MasjidsModule.actions.getSalaahTimesForMonth
-    expect(getSalaahTimesForMonth).to.have.been.calledOnce
-    expect(getSalaahTimesForMonth).to.have.been.calledWith(sinon.match.any, sinon.match(val => {
-      return val.type === 'getSalaahTimesForMonth' &&
-        val.masjidId === 1 &&
-        val.year === 2016 &&
-        val.month === 0
-    }))
-    // Navigate to a new page
-    router.push({name: 'edit-salaah-times', params: {id: 1, year: 2016, month: 1}})
-    Vue.nextTick(() => {
-      expect(getSalaahTimesForMonth).to.have.been.calledTwice
+    setUpComponent().then(([, mockStore]) => {
+      const getSalaahTimesForMonth = mockStore.modules.MasjidsModule.actions.getSalaahTimesForMonth
+      expect(getSalaahTimesForMonth).to.have.been.calledOnce
       expect(getSalaahTimesForMonth).to.have.been.calledWith(sinon.match.any, sinon.match(val => {
         return val.type === 'getSalaahTimesForMonth' &&
           val.masjidId === 1 &&
           val.year === 2016 &&
-          val.month === 1
+          val.month === 0
       }))
-      done()
+      // Navigate to a new page
+      router.push({name: 'edit-salaah-times', params: {id: 1, year: 2016, month: 1}})
+      Vue.nextTick(() => {
+        expect(getSalaahTimesForMonth).to.have.been.calledTwice
+        expect(getSalaahTimesForMonth).to.have.been.calledWith(sinon.match.any, sinon.match(val => {
+          return val.type === 'getSalaahTimesForMonth' &&
+            val.masjidId === 1 &&
+            val.year === 2016 &&
+            val.month === 1
+        }))
+        done()
+      })
     })
   })
 
@@ -80,13 +90,18 @@ describe('EditSalaahTimes.vue', () => {
         expectedYear: 2015,
         expectedMonth: 11}]
     changingMonthTests.forEach(e => {
-      it(e.title, () => {
-        const [vm] = e.routerParams ? setUpComponent([], e.routerParams) : setUpComponent()
-        const [prevMonthButton, nextMonthButton] = vm.$el.getElementsByTagName('button')
-        const buttonToClick = e.clickOnPrevMonthButton ? prevMonthButton : nextMonthButton
-        buttonToClick.click()
-        expect(router.currentRoute.params).to.have.property('year', e.expectedYear)
-        expect(router.currentRoute.params).to.have.property('month', e.expectedMonth)
+      it(e.title, done => {
+        const setUpPromise = e.routerParams ? setUpComponent([], e.routerParams) : setUpComponent()
+        setUpPromise.then(([vm]) => {
+          const f = vm.$el.getElementsByTagName('button')
+          const prevMonthButton = f[0]
+          const nextMonthButton = f[1]
+          const buttonToClick = e.clickOnPrevMonthButton ? prevMonthButton : nextMonthButton
+          buttonToClick.click()
+          expect(router.currentRoute.params).to.have.property('year', e.expectedYear)
+          expect(router.currentRoute.params).to.have.property('month', e.expectedMonth)
+          done()
+        })
       })
     })
   })
