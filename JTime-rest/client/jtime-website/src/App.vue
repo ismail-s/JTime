@@ -5,11 +5,10 @@
       <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
       <!-- Title -->
-      <span class="mdl-layout-title">Home</span>
+      <span class="mdl-layout-title">{{title}}</span>
     </div>
   </header>
   <div class="mdl-layout__drawer">
-    <span class="mdl-layout-title"></span>
     <nav class="mdl-navigation">
       <sign-in-button></sign-in-button>
       <sign-out-button></sign-out-button>
@@ -42,15 +41,33 @@ export default {
     'sign-in-button': SignInButton,
     'sign-out-button': SignOutButton
   },
+  data () {
+    return {
+      title: 'Home'
+    }
+  },
   mixins: [upgradeElementMixin],
   methods: {
     showToast (message) {
       const snackbar = document.getElementById('snackbar')
       snackbar.MaterialSnackbar.showSnackbar({message})
+    },
+    setTitle (routeName) {
+      const routeTitleMap = {
+        'home': 'Home',
+        'all-masjids': 'All masjids',
+        'help': 'Help',
+        'masjid-times-for-month': 'Masjid times',
+        'edit-salaah-times': 'Change salaah times'
+      }
+      this.title = routeTitleMap[routeName] || routeTitleMap.home
     }
   },
+  mounted () {
+    this.setTitle(this.$route.name)
+  },
   watch: {
-    $route () {
+    $route (to) {
       // Check if drawer is visible
       const drawerIsVisible = this.$el
         .getElementsByClassName('mdl-layout__drawer is-visible').length > 0
@@ -58,6 +75,8 @@ export default {
         // Hide drawer
         this.$el.firstChild.firstChild.MaterialLayout.toggleDrawer()
       }
+      // Set title in app bar based on new value of $route.name
+      this.setTitle(to.name)
     },
     '$store.state.ToastModule.toastQueue': function (queue) {
       const msg = queue[0]
