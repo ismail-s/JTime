@@ -50,9 +50,12 @@ export default {
     }
   },
   watch: {
-    $route: function (to) {
-      if (!(['masjid-times-for-month', 'edit-salaah-times'].includes(to.name))) {
-        // Toggle drawer
+    $route () {
+      // Check if drawer is visible
+      const drawerIsVisible = this.$el
+        .getElementsByClassName('mdl-layout__drawer is-visible').length > 0
+      if (drawerIsVisible === true) {
+        // Hide drawer
         this.$el.firstChild.firstChild.MaterialLayout.toggleDrawer()
       }
     },
