@@ -41,6 +41,11 @@ class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener 
         onRefresh()
     }
 
+    override fun onStop() {
+        super.onStop()
+        hideRefreshIcon()
+    }
+
     override fun onRefresh() {
         cancelPromiseOnFragmentDestroy {
             RestClient(act).getMasjids() successUi { masjids ->
