@@ -10,10 +10,15 @@ import {upgradeElementMixin} from '../utils'
 export default {
   name: 'sign-in-button',
   mixins: [upgradeElementMixin],
+  data () {
+    return {
+      timeoutId: null
+    }
+  },
   methods: {
     setUpGoogleApi () {
       if (!window.gapi_is_available && !window.gapi) {
-        setTimeout(this.setUpGoogleApi, 100)
+        this.timeoutId = setTimeout(this.setUpGoogleApi, 100)
       } else {
         window.gapi && window.gapi.load('auth2', () => {
           window.gapi.auth2.init({
@@ -30,6 +35,9 @@ export default {
       const idToken = googleUser.getAuthResponse().id_token
       this.$store.dispatch('login', {idToken, email})
     }
+  },
+  beforeDestroy () {
+    clearTimeout(this.timeoutId)
   }
 }
 </script>
