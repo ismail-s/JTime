@@ -34,6 +34,14 @@ describe('App.vue', () => {
     })
   })
 
+  afterEach(() => {
+    // This line ensures that the SignInButton sub-component gets destroyed,
+    // which triggers its beforeDestroy hook, which calls clearTimeout on any
+    // timer it has created. Deleting this line should sporadically cause a
+    // test that tests this timer being run in SignInButton.spec.js to fail.
+    vm.$destroy()
+  })
+
   it('should display Home, All Masjids and Help navbar', () => {
     const text = vm.$el.textContent
     expect(text).to.match(/Home\s+All Masjids\s+Help/)
