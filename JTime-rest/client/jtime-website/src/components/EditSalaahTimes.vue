@@ -113,11 +113,11 @@ export default {
         return
       }
       const options = {
-        params: {masjidId: this.masjidId, newOrUpdatedTimes},
         headers: {
           Authorization: this.$store.state.LoggedInUserModule.loggedInUser.accessToken
         }}
-      Vue.http.post(`${baseUrl}/SalaahTimes/create-or-update-multiple`, {}, options).then(response => {
+      const body = {masjidId: this.masjidId, newOrUpdatedTimes}
+      Vue.http.post(`${baseUrl}/SalaahTimes/create-or-update-multiple`, body, options).then(response => {
         return response.json()
       }).then(res => {
         this.$store.commit('toast', 'Times were successfully saved')
