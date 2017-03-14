@@ -73,7 +73,11 @@ export default {
   },
   methods: {
     isToday (dayOfMonth) {
-      return new Date().getDate() === dayOfMonth
+      const today = moment().format('YYYY-MM-DD')
+      const maybeToday = moment()
+        .year(this.year).month(this.month).date(dayOfMonth)
+        .format('YYYY-MM-DD')
+      return today === maybeToday
     },
     ...commonMethods
   },
