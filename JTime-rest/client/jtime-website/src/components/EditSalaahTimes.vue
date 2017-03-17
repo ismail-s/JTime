@@ -91,11 +91,15 @@ export default {
     },
     saveChanges () {
       this.saveButtonIsDisabled = true
+      const daysInMonth = moment().year(this.year).month(this.month).daysInMonth()
       const changesToMake = {} // map from eg "01-f" to new time
       for (const change of this.changesToSave) {
         let [dayOfMonth, salaahTypeNum, oldVal, newVal] = change
         dayOfMonth += 1
-        if (!this.isValidTime(newVal) || oldVal === newVal) continue
+        if (!this.isValidTime(newVal) || oldVal === newVal ||
+          dayOfMonth < 1 || dayOfMonth > daysInMonth) {
+          continue
+        }
         const salaahTypeCode = this.salaahTypeNumToCode(salaahTypeNum)
         const key = `${dayOfMonth}-${salaahTypeCode}`
         changesToMake[key] = newVal
