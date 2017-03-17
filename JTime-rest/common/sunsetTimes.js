@@ -14,12 +14,12 @@ function getSunsetFromBody (body, date) {
   if (!body || !body.sunset) {
     return null
   }
-  var sunset1 = new Date(body.sunset)
-  var sunset2 = body.dates && body.dates.length && body.dates[0] && body.dates[0].sunset && new Date(body.dates[0].sunset)
-  if (moment(sunset1).format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD')) {
-    return sunset1
-  } else if (sunset2 && moment(sunset2).format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD')) {
-    return sunset2
+  var sunset1 = body.sunset && moment.utc(body.sunset)
+  var sunset2 = body.dates && body.dates.length && body.dates[0] && body.dates[0].sunset && moment.utc(body.dates[0].sunset)
+  if (sunset1 && sunset1.format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD')) {
+    return sunset1.toDate()
+  } else if (sunset2 && sunset2.format('YYYY-MM-DD') === moment(date).format('YYYY-MM-DD')) {
+    return sunset2.toDate()
   } else {
     return null
   }
@@ -28,8 +28,8 @@ function getSunsetFromBody (body, date) {
 function getSunsetTime (location, date) {
     // Date is normalised (ie info about hour/min/seconds is thrown away) for
     // caching purposes
-  var normalisedDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0))
-  var key = [location.lat.toString(), location.lng.toString(), normalisedDate].join(',')
+  var normalisedDate = moment(date).hour(0).minute(0).second(0).millisecond(0)
+  var key = [location.lat.toString(), location.lng.toString(), normalisedDate.format('YYYY-DDDD')].join(',')
   return memoryCache.wrap(key, function () {
     var options = {
       uri: 'http://api.geonames.org/timezoneJSON',
