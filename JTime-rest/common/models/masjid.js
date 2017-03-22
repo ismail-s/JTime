@@ -232,7 +232,7 @@ module.exports = function (Masjid) {
                 cb(500)
                 return
               }
-              Masjid.findOne({where: {id: id}, fields: {location: true}},
+              Masjid.findOne({where: {id: id}, fields: {location: true, timeZoneId: true}},
                 function (err, masjid) {
                   if (err != null || !masjid) {
                     console.error(err, masjid)
@@ -243,7 +243,7 @@ module.exports = function (Masjid) {
                     }
                     return
                   }
-                  getSunsetTime(masjid.location, date).then(function (sunset) {
+                  getSunsetTime(masjid.location, date, masjid.timeZoneId).then(function (sunset) {
                     instances.push({type: 'm', datetime: sunset})
                     cb(null, instances)
                   }).catch(function () {
@@ -332,7 +332,7 @@ module.exports = function (Masjid) {
                 cb(500)
                 return
               }
-              Masjid.findOne({where: {id: id}, fields: {location: true}},
+              Masjid.findOne({where: {id: id}, fields: {location: true, timeZoneId: true}},
                 function (err, masjid) {
                   if (err != null || !masjid) {
                     console.error(err, masjid)
@@ -350,7 +350,7 @@ module.exports = function (Masjid) {
                     dates.push(new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), i)))
                   }
                   Promise.all(dates.map(function (elem) {
-                    return getSunsetTime(masjid.location, elem).then(function (sunset) {
+                    return getSunsetTime(masjid.location, elem, masjid.timeZoneId).then(function (sunset) {
                       return {datetime: sunset, type: 'm'}
                     }).reflect()
                   }))

@@ -20,8 +20,10 @@
     "loopback-connector-postgresql": "^2.3.0",
     "loopback-datasource-juggler": "^2.39.0",
     "moment": "^2.15.1",
+    "moment-timezone": "^0.5.11",
     "request": "^2.72.0",
-    "serve-favicon": "^2.0.1"
+    "serve-favicon": "^2.0.1",
+    "suncalc": "^1.8.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
