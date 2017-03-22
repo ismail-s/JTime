@@ -26,6 +26,14 @@
         "dataLength": 100
       }
     },
+    "timeZoneId": {
+      "type": "string",
+      "required": false,
+      "length": 100,
+      "postgres": {
+        "dataLength": 100
+      }
+    },
     "createdAt": {
       "type": "date",
       "required": "true",
