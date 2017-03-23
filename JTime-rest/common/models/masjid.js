@@ -16,32 +16,53 @@ RegExp.escape = function (s) {
   return s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
 }
 
+GoogleMapsAPI.reverseGeocodeAsync = Promise.promisify(GoogleMapsAPI.reverseGeocode, {context: GoogleMapsAPI})
+GoogleMapsAPI.timezoneAsync = Promise.promisify(GoogleMapsAPI.timezone, {context: GoogleMapsAPI})
+
 /**
- * Call the Google Maps api with to try and get a human-readable address for
- * the location data.location. When no address is obtained, cb is called with
- * the original data object, else data.humanReadableAddress is set to be the
- * human-readable address, and cb is called with the modified data object.
+ * Call the Google Maps api with to try and get a human-readable address and
+ * timezone for the location data.location. If we get an address, we set
+ * data.humanReadableAddress to be that. If we get a timezone id, we set
+ * data.timeZoneId to be that.
  *
  * @param {Object} data - The object to add the address to & pass to cb
  * @param {Function} cb - The callback to call with the data object
+ * @returns {Promise} Promise that always resolves to the data object passed in
  */
-function doReverseGeocode (data, cb) {
+function doReverseGeocode (data) {
+  var latlng = data.location.lat.toString() + ',' + data.location.lng.toString()
   var reverseGeocodeParams = {
-    'latlng': data.location.lat.toString() + ',' + data.location.lng.toString(),
-    'language': 'en'
+    latlng: latlng,
+    language: 'en'
   }
-  GoogleMapsAPI.reverseGeocode(reverseGeocodeParams,
-        function (err, result) {
-          if (err || result.status !== 'OK') {
-            console.error("Didn't get at least 1 address.",
-                    'Creating masjid without human-readable address', err, result)
-            return cb(data)
-          }
-          console.log('got google maps reverse geocode results: ', result)
-          var formattedAddress = result.results[0].formatted_address
-          data.humanReadableAddress = formattedAddress
-          return cb(data)
-        })
+  return GoogleMapsAPI.reverseGeocodeAsync(reverseGeocodeParams).then(function (result) {
+    console.log('got google maps reverse geocode results: ', result)
+    if (result.status !== 'OK') {
+      throw new Error('Result status is: ' + result.status)
+    }
+    var formattedAddress = result.results[0].formatted_address
+    data.humanReadableAddress = formattedAddress
+  }).catch(function (err) {
+    console.error("Didn't get at least 1 address.",
+            'Creating masjid without human-readable address', err)
+  }).then(function () {
+    var timezoneParams = {
+      location: latlng,
+      timestamp: (new Date()).getTime() / 1000
+    }
+    return GoogleMapsAPI.timezoneAsync(timezoneParams)
+  }).then(function (result) {
+    console.log('got google maps timezone result: ', result)
+    if (result.status !== 'OK') {
+      throw new Error('Result status is: ' + result.status)
+    }
+    data.timeZoneId = result.timeZoneId
+  }).catch(function (err) {
+    console.error("Didn't get a timezone.",
+            'Creating masjid without a timezone', err)
+  }).then(function () {
+    return data
+  })
 }
 
 module.exports = function (Masjid) {
@@ -178,8 +199,8 @@ module.exports = function (Masjid) {
           if (err != null) {
             return cb(err)
           }
-          return doReverseGeocode(data, function (data) {
-            create.apply(originalThis, [data, cb])
+          return doReverseGeocode(data).then(function (newData) {
+            create.apply(originalThis, [newData, cb])
           })
         })
       })
@@ -211,7 +232,7 @@ module.exports = function (Masjid) {
                 cb(500)
                 return
               }
-              Masjid.findOne({where: {id: id}, fields: {location: true}},
+              Masjid.findOne({where: {id: id}, fields: {location: true, timeZoneId: true}},
                 function (err, masjid) {
                   if (err != null || !masjid) {
                     console.error(err, masjid)
@@ -222,7 +243,7 @@ module.exports = function (Masjid) {
                     }
                     return
                   }
-                  getSunsetTime(masjid.location, date).then(function (sunset) {
+                  getSunsetTime(masjid.location, date, masjid.timeZoneId).then(function (sunset) {
                     instances.push({type: 'm', datetime: sunset})
                     cb(null, instances)
                   }).catch(function () {
@@ -311,7 +332,7 @@ module.exports = function (Masjid) {
                 cb(500)
                 return
               }
-              Masjid.findOne({where: {id: id}, fields: {location: true}},
+              Masjid.findOne({where: {id: id}, fields: {location: true, timeZoneId: true}},
                 function (err, masjid) {
                   if (err != null || !masjid) {
                     console.error(err, masjid)
@@ -329,7 +350,7 @@ module.exports = function (Masjid) {
                     dates.push(new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), i)))
                   }
                   Promise.all(dates.map(function (elem) {
-                    return getSunsetTime(masjid.location, elem).then(function (sunset) {
+                    return getSunsetTime(masjid.location, elem, masjid.timeZoneId).then(function (sunset) {
                       return {datetime: sunset, type: 'm'}
                     }).reflect()
                   }))

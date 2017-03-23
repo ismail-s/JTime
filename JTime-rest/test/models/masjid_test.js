@@ -54,6 +54,7 @@ describe('/Masjid', function () {
       expect(res.body.name).to.equal('test')
       expect(res.body.location).to.eql({lat: 0, lng: 0})
       expect(res.body.humanReadableAddress).to.equal('Test Address')
+      expect(res.body.timeZoneId).to.equal('Europe/London')
       expect(res.body.id).to.equal(1)
       expect(res.body.createdAt).to.exist
       expect(res.body.lastModifiedAt).to.exist

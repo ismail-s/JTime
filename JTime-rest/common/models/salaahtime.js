@@ -206,10 +206,10 @@ module.exports = function (SalaahTime) {
     var endDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 23, 59, 59, 999))
     var startDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0, 0))
 
-    Masjid.findAsync({fields: {id: true, name: true, location: true}, where: {id: {inq: faveMasjidIds}}})
+    Masjid.findAsync({fields: {id: true, name: true, location: true, timeZoneId: true}, where: {id: {inq: faveMasjidIds}}})
             .then(function (faveMasjidNames) {
               var masjidNameLocMap = {}
-              faveMasjidNames.forEach(function (m) { masjidNameLocMap[m.id] = [m.name, m.location] })
+              faveMasjidNames.forEach(function (m) { masjidNameLocMap[m.id] = [m.name, m.location, m.timeZoneId] })
 
               var fieldsToReturn = {type: true, masjidId: true, datetime: true}
               var baseWhereQuery = {datetime: {between: [startDate, endDate]}}
@@ -218,10 +218,10 @@ module.exports = function (SalaahTime) {
               }
               if (location) {
                 // get the nearest masjids, add them to faveMasjidIds
-                Masjid.findAsync({limit: 30, fields: {id: true, name: true, location: true}, where: {location: {near: location, maxDistance: 5, unit: 'miles'}}})
+                Masjid.findAsync({limit: 30, fields: {id: true, name: true, location: true, timeZoneId: true}, where: {location: {near: location, maxDistance: 5, unit: 'miles'}}})
                     .then(function (masjids) {
                       faveMasjidIds = faveMasjidIds.concat(masjids.map(function (m) { return m.id }))
-                      masjids.forEach(function (m) { masjidNameLocMap[m.id] = [m.name, m.location] })
+                      masjids.forEach(function (m) { masjidNameLocMap[m.id] = [m.name, m.location, m.timeZoneId] })
                       baseWhereQuery.masjidId = {inq: faveMasjidIds}
                       return SalaahTime.findAsync({
                         fields: fieldsToReturn,
@@ -229,8 +229,8 @@ module.exports = function (SalaahTime) {
                     }).then(function (instances) {
                         // Get magrib times, add them to instances
                       if (!salaahType || salaahType === 'm') {
-                            // Get magrib times, add them to instances
-                        var argList = Object.keys(masjidNameLocMap).map(function (k) { return {masjidId: k, location: masjidNameLocMap[k][1]} })
+                        // Get magrib times, add them to instances
+                        var argList = Object.keys(masjidNameLocMap).map(function (k) { return {masjidId: k, location: masjidNameLocMap[k][1], timeZoneId: masjidNameLocMap[k][2]} })
                         return getSunsetTimes(argList, date).then(function (sunsets) {
                           var result = addMasjidNamesAndLocsToSalaahTimes(instances.concat(sunsets), masjidNameLocMap)
                           return cb(null, result)
@@ -248,7 +248,7 @@ module.exports = function (SalaahTime) {
                 }).then(function (instances) {
                   if (!salaahType || salaahType === 'm') {
                         // Get magrib times, add them to instances
-                    var argList = Object.keys(masjidNameLocMap).map(function (k) { return {masjidId: k, location: masjidNameLocMap[k][1]} })
+                    var argList = Object.keys(masjidNameLocMap).map(function (k) { return {masjidId: k, location: masjidNameLocMap[k][1], timeZoneId: masjidNameLocMap[k][2]} })
                     return getSunsetTimes(argList, date).then(function (sunsets) {
                       var result = addMasjidNamesAndLocsToSalaahTimes(instances.concat(sunsets), masjidNameLocMap)
                       return cb(null, result)
