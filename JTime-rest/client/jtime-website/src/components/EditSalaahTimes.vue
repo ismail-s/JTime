@@ -103,7 +103,7 @@ export default {
       const newOrUpdatedTimes = []
       for (const key in changesToMake) {
         const [dayOfMonth, salaahType] = key.split('-')
-        const date = moment(changesToMake[key], 'HH-mm', true)
+        const date = moment(changesToMake[key], 'HH-mm', true).utc()
           .year(this.year).month(this.month).date(parseInt(dayOfMonth)).toISOString()
         newOrUpdatedTimes.push({date, type: salaahType})
       }

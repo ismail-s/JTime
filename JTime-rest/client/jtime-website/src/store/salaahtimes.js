@@ -30,7 +30,7 @@ export default {
       }).then(({times}) => {
         const newTimes = times.map(time => {
           if (typeof time.datetime === 'string') {
-            time.datetime = new Date(time.datetime)
+            time.datetime = moment.utc(time.datetime).toDate()
           }
           return time
         // Make sure times returned by rest api are for the correct month/year
@@ -46,11 +46,11 @@ export default {
       }).then(({res}) => {
         const newTimes = res.map(time => {
           if (typeof time.datetime === 'string') {
-            time.datetime = moment(time.datetime).seconds(0).milliseconds(0).toDate()
+            time.datetime = moment.utc(time.datetime).seconds(0).milliseconds(0).toDate()
           }
           return time
         // Make sure times returned by rest api are for today
-        }).filter(time => moment().format('YYYY-DDD') === moment(time).format('YYYY-DDD'))
+        }).filter(time => moment().format('YYYY-DDD') === moment.utc(time).format('YYYY-DDD'))
         context.commit('addNearbySalaahTimes', newTimes)
       })
     }
