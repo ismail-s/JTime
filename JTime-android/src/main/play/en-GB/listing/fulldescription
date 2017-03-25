@@ -2,7 +2,11 @@ See jamaat times for local masjids. All jamaat times are added/changed within th
 
 This app is free and open-source, see https://www.github.com/ismail-s/jtime . Feel free to contribute in whatever way.
 
-I plan to add more features, see https://waffle.io/ismail-s/JTime for more details. Note that I am not planning on making an iPhone app, see https://developer.apple.com/programs/how-it-works/.
+There is a website available at https://jtime.ismail-s.com . This does the same job as this app, but can be used on any device.
+
+I have tried hard to make the app and website look nice and work well, without wasting your time clicking on lots of buttons to see jamaat times. If you have any ideas, or want to help improve it, please create an issue at https://www.github.com/ismail-s/jtime .
+
+Note that I am not planning on making an iPhone app, see https://developer.apple.com/programs/how-it-works/.
 
 <b>Permissions</b>
 
