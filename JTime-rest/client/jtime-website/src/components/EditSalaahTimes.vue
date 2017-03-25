@@ -91,11 +91,15 @@ export default {
     },
     saveChanges () {
       this.saveButtonIsDisabled = true
+      const daysInMonth = moment().year(this.year).month(this.month).daysInMonth()
       const changesToMake = {} // map from eg "01-f" to new time
       for (const change of this.changesToSave) {
         let [dayOfMonth, salaahTypeNum, oldVal, newVal] = change
         dayOfMonth += 1
-        if (!this.isValidTime(newVal) || oldVal === newVal) continue
+        if (!this.isValidTime(newVal) || oldVal === newVal ||
+          dayOfMonth < 1 || dayOfMonth > daysInMonth) {
+          continue
+        }
         const salaahTypeCode = this.salaahTypeNumToCode(salaahTypeNum)
         const key = `${dayOfMonth}-${salaahTypeCode}`
         changesToMake[key] = newVal
@@ -103,7 +107,7 @@ export default {
       const newOrUpdatedTimes = []
       for (const key in changesToMake) {
         const [dayOfMonth, salaahType] = key.split('-')
-        const date = moment(changesToMake[key], 'HH-mm', true)
+        const date = moment(changesToMake[key], 'HH-mm', true).utc()
           .year(this.year).month(this.month).date(parseInt(dayOfMonth)).toISOString()
         newOrUpdatedTimes.push({date, type: salaahType})
       }
@@ -113,11 +117,11 @@ export default {
         return
       }
       const options = {
-        params: {masjidId: this.masjidId, newOrUpdatedTimes},
         headers: {
           Authorization: this.$store.state.LoggedInUserModule.loggedInUser.accessToken
         }}
-      Vue.http.post(`${baseUrl}/SalaahTimes/create-or-update-multiple`, {}, options).then(response => {
+      const body = {masjidId: this.masjidId, newOrUpdatedTimes}
+      Vue.http.post(`${baseUrl}/SalaahTimes/create-or-update-multiple`, body, options).then(response => {
         return response.json()
       }).then(res => {
         this.$store.commit('toast', 'Times were successfully saved')

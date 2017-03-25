@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import moment from 'moment'
+import jsc from 'jsverify'
 import router from 'src/router'
 import LoggedInUserModule from 'src/store/logged-in-user'
 import Masjid from 'src/components/Masjid'
@@ -164,4 +165,26 @@ describe('Masjid.vue', () => {
       done()
     })
   })
+
+  it('highlights today', () => {
+    const today = new Date()
+    const [vm] = setUpComponent([], {id: 1, year: today.getFullYear(), month: today.getMonth()})
+    const highlightedRows = vm.$el.getElementsByClassName('highlight-row')
+    expect(highlightedRows.length).to.equal(1)
+    const highlightedRow = highlightedRows[0]
+    expect(highlightedRow.textContent).to.match(new RegExp(`^${today.getDate()}`))
+  })
+
+  jsc.property('doesn\'t highlight days that aren\'t today',
+    jsc.integer(2000, 3000), jsc.nat(11), (year, month) => {
+      const today = new Date()
+      // Make sure random year and month aren't for current month
+      if (today.getFullYear() === year && today.getMonth() === month) {
+        return true
+      }
+      const [vm] = setUpComponent([], {id: 1, year, month})
+      const highlightedRows = vm.$el.getElementsByClassName('highlight-row')
+      expect(highlightedRows.length).to.equal(0)
+      return true
+    })
 })

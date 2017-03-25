@@ -21,7 +21,7 @@ export function sortSalaahTimes (salaahTimes, year, month) {
     var obj = {date: i, dayOfWeek: moment().year(year).month(month).date(i).format('ddd')}
     while (times[0] && times[0].datetime.getDate() === i) {
       const time = times.shift()
-      const datetime = moment(time.datetime).format('HH-mm')
+      const datetime = moment(time.datetime).utc().format('HH-mm')
       switch (time.type) {
         case 'f':
           obj.fajrTime = datetime
@@ -33,7 +33,7 @@ export function sortSalaahTimes (salaahTimes, year, month) {
           obj.asrTime = datetime
           break
         case 'm':
-          obj.magribTime = moment(time.datetime).add(5, 'minutes').format('HH-mm')
+          obj.magribTime = moment(time.datetime).utc().add(5, 'minutes').format('HH-mm')
           break
         case 'e':
           obj.eshaTime = datetime
