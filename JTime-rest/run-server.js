@@ -36,4 +36,4 @@ setInterval(function () {
       child.restart()
     })
   })
-}, 60/*secs*/ * 1000/*milliseconds*/)
+}, 60/* secs */ * 1000/* milliseconds */)
