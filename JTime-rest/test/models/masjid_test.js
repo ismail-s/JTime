@@ -10,7 +10,7 @@ describe('/Masjid', function () {
   var Masjid, request
 
   before(function () {
-    this.timeout(3000)
+    this.timeout(3500)
     mockery.enable({useCleanCache: true, warnOnUnregistered: false})
     mockery.registerMock('googlemaps', require('../mocks/googleMapsMock'))
     mockery.registerMock('../sunsetTimes', require('../mocks/sunsetTimesMock'))
