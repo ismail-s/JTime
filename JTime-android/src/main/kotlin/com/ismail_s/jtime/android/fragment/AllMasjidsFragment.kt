@@ -25,7 +25,7 @@ import org.jetbrains.anko.support.v4.longToast
 class AllMasjidsFragment : BaseFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private fun hideRefreshIcon() {
-        pull_to_refresh_container.isRefreshing = false
+        pull_to_refresh_container?.isRefreshing = false
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
