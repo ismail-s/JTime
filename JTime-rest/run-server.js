@@ -20,7 +20,7 @@ child.on('exit', function () {
 child.start()
 
 setInterval(function () {
-  fs.access(flagFile, fs.constants.F_OK, function (err) {
+  fs.access(flagFile, function (err) {
     if (err) {
       // File doesn't exist, nothing to do
       return
