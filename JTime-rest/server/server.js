@@ -3,11 +3,6 @@ var boot = require('loopback-boot')
 
 var app = module.exports = loopback()
 
-// Enable http session
-app.use(loopback.session({
-  secret: 'some secret...TODO-change this'
-}))
-
 boot(app, __dirname)
 
 app.start = function () {
