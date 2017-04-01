@@ -2,7 +2,7 @@ var fs = require('fs')
 var path = require('path')
 var forever = require('forever-monitor')
 
-var flagFile = 'restart-rest-api.flag'
+var flagFile = path.resolve(__dirname, 'restart-rest-api.flag')
 
 var child = new (forever.Monitor)('server.js', {
   sourceDir: path.resolve(__dirname, 'server'),
