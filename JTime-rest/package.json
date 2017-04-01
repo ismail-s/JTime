@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server/server.js",
   "scripts": {
-    "lint": "eslint --format 'node_modules/eslint-friendly-formatter' common server test",
+    "lint": "eslint --format 'node_modules/eslint-friendly-formatter' common server test run-server.js",
     "test": "mocha test/*.js test/models/*.js"
   },
   "dependencies": {
@@ -13,6 +13,7 @@
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "express-session": "^1.12.1",
+    "forever-monitor": "^1.7.1",
     "googlemaps": "^1.6.0",
     "loopback": "^2.22.0",
     "loopback-boot": "^2.6.5",

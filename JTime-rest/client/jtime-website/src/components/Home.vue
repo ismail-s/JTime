@@ -75,7 +75,7 @@ export default {
     }
   },
   filters: {
-    format_as_hh_mm: d => moment(d).format('HH-mm')
+    format_as_hh_mm: d => moment.utc(d).format('HH-mm')
   },
   computed: {
     locationOrErrorIsError () {
