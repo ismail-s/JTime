@@ -34,7 +34,8 @@ export default {
   data () {
     return {
       locationApiIsAvailable: true,
-      locationOrError: null
+      locationOrError: null,
+      timeoutId: null
     }
   },
   methods: {
@@ -98,7 +99,7 @@ export default {
         ['a', times['a']], ['m', times['m']], ['e', times['e']]]
           .map(([salaahType, times]) => {
             times.sort((a, b) => {
-              // sort by time, then by distance from current possition
+              // sort by time, then by distance from current position
               const [aTime, bTime] = [a.datetime.getTime(), b.datetime.getTime()]
               if (aTime < bTime) {
                 return -1
@@ -113,10 +114,11 @@ export default {
       return timesAsList.length === 0 ? null : timesAsList
     },
     closestTime () {
+      const utcOffset = moment().utcOffset() * 60 * 1000 // in milliseconds
       const nowish = moment().subtract(3, 'minutes')
       const sortedTimes = this.$store.state.SalaahTimesModule.nearbySalaahTimes
         .map(elem => {
-          elem.keyForTime = -nowish.diff(elem.datetime)
+          elem.keyForTime = -nowish.diff(elem.datetime) - utcOffset
           return elem
         })
         .sort((aElem, bElem) => {
@@ -148,24 +150,27 @@ export default {
       if (!this.closestTime) {
         return null
       }
+      const utcOffset = moment().utcOffset()
       /* If closestTime is at least 3 mins in the past, then we can assume that
          there are no more salaah times for today, so we should next update the
          salaah times at midnight */
-      if (moment().diff(this.closestTime.datetime, 'minutes', true) >= 3) {
-        return moment().add(1, 'days').startOf('day')
+      if (moment().diff(this.closestTime.datetime, 'minutes', true) + utcOffset >= 3) {
+        return moment().add(1, 'days').startOf('day').diff(moment())
       }
       return moment(this.closestTime.datetime).clone()
-        .add(3, 'minutes').add(1, 'millisecond')
+        .add(3, 'minutes').add(1, 'millisecond').diff(moment()) - (utcOffset * 60 * 1000)
     }
   },
   mounted () {
     this.getLocationAndNearbyMasjids()
   },
+  beforeDestroy () {
+    clearTimeout(this.timeoutId)
+  },
   watch: {
-    updateTime (momentObj) {
-      if (moment.isMoment(momentObj)) {
-        setTimeout(this.getLocationAndNearbyMasjids, momentObj.diff(moment()))
-      }
+    updateTime (t) {
+      clearTimeout(this.timeoutId)
+      this.timeoutId = setTimeout(this.getLocationAndNearbyMasjids, t)
     }
   }
 }
