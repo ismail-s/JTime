@@ -1,6 +1,6 @@
 machine:
   environment:
-    GRADLE_OPTS: -Dorg.gradle.daemon=true
+    GRADLE_OPTS: '-Xmx200m -XX:MaxPermSize=512m" -Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
   node:
     version: 6
 dependencies:
