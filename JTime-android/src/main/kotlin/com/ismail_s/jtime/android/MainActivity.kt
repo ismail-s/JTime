@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         get() = PrimaryDrawerItem()
                 .withName(getString(R.string.drawer_item_logout))
                 .withIdentifier(LOGOUT_DRAWER_ITEM_IDENTIFIER)
-                .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                .withOnDrawerItemClickListener { _, _, _ ->
                     RestClient(this).logout() successUi {
                         loginStatus = 2
                         toast(getString(R.string.logout_success_toast))
@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         get() = PrimaryDrawerItem()
                 .withName(getString(R.string.drawer_item_login))
                 .withIdentifier(LOGIN_DRAWER_ITEM_IDENTIFIER)
-                .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                .withOnDrawerItemClickListener { _, _, _ ->
                     val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
                    startActivityForResult(signInIntent, RC_SIGN_IN)
                     true
@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         get() = PrimaryDrawerItem()
                 .withName(getString(R.string.drawer_item_add_masjid))
                 .withIdentifier(ADD_MASJID_DRAWER_ITEM_IDENTIFIER)
-                .withOnDrawerItemClickListener { view, i, iDrawerItem ->
+                .withOnDrawerItemClickListener { _, _, _ ->
                     switchToAddMasjidFragment()
                     true
                 }
@@ -289,18 +289,18 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                 .withSavedInstance(savedInstance)
                 .addDrawerItems(PrimaryDrawerItem()
                         .withName(getString(R.string.drawer_item_home))
-                        .withOnDrawerItemClickListener { view, position, drawerItem ->
+                        .withOnDrawerItemClickListener { _, _, _ ->
                             switchToHomeFragment()
                             true
                         }, PrimaryDrawerItem()
                         .withName(getString(R.string.drawer_item_all_masjids))
-                        .withOnDrawerItemClickListener { view, position, drawerItem ->
+                        .withOnDrawerItemClickListener { _, _, _ ->
                             switchToAllMasjidsFragment()
                             true
                         }, PrimaryDrawerItem()
                         .withName(getString(R.string.drawer_item_help))
                         .withIdentifier(HELP_DRAWER_ITEM_IDENTIFIER)
-                        .withOnDrawerItemClickListener {view, position, drawerItem ->
+                        .withOnDrawerItemClickListener {_, _, _ ->
                             switchToHelpFragment()
                             true
                         })
@@ -311,7 +311,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         val drawerItems = SalaahType.values().map {
                 SecondaryDrawerItem()
                     .withName(it.toString(ctx))
-                    .withOnDrawerItemClickListener { view, position, drawerItem ->
+                    .withOnDrawerItemClickListener { _, _, _ ->
                         switchToNearbyTimesFragment(it)
                         true
                     }
