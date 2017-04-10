@@ -8,6 +8,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
 
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
@@ -97,7 +98,22 @@ var webpackConfig = merge(baseWebpackConfig, {
     ]),
     // https://github.com/moment/moment/issues/1435#issuecomment-33106268
     // Used to avoid including unused momentjs locales
-    new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/en$/)
+    new webpack.ContextReplacementPlugin(/moment[\\\/]locale$/, /^\.\/en$/),
+    new SWPrecacheWebpackPlugin({
+      filename: 'service-worker.js',
+      staticFileGlobsIgnorePatterns: [/\.map$/], // Don't cache sourcemap files
+      minify: true,
+      cacheId: 'jtime-website-sw-cache-v1',
+      clientsClaim: true,
+      verbose: true,
+      runtimeCaching: [{
+        urlPattern: /\/api\/masjids/i,
+        handler: 'fastest'
+      }, {
+        urlPattern: /\/api\//,
+        handler: 'networkFirst'
+      }]
+    })
   ]
 })
 
