@@ -1,9 +1,9 @@
 package com.ismail_s.jtime.android
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
-import android.Manifest
 import android.os.Bundle
 import android.os.Handler
 import android.support.annotation.NonNull
@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.Gravity
 import android.view.Menu
 import android.view.View
 import com.google.android.gms.auth.api.Auth
@@ -20,11 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.location.LocationListener
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsStatusCodes
+import com.google.android.gms.location.*
 import com.ismail_s.jtime.android.fragment.*
 import com.ismail_s.jtime.android.pojo.SalaahType
 import com.mikepenz.materialdrawer.AccountHeader
@@ -33,8 +28,6 @@ import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem
-import com.mikepenz.materialdrawer.model.SectionDrawerItem
 import nl.komponents.kovenant.android.startKovenant
 import nl.komponents.kovenant.android.stopKovenant
 import nl.komponents.kovenant.deferred
@@ -50,7 +43,6 @@ import java.util.*
 class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, ActivityCompat.OnRequestPermissionsResultCallback {
     var drawer: Drawer? = null
     lateinit var header: AccountHeader
-    lateinit var rightDrawer: Drawer
     lateinit var toolbar: Toolbar
     var locationDeferred = deferred<Location, Exception>()
     var location = locationDeferred.promise
@@ -209,7 +201,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         setSupportActionBar(toolbar)
         setUpGoogleApiClient()
         setUpNavDrawer(savedInstanceState)
-        setUpRightDrawer(savedInstanceState)
 
         val onLoggedOut = {
             loginStatus = 2
@@ -270,8 +261,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
             }
 
             override fun onDrawerClosed(drawerView: View) {
-                if (!rightDrawer.isDrawerOpen)
-                    currentFragment?.onDrawerClosed(drawerView)
+                currentFragment?.onDrawerClosed(drawerView)
             }
 
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
@@ -304,42 +294,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
                             switchToHelpFragment()
                             true
                         })
-                .build()
-    }
-
-    private fun setUpRightDrawer(savedInstance: Bundle?) {
-        val drawerItems = SalaahType.values().map {
-                SecondaryDrawerItem()
-                    .withName(it.toString(ctx))
-                    .withOnDrawerItemClickListener { _, _, _ ->
-                        switchToNearbyTimesFragment(it)
-                        true
-                    }
-            }.toTypedArray()
-        val drawerListener = object: Drawer.OnDrawerListener {
-            override fun onDrawerOpened(drawerView: View) {
-                if (drawer?.isDrawerOpen == true) {
-                    drawer?.closeDrawer()
-                } else {
-                    currentFragment?.onDrawerOpened(drawerView)
-                }
-            }
-
-            override fun onDrawerClosed(drawerView: View) {
-                currentFragment?.onDrawerClosed(drawerView)
-            }
-
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-        }
-        rightDrawer = DrawerBuilder()
-                .withActivity(this)
-                .withOnDrawerListener(drawerListener)
-                .withDrawerGravity(Gravity.END)
-                .withSavedInstance(savedInstance)
-                .addDrawerItems(
-                        SectionDrawerItem()
-                            .withName(getString(R.string.drawer_item_nearby_times_header)),
-                        *drawerItems)
                 .build()
     }
 
@@ -453,7 +407,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger, GoogleApiClient.OnConnecti
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment).commit()
         drawer?.closeDrawer()
-        rightDrawer.closeDrawer()
         toolbar.title = getString(title)
         Handler().post { supportInvalidateOptionsMenu() }
     }
