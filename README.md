@@ -1,7 +1,11 @@
-# JTime [![Circle CI](https://circleci.com/gh/ismail-s/JTime.svg?style=svg)](https://circleci.com/gh/ismail-s/JTime) [![Stories in Ready](https://badge.waffle.io/ismail-s/JTime.svg?label=ready&title=Ready)](https://waffle.io/ismail-s/JTime)
+# JTime [![build status](https://gitlab.com/ismail-s/JTime/badges/master/build.svg)](https://gitlab.com/ismail-s/JTime/commits/master)
 
-See local masjid jamaat times on the move, with jamaat times submitted in-app by anyone.
+See local masjid jamaat times on the move, with jamaat times submitted by anyone (via the website or Android app).
 
-This is a REST API along with an Android app that connects to it. I don't have a mac, so am not focussing on an iPhone app until everything else is up and running. If/when that happens, as this is currently a solo project, and I do not have all the time in the world to work on this.
+This project is composed of 3 parts:
 
-*Currently WIP.*
+- a REST API
+- a [website](https://jtime.ismail-s.com)
+- an [Android app](https://play.google.com/store/apps/details?id=com.ismail_s.jtime.android)
+
+Contributions/bug reports/general feedback is welcome.
