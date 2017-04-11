@@ -1,0 +1,116 @@
+image: openjdk:8-jdk
+
+variables:
+  ANDROID_COMPILE_SDK: "25"
+  ANDROID_BUILD_TOOLS: "25.0.2"
+  ANDROID_SDK_TOOLS: "24.4.1"
+
+stages:
+  - build
+  - test
+  - lint
+  - docs
+
+.android-base: &android
+  variables:
+    GRADLE_USER_HOME: /builds/ismail-s/JTime/gradle-user-home/.gradle
+  cache:
+    key: "$CI_BUILD_REF_NAME/android"
+    paths:
+      - gradle-user-home/
+  before_script:
+    - mkdir -p gradle-user-home/.gradle
+    # Install Android deps
+    - apt-get --quiet update --yes
+    - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+    - wget --quiet --output-document=android-sdk.tgz https://dl.google.com/android/android-sdk_r${ANDROID_SDK_TOOLS}-linux.tgz
+    - tar --extract --gzip --file=android-sdk.tgz
+    - export PATH=$PATH:$PWD/android-sdk-linux/tools/
+    - echo y | android --silent update sdk --no-ui --all --filter android-${ANDROID_COMPILE_SDK}
+    - echo y | android --silent update sdk --no-ui --all --filter android-23
+    - echo y | android --silent update sdk --no-ui --all --filter platform-tools
+    - echo y | android --silent update sdk --no-ui --all --filter build-tools-${ANDROID_BUILD_TOOLS}
+    - echo y | android --silent update sdk --no-ui --all --filter extra-android-m2repository
+    - echo y | android --silent update sdk --no-ui --all --filter extra-google-google_play_services
+    - echo y | android --silent update sdk --no-ui --all --filter extra-google-m2repository
+    - export ANDROID_HOME=$PWD/android-sdk-linux
+    - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
+    - chmod +x ./gradlew
+
+android-assembleDebug:
+  <<: *android
+  stage: build
+  script:
+    - ./gradlew assembleDebug --console=plain
+
+android-unittest:
+  <<: *android
+  stage: test
+  script:
+    - sed -i '6 i <item name="selectableItemBackground">@color/colorPrimaryLight</item>' JTime-android/src/main/res/values/styles.xml
+    - ./gradlew test --console=plain
+
+# Dokka builds are currently failing due to a bug in the dokka Gradle plugin
+# android-dokka:
+#   <<: *android
+#   stage: docs
+#   script:
+#     - ./gradlew dokka --console=plain
+
+.website-base: &website
+  image: node:6.9-alpine
+  variables:
+    NPM_CONFIG_LOGLEVEL: warn
+  before_script:
+    - cd JTime-rest/client/jtime-website
+    - npm install
+  cache:
+    key: "$CI_BUILD_REF_NAME/website"
+    paths:
+      - JTime-rest/client/jtime-website/node_modules/
+
+website-build:
+  <<: *website
+  stage: build
+  script:
+    - npm run build
+
+website-unittest:
+  <<: *website
+  stage: test
+  image: node:6.9 # alpine linux not used due to tests using phantomjs
+  script:
+    - npm test
+
+website-lint:
+  <<: *website
+  stage: lint
+  script:
+    - npm run lint
+
+.rest-api-base: &rest-api
+  image: node:6.9-alpine
+  variables:
+    NPM_CONFIG_LOGLEVEL: warn
+  before_script:
+    - cd JTime-rest/
+    - npm install
+  cache:
+    key: "$CI_BUILD_REF_NAME/rest-api"
+    paths:
+      - JTime-rest/node_modules/
+
+rest-api-unittest:
+  <<: *rest-api
+  stage: test
+  script:
+    - apk add --update jq
+    - "jq '.postgres = {name: \"postgres\", connector: \"memory\"}' server/datasources.json > /tmp/temp.json"
+    - mv /tmp/temp.json server/datasources.json
+    - npm test
+
+rest-api-lint:
+  <<: *rest-api
+  stage: lint
+  script:
+    - npm run lint
