@@ -28,9 +28,7 @@ class MasjidRecyclerViewAdapter(private val mValues: List<MasjidPojo>, private v
         }
     }
 
-    override fun getItemCount(): Int {
-        return mValues.size
-    }
+    override fun getItemCount() = mValues.size
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val mNameView: TextView = mView.find<TextView>(R.id.content)

@@ -23,7 +23,7 @@ fun createMockWebServerAndConnectToRestClient(): MockWebServer {
         @Throws(InterruptedException::class)
         override fun dispatch(recordedRequest: RecordedRequest): MockResponse {
             val path = recordedRequest.path
-            val formattedDate = Regex("""date=(\d\d\d\d\-\d\d\-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ)""")
+            val formattedDate = Regex("""date=(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\dZ)""")
                     .find(path)?.groups?.get(1)?.value
                     ?.let { dateFormatter.format(dateTimeFormatter.parse(it)) }
             if (path.startsWith("/Masjids/1/times")) {
