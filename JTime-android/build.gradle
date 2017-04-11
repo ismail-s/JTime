@@ -12,7 +12,7 @@ buildscript {
         // this bug is fixed.
         // classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:${dokka_version}"
         classpath 'com.google.gms:google-services:3.0.0'
-        classpath 'com.github.triplet.gradle:play-publisher:1.1.5'
+        classpath 'com.github.triplet.gradle:play-publisher:1.2.0'
     }
 }
 
