@@ -78,7 +78,7 @@ class HomeFragment : BaseFragment() {
             val cdp = CalendarDatePickerDialogFragment()
                     .setThemeDark()
                     .setPreselectedDate(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH))
-                    .setOnDateSetListener { unused, y, m, d ->
+                    .setOnDateSetListener { _, y, m, d ->
                         date = GregorianCalendar()
                         date.set(Calendar.YEAR, y)
                         date.set(Calendar.MONTH, m)

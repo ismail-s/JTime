@@ -137,7 +137,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun saveTimeAndSwitchToAnotherDay(dayOffset: Int) {
-        saveTimeAndSwitchToAnotherDayAndThen(dayOffset) { previousDisplayedTime ->
+        saveTimeAndSwitchToAnotherDayAndThen(dayOffset) { _ ->
                 val times = currentMasjidPojo as MasjidPojo
                 var timeToDisplay: GregorianCalendar? = null
                 when (currentSalaahType) {
@@ -187,7 +187,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun saveTimeAndSwitchToNextSalaah() {
-        saveTimeAndThen { newDate ->
+        saveTimeAndThen { _ ->
             //Switch to next salaah
             var newTime: GregorianCalendar? = null
             when (currentSalaahType) {
@@ -214,7 +214,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun saveTimeAndSwitchToPrevSalaah() {
-        saveTimeAndThen { newDate ->
+        saveTimeAndThen { _ ->
             //Switch to prev. salaah
             var newTime: GregorianCalendar? = null
             when (currentSalaahType) {
@@ -241,7 +241,7 @@ class ChangeMasjidTimesFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun saveTimeAndThen(then: (newDate: GregorianCalendar?) -> Unit) {
-        if (masjidTimeTextbox.text.length == 0) {
+        if (masjidTimeTextbox.text.isEmpty()) {
             //If the textbox is empty, don't save
             then(null)
             return

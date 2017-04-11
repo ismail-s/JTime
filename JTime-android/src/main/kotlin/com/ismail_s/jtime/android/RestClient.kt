@@ -32,7 +32,7 @@ import java.util.*
  * Helper class for talking to the rest server asynchronously.
  */
 class RestClient(private var context: Context) {
-    private var sharedPrefs: SharedPreferencesWrapper
+    private var sharedPrefs: SharedPreferencesWrapper = SharedPreferencesWrapper(context)
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
     private val noNetworkException: NoRouteToHostException
         get() = NoRouteToHostException(context.getString(R.string.no_network_exception))
@@ -72,7 +72,7 @@ class RestClient(private var context: Context) {
         }
         val request = "${Companion.url}/Masjids".httpGet()
         val deferred = deferred<List<MasjidPojo>, Throwable> { request.cancel() }
-        request.responseJson { request, response, result ->
+        request.responseJson { _, response, result ->
             when (result) {
                 is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
@@ -108,7 +108,7 @@ class RestClient(private var context: Context) {
         val request = "${Companion.url}/Masjids/$masjidId/times"
                 .httpGet(listOf("date" to dateFormatter.format(date.time)))
         val deferred = deferred<MasjidPojo, Throwable> { request.cancel() }
-        request.responseJson { request, response, result ->
+        request.responseJson { _, response, result ->
             when (result) {
                 is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
@@ -158,7 +158,7 @@ class RestClient(private var context: Context) {
         val request = "${Companion.url}/SalaahTimes/times-for-multiple-masjids"
                 .httpGet(params)
         val deferred = deferred<List<SalaahTimePojo>, Throwable> { request.cancel() }
-        request.responseJson { request, response, result ->
+        request.responseJson { _, response, result ->
             when (result) {
                 is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
@@ -205,7 +205,7 @@ class RestClient(private var context: Context) {
         val url = Companion.url + "/Masjids"
         val request = url.httpPost().body(body.toString())
         val deferred = deferred<Unit, Throwable> { request.cancel() }
-        request.responseJson { request, response, result ->
+        request.responseJson { _, response, result ->
             when (result) {
                 is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> deferred.resolve()
@@ -231,7 +231,7 @@ class RestClient(private var context: Context) {
         fuelInstance.baseHeaders = fuelInstance.baseHeaders?.plus(mapOf("Content-Type" to "application/x-www-form-urlencoded"))
         val request = url.httpPost(listOf("masjidId" to "$masjidId", "type" to type, "datetime" to datetime))
         val deferred = deferred<Unit, Throwable> { request.cancel() }
-        request.responseJson { request, response, result ->
+        request.responseJson { _, response, result ->
             when (result) {
                 is Result.Failure -> {
                     deferred reject getServerException(response)
@@ -259,7 +259,7 @@ class RestClient(private var context: Context) {
                 .httpGet(listOf("id_token" to code))
         val deferred = deferred<Pair<Int, String>, Throwable> { request.cancel() }
 
-        request.responseJson { request, response, result ->
+        request.responseJson { _, response, result ->
             when (result) {
                 is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
@@ -287,7 +287,7 @@ class RestClient(private var context: Context) {
         }
         val request = "${Companion.url}/user_tables/logout".httpPost()
         val deferred = deferred<Unit, Throwable> { request.cancel() }
-        request.responseString { request, response, result ->
+        request.responseString { _, response, result ->
             when (result) {
                 is Result.Failure -> deferred reject getServerException(response)
                 is Result.Success -> {
@@ -319,7 +319,7 @@ class RestClient(private var context: Context) {
         val request = "${Companion.url}/user_tables/${sharedPrefs.userId}"
                 .httpGet()
         val deferred = deferred<Unit, Unit> { request.cancel() }
-        request.responseJson { request, response, result ->
+        request.responseJson { _, response, result ->
             when (result) {
                 is Result.Failure -> {
                     clearSavedUser()
@@ -349,7 +349,6 @@ class RestClient(private var context: Context) {
     }
 
     init {
-        this.sharedPrefs = SharedPreferencesWrapper(context)
         if ((FuelManager.instance.baseHeaders == emptyMap<String, String>()
                 || FuelManager.instance.baseHeaders == null)
                 && sharedPrefs.accessToken != "") {
