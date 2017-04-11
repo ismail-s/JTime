@@ -1,5 +1,6 @@
 import 'babel-polyfill'
 import Vue from 'vue'
+import './service-worker-registration'
 import store from './store'
 import router from './router'
 import App from './App'
