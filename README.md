@@ -9,3 +9,7 @@ This project is composed of 3 parts:
 - an [Android app](https://play.google.com/store/apps/details?id=com.ismail_s.jtime.android)
 
 Contributions/bug reports/general feedback is welcome.
+
+# Important Update
+
+This project has migrated to Gitlab and can be accessed at https://www.gitlab.com/ismail-s/JTime . No further work is taking place on Github.
